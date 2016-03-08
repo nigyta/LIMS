@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI qw(:standard);
+use CGI::Carp qw ( fatalsToBrowser ); 
+use DBI;
+use lib "lib/";
+use lib "lib/pangu";
+use pangu;
+use userCookie;
+
+my $userCookie = new userCookie;
+my $userId = (cookie('cid')) ? $userCookie->checkCookie(cookie('cid')) : 0;
+exit if (!$userId);
+
+my $commoncfg = readConfig("main.conf");
+my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
+
+my $assemblyId = param ('assemblyId') || '';
+
+undef $/;# enable slurp mode
+my $html = <DATA>;
+
+my @ctgId;
+my %ctg;
+my %chrName;
+my $col = 8;
+my $colNumber=0;
+my $assemblyCtg= $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY name");
+$assemblyCtg->execute($assemblyId);
+while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
+{
+	push @ctgId,$assemblyCtg[0];
+	$ctg{$assemblyCtg[0]}=$assemblyCtg[2];
+	$chrName{$assemblyCtg[0]}=$assemblyCtg[4];
+
+}
+@ctgId=sort {$ctg{$a} <=> $ctg{$b}} @ctgId;
+my $ctgList = "<table id='ctgList$$' class='display'><thead style='display:none;'><tr>" . "<th></th>" x $col . "</tr></thead><tbody>";
+for my $ctgId (@ctgId)
+{
+	if($colNumber % $col == 0)
+	{
+		$ctgList .= ( $chrName{$ctgId} > 0 ) ? "<tr><td><input type='checkbox' id='ctgList$ctg{$ctgId}$$' name='assemblyCtgId' value='$ctgId'><label for='ctgList$ctg{$ctgId}$$' title='$chrName{$ctgId}'><u>Ctg$ctg{$ctgId}</u></label></td>" : "<tr><td><input type='checkbox' id='ctgList$ctg{$ctgId}$$' name='assemblyCtgId' value='$ctgId'><label for='ctgList$ctg{$ctgId}$$' title='$chrName{$ctgId}'>Ctg$ctg{$ctgId}</label></td>";
+	}
+	elsif($colNumber % $col == $col - 1)
+	{
+		$ctgList .= ( $chrName{$ctgId} > 0 ) ? "<td><input type='checkbox' id='ctgList$ctg{$ctgId}$$' name='assemblyCtgId' value='$ctgId'><label for='ctgList$ctg{$ctgId}$$' title='$chrName{$ctgId}'><u>Ctg$ctg{$ctgId}</u></label></td></tr>" : "<td><input type='checkbox' id='ctgList$ctg{$ctgId}$$' name='assemblyCtgId' value='$ctgId'><label for='ctgList$ctg{$ctgId}$$' title='$chrName{$ctgId}'>Ctg$ctg{$ctgId}</label></td></tr>";
+	}
+	else
+	{
+		$ctgList .= ( $chrName{$ctgId} > 0 ) ? "<td><input type='checkbox' id='ctgList$ctg{$ctgId}$$' name='assemblyCtgId' value='$ctgId'><label for='ctgList$ctg{$ctgId}$$' title='$chrName{$ctgId}'><u>Ctg$ctg{$ctgId}</u></label></td>":"<td><input type='checkbox' id='ctgList$ctg{$ctgId}$$' name='assemblyCtgId' value='$ctgId'><label for='ctgList$ctg{$ctgId}$$' title='$chrName{$ctgId}'>Ctg$ctg{$ctgId}</label></td>";
+	}
+	$colNumber++;
+}
+my $toBeFilled = $col - ( $colNumber % $col);
+$ctgList .= ($toBeFilled < $col ) ? "<td>&nbsp;</td>" x $toBeFilled ."</tr></tbody></table>" : "</tbody></table>";
+
+$html =~ s/\$ctgList/$ctgList/g;
+$html =~ s/\$assemblyId/$assemblyId/g;
+$html =~ s/\$commoncfg->{HTDOCS}/$commoncfg->{HTDOCS}/g;
+print header;
+print $html;
+
+__DATA__
+<form id="assemblyAssign" name="assemblyAssign" action="assemblyAssignSave.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+<h3>Please check ctgs to chr:</h3>
+$ctgList
+<table>
+<tr><td style='text-align:right'><label for="chr$$"><b>Chromosome Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="chrNumber" id="editchrNumber" size="15" type="text" maxlength="15" ></td></tr>
+</table>
+</form>
+<script>
+$('#dialog').dialog("option", "title", "Assign Ctg To Chr");
+$( "#dialog" ).dialog( "option", "buttons", [{ text: "Assign", click: function() { submitForm('assemblyAssign'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
+</script>
