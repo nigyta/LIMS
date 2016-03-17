@@ -95,7 +95,6 @@ __DATA__
 			</div>
 		</td>
 	</tr>
-	<tr><td style='text-align:right'><label for="editGenomeLibraryId"><b>Link to</b></label></td><td><select class='ui-widget-content ui-corner-all' name='libraryId' id='editGenomeLibraryId'>$libraryId</select></td></tr>
 	<tr><td style='text-align:right'><b>Import Options</b></td>
 		<td>
 			<hr>
@@ -107,6 +106,7 @@ __DATA__
 			<hr>
 		</td>
 	</tr>
+	<tr><td style='text-align:right'><label for="editGenomeLibraryId"><b>Link to</b></label></td><td><select class='ui-widget-content ui-corner-all' name='libraryId' id='editGenomeLibraryId'>$libraryId</select></td></tr>
 	<tr><td style='text-align:right'><label for="editGenomeDescription"><b>Description</b></label></td><td><textarea class='ui-widget-content ui-corner-all' name="description" id="editGenomeDescription" cols="50" rows="10">$genomeDescription</textarea></td></tr>
 	</table>
 </form>

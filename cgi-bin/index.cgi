@@ -3,7 +3,7 @@ use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
 use URI::Escape::XS;
-use Date::Calc qw(:all);
+#use Date::Calc qw(:all);
 use JSON;
 use DBI;
 use Bio::SeqIO;
@@ -25,11 +25,11 @@ $keywords = escapeHTML($keywords);
 
 
 
-my $year1 = "2011";
-my $month1 = "8";
-my $day1 = "1";
-my ($year2,$month2,$day2) = Today();
-my $Dd = Delta_Days($year1,$month1,$day1,$year2,$month2,$day2);
+# my $year1 = "2011";
+# my $month1 = "8";
+# my $day1 = "1";
+# my ($year2,$month2,$day2) = Today();
+# my $Dd = Delta_Days($year1,$month1,$day1,$year2,$month2,$day2);
 my $active = cookie('menu') || 0;;
 my $commoncfg = readConfig("main.conf");
 undef $/;# enable slurp mode
@@ -42,7 +42,7 @@ $html =~ s/\$slogan/$slogan/g;
 $html =~ s/\$keywords/$keywords/g;
 
 
-my $update = 0;
+my $update = 1;
 
 my $pid = fork();
 if ($pid) {

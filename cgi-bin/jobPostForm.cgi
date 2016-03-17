@@ -89,6 +89,6 @@ $( "#postHGAPMinOverlap" ).spinner({
 	}
 });
 $( "#postHGAPIdentity" ).spinner({ min: 90, max: 100});
-$('#dialog').dialog("option", "title", "Run Post-HGAP");
+$('#dialog').dialog("option", "title", "Run postHGAP");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Run", click: function() { submitForm('runPostHGAP'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 </script>

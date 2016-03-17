@@ -201,12 +201,12 @@ elsif(param ('seqLibraryId'))
 		}
 		$clones = "None" unless ($clones);
 		my $totalCloneNumber = $sequencedNumber + $notSequencedNumber;
-		$pools .= ($notSequencedNumber > 0) ? "<tr><td>$pool[2] (Id:$pool[0])</td>
+		$pools .= ($notSequencedNumber > 0) ? "<tr><td><a title='Id:$pool[0]'>$pool[2]</a></td>
 		<td>$totalCloneNumber</td>
 		<td>$clones</td>
 		<td>$originalClones</td>
 		<td><sup>Sequenced: $sequencedNumber; Not sequenced: $notSequencedNumber.</sup><br>$pool[8]</td>
-		<td>$jobIds</td></tr>" : "<tr><td>$pool[2] (Id:$pool[0])</td>
+		<td>$jobIds</td></tr>" : "<tr><td><a title='Id:$pool[0]'>$pool[2]</a></td>
 		<td>$totalCloneNumber</td>
 		<td>$clones</td>
 		<td>$originalClones</td>

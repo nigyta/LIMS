@@ -6,11 +6,18 @@ use DBI;
 use lib "lib/";
 use lib "lib/pangu";
 use pangu;
+use user;
+use config;
+use userConfig;
 use userCookie;
 
 my $userCookie = new userCookie;
 my $userId = (cookie('cid')) ? $userCookie->checkCookie(cookie('cid')) : 0;
 exit if (!$userId);
+my $user = new user;
+my $userDetail = $user->getAllFieldsWithUserId($userId);
+my $userName = $userDetail->{"userName"};
+my $role = $userDetail->{"role"};
 
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
@@ -23,6 +30,8 @@ my $libraryId = param ('libraryId') || '';
 my $active = 0;
 my $acitveDetector = 0;
 my $cookiePlate = cookie('plate') || '';
+my $config = new config;
+my $userConfig = new userConfig;
 
 my $button = "<ul id='plateInfoMenu$libraryId$$' style='margin-top: .3em; width: 200px;'>
 					<li><a><b>Plates in Library</b></a>
@@ -35,6 +44,11 @@ my $pools = '';
 my $plates = '';
 if ($libraryId)
 {
+#	my $configPoolsPerPage = $config->getFieldDefaultWithFieldName("poolsPerPage");
+#	my $poolsPerPage = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"poolsPerPage");
+	my $poolsPerPage = 100;
+#	my ($inputType, $lengthMenu, $inputDefault) = split(/:/, $configPoolsPerPage);
+
 	my $library=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$library->execute($libraryId);
 	my @library = $library->fetchrow_array();
@@ -123,6 +137,7 @@ if ($libraryId)
 	$pools .= "</tbody></table></div>\n" if ($pools);
 	$html =~ s/\$button/$button/g;
 	$html =~ s/\$plates/$plates/g;
+	$html =~ s/\$poolsPerPage/$poolsPerPage/g;
 	$html =~ s/\$pools/$pools/g;
 	$html =~ s/\$libraryId/$libraryId/g;
 	$html =~ s/\$\$/$$/g;
@@ -162,6 +177,7 @@ $( "#platesInLibrary$libraryId$$" ).tabs({
 $( "#plateInfoMenu$libraryId$$" ).menu();
 $( "#poolInfoMenu$libraryId$$" ).menu();
 $( "#poolsInLibrary$libraryId$$" ).dataTable({
-	"lengthMenu": [ 5, 10, 25, 50, 100 ]
+	"lengthMenu": [ 5, 10, 25, 50, 100 ],
+	"pageLength": $poolsPerPage,
 });
 </script>
