@@ -42,7 +42,7 @@ $html =~ s/\$slogan/$slogan/g;
 $html =~ s/\$keywords/$keywords/g;
 
 
-my $update = 1;
+my $update = 0;
 
 my $pid = fork();
 if ($pid) {
@@ -120,20 +120,20 @@ elsif($pid == 0){
 # 	}
 
 	#update old Assembly data
-	my $getAssembly = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly'");
-	$getAssembly->execute();
-	while (my @getAssembly =  $getAssembly->fetchrow_array())
-	{
-		if ($getAssembly[8] !~ /^{/)
-		{
-			my $assemblyDetails;
-			$assemblyDetails->{'description'} = $getAssembly[8];
-			my $json = JSON->new->allow_nonref;
-			$assemblyDetails = $json->encode($assemblyDetails);
-			my $updateToAssembly = $dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
-			$updateToAssembly->execute($assemblyDetails,$getAssembly[0]);
-		}
-	}
+# 	my $getAssembly = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly'");
+# 	$getAssembly->execute();
+# 	while (my @getAssembly =  $getAssembly->fetchrow_array())
+# 	{
+# 		if ($getAssembly[8] !~ /^{/)
+# 		{
+# 			my $assemblyDetails;
+# 			$assemblyDetails->{'description'} = $getAssembly[8];
+# 			my $json = JSON->new->allow_nonref;
+# 			$assemblyDetails = $json->encode($assemblyDetails);
+# 			my $updateToAssembly = $dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
+# 			$updateToAssembly->execute($assemblyDetails,$getAssembly[0]);
+# 		}
+# 	}
 	exit 0;
 }
 else{
