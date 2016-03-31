@@ -132,6 +132,14 @@ eof
 	$userConfig->insertRecord($newUserId,$configLastNameId,$lastName);
 	$userConfig->insertRecord($newUserId,$configEmailId,$email);
 
+	print <<eof;
+	<script type="text/javascript">
+		parent.closeDialog();
+		parent.informationPop('New user has been added.');
+		parent.refresh("settingTabs");
+	</script>
+eof
+
 	# ...and send email to the person telling them their new password.
 	# be sure to send them the un-encrypted version!
 	open(MAIL,"|/usr/sbin/sendmail -t -oi");
@@ -153,13 +161,6 @@ Dear $firstName $lastName ($userName),
 Best regards,
 Dev Team
 $siteName
-eof
-	print <<eof;
-	<script type="text/javascript">
-		parent.closeDialog();
-		parent.informationPop('New user has been added.');
-		parent.refresh("settingTabs");
-	</script>
 eof
 }
 

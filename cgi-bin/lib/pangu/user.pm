@@ -210,9 +210,14 @@ sub reactivateUser{
 	my $sth;
 	$sth = $self->{_conn}->dbh->prepare(
 		"UPDATE user
-		 SET activation = SUBSTRING(activation, -19)
+		 SET activation = NOW()
 		 WHERE id = ?"
 	) or die "prepare failed: " . $self->{_conn}->dbh->errstr();
+# 	$sth = $self->{_conn}->dbh->prepare(
+# 		"UPDATE user
+# 		 SET activation = SUBSTRING(activation, -19)
+# 		 WHERE id = ?"
+# 	) or die "prepare failed: " . $self->{_conn}->dbh->errstr();
 	$sth->execute($userId) or die "execute failed: " . $sth->errstr();
 	return $sth->rows;
 }
