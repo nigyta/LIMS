@@ -119,7 +119,7 @@ __DATA__
 	<tr><td style='text-align:right'><label for="newAssemblyGenome"><b>Reference Genome</b></label></td>
 	<td><select class='ui-widget-content ui-corner-all' name="refGenomeId" id="newAssemblyGenome">$refGenomeId</select><br>
 			<input type="checkbox" id="newAssemblyAssignChrCheckbox" name="assignChr" value="1" checked="checked"><label for="newAssemblyAssignChrCheckbox">Assign chromosome number for contigs</label><br>
-			<input type="checkbox" id="newAssemblyOrientateContigsCheckbox" name="orientateContigs" value="1" checked="checked"><label for="newAssemblyOrientateContigsCheckbox">Orientate contigs based-on reference genome</label>
+			<input type="checkbox" id="newAssemblyOrientContigsCheckbox" name="orientContigs" value="1" checked="checked"><label for="newAssemblyOrientContigsCheckbox">Orient contigs based-on reference genome</label>
 	</td>
 	</tr>
 	</table>
@@ -179,11 +179,11 @@ __DATA__
 		</div>
 	</td>
 	</tr>
-	<tr><td></td><td style='text-align:right'><label for="newAssemblyOrientateSeqs"><b>Auto-Orientate Sequences</b></label></td>
+	<tr><td></td><td style='text-align:right'><label for="newAssemblyOrientSeqs"><b>Auto-Orient Sequences</b></label></td>
 		<td>
-		<div id="newAssemblyOrientateSeqs">
-			<input type="radio" id="newAssemblyOrientateSeqsRadio2" name="orientateSeqs" value="1" checked="checked"><label for="newAssemblyOrientateSeqsRadio2">Yes</label>
-			<input type="radio" id="newAssemblyOrientateSeqsRadio1" name="orientateSeqs" value="0"><label for="newAssemblyOrientateSeqsRadio1">No</label>
+		<div id="newAssemblyOrientSeqs">
+			<input type="radio" id="newAssemblyOrientSeqsRadio2" name="orientSeqs" value="1" checked="checked"><label for="newAssemblyOrientSeqsRadio2">Yes</label>
+			<input type="radio" id="newAssemblyOrientSeqsRadio1" name="orientSeqs" value="0"><label for="newAssemblyOrientSeqsRadio1">No</label>
 		</div>
 	</td>
 	</tr>

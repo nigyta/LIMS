@@ -28,7 +28,7 @@ my $replace = param ('replace') || '0';
 my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
 my $refGenomeId = param ('refGenomeId') || '0';
 my $assignChr = param ('assignChr') || '0';
-my $orientateContigs = param ('orientateContigs') || '0';
+my $orientContigs = param ('orientContigs') || '0';
 my $seqToSeq = param ('seqToSeq') || '0';
 my $identitySeqToSeq = param ('identitySeqToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQIDENTITY");
 my $minOverlapSeqToSeq = param ('minOverlapSeqToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQMINOVERLAP");
@@ -45,7 +45,7 @@ my $minOverlapEndToEnd = param ('minOverlapEndToEnd') || $userConfig->getFieldVa
 my $redundancyFilterSeq = param ('redundancyFilterSeq') || '0';
 my $redundancySeq = 0;
 my $redundancyFilterOverlap = param ('redundancyFilterOverlap') || '0';
-my $orientateSeqs = param ('orientateSeqs') || '0';
+my $orientSeqs = param ('orientSeqs') || '0';
 my $renumber = param ('renumber') || '0';
 my $blastn = 'blast+/bin/blastn';
 my $makeblastdb = 'blast+/bin/makeblastdb';
@@ -504,6 +504,23 @@ END
 			elsif($fpcOrAgp[1] eq 'agp')
 			{
 				#to be added
+				my $object;
+				my $objectBeg;
+				my $objectEnd;
+				my $partNumber
+				my $orientation;
+				while ($fpcOrAgp[8])
+				{
+					chomp;
+					my @agpLine = split/\t/;
+					if ($agpLine[4] =~/D/){
+						$object->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[0];
+						$objectBeg->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[1];
+						$objectEnd->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[2];
+						$partNumber->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[3];
+						$orientation->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[8];
+					}
+				}
 			}
 
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
@@ -863,7 +880,7 @@ END
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		}
 
-		if($orientateSeqs)
+		if($orientSeqs)
 		{
 			my $updateAssemblyToAutoOrientation=$dbh->do("UPDATE matrix SET barcode = '-7' WHERE id = $assemblyId");
 			my $assemblyMultiCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? AND note LIKE '%,%'");
@@ -928,7 +945,7 @@ END
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		}
 
- 		if ($refGenomeId && $orientateContigs)
+ 		if ($refGenomeId && $orientContigs)
  		{
 			my $updateAssemblyToOrientingContigs=$dbh->do("UPDATE matrix SET barcode = '-8' WHERE id = $assemblyId");
 			my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
@@ -1858,12 +1875,12 @@ END
 		$assemblyDetails->{'log'} .= "==== ". localtime() . " ====\n"
 			."New Assembly: $replace;\n"
 			."Reference FPC/AGP: $fpcOrAgpId;\n"
-			."Reference Genome: $refGenomeId;Assign Chr: $assignChr; Orientate Contigs: $orientateContigs;\n"
+			."Reference Genome: $refGenomeId;Assign Chr: $assignChr; Orient Contigs: $orientContigs;\n"
 			."Seq to Seq: $seqToSeq, Identity:$identitySeqToSeq, Overlap:$minOverlapSeqToSeq;\n"
 			."Seq to Genome: $seqToGenome, Identity:$identitySeqToGenome, Overlap:$minOverlapSeqToGenome;\n"
 			."End to End: $endToEnd, Identity:$identityEndToEnd, Overlap:$minOverlapEndToEnd;\n"
 			."Filter Redundancy: Seq - $redundancyFilterSeq ($redundancySeq Hidden), Overlap - $redundancyFilterOverlap;\n"
-			."Auto-Orientate Seqs: $orientateSeqs;\n"
+			."Auto-Orient Seqs: $orientSeqs;\n"
 			."Renumber Contigs: $renumber."
 			;
 		my $json = JSON->new->allow_nonref;
