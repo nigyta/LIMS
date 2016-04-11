@@ -125,7 +125,7 @@ __DATA__
 	</table>
 	<hr>
 	<table>
-	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="2"><label for="newAssemblySeqToSeq"><b>Seq to Seq Alignment</b></label>
+	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="2"><label for="newAssemblySeqToSeq"><b>Seq-to-Seq Alignment</b></label>
 		<div id="newAssemblySeqToSeq">
 			<input type="radio" id="newAssemblySeqToSeqRadio2" name="seqToSeq" value="1"><label for="newAssemblySeqToSeqRadio2">Yes</label>
 			<input type="radio" id="newAssemblySeqToSeqRadio1" name="seqToSeq" value="0" checked="checked"><label for="newAssemblySeqToSeqRadio1">No</label>
@@ -139,7 +139,7 @@ __DATA__
 	</table>
 	<hr>
 	<table>
-	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="2"><label for="newAssemblySeqToGenome"><b>Seq to Genome Alignment</b></label>
+	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="2"><label for="newAssemblySeqToGenome"><b>Seq-to-Genome Alignment</b></label>
 		<div id="newAssemblySeqToGenome">
 			<input type="radio" id="newAssemblySeqToGenomeRadio2" name="seqToGenome" value="1"><label for="newAssemblySeqToGenomeRadio2">Yes</label>
 			<input type="radio" id="newAssemblySeqToGenomeRadio1" name="seqToGenome" value="0" checked="checked"><label for="newAssemblySeqToGenomeRadio1">No</label>
@@ -204,7 +204,7 @@ $( "#newAssemblyReplace" ).buttonset();
 $( "#newAssemblySeqToSeq" ).buttonset();
 $( "#newAssemblySeqToGenome" ).buttonset();
 $( "#newAssemblyEndToEnd" ).buttonset();
-$( "#newAssemblyOrientateSeqs" ).buttonset();
+$( "#newAssemblyOrientSeqs" ).buttonset();
 $( "#newAssemblyRenumber" ).buttonset();
 $( "#newAssemblySeqToSeqMinOverlap" ).spinner({
 	min: 500,
