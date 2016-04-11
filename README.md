@@ -1,7 +1,7 @@
 # LIMS
 ## Laboratory Information Management System
 
-We developed a web-based LIMS to manage and analyze all kinds of data from both wet and dry labs. 
+We developed a web-based LIMS to manage and analyze genomic data at different levels from both wet and dry lab experiments.
 
 ## Demo
 http://www.genome.arizona.edu/lims-demo (coming soon)
