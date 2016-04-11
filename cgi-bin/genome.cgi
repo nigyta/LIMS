@@ -61,7 +61,7 @@ while (my @allGenome = $allGenome->fetchrow_array())
 	$agpList->execute($allGenome[0]);
 	while (my @agpList = $agpList->fetchrow_array())
 	{
-		$agpAvailable .= ($agpAvailable) ? ", <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>" : "(AGP: <a href='download.cgi?agpId=$agpList[6]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>";
+		$agpAvailable .= ($agpAvailable) ? ", <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>" : "(AGP: <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>";
 	}
 	$agpAvailable .= ")" if ($agpAvailable);
 
@@ -82,7 +82,7 @@ while (my @allGenome = $allGenome->fetchrow_array())
 			<tbody>" unless($genomes);
 	$genomes .= "<tr>
 		<td title='Genome'><a id='genomeId$allGenome[0]$$' onclick='openDialog(\"genomeView.cgi?genomeId=$allGenome[0]\")' title='View'>$allGenome[2]</a></td>
-		<td title='$allGenome[3] Sequences'>$allGenome[3]</td>
+		<td title='Click to download $allGenome[3] Sequences'><a href='download.cgi?genomeId=$allGenome[0]' target='hiddenFrame'>$allGenome[3]</a></td>
 		<td title='For reassembly with GPM'>$yesOrNo{$allGenome[4]} $agpAvailable</td>
 		<td title='As a reference for assembly'>$yesOrNo{$allGenome[5]}</td>
 		<td title='Related Library'>$relatedLibraries</td>

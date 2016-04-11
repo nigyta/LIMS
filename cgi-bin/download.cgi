@@ -116,6 +116,27 @@ elsif (param ('agpId'))
 		);
 	print $getAgp[8];
 }
+elsif (param ('genomeId'))
+{
+	my $genomeId = param ('genomeId');
+	my $getGenome = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+	$getGenome->execute($genomeId);
+	my @getGenome =  $getGenome->fetchrow_array();
+	print header(-type=>'application/octet-stream',
+		-attachment=> "genome-$genomeId.$getGenome[2].seq"
+		);
+	my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
+	$getSequences->execute($genomeId);
+	while(my @getSequences =  $getSequences->fetchrow_array())
+	{
+		my $sequenceDetails = decode_json $getSequences[8];
+		$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
+		$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
+		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
+		print ">$sequenceDetails->{'id'} $getSequences[2] $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}\n";
+	}		
+}
 elsif(param ('libraryId'))
 {
 	my $libraryId = param ('libraryId');
