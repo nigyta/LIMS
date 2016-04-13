@@ -504,25 +504,79 @@ END
 			elsif($fpcOrAgp[1] eq 'agp')
 			{
 				#to be added
-				my $object;
-				my $objectBeg;
-				my $objectEnd;
-				my $partNumber
-				my $orientation;
-				while ($fpcOrAgp[8])
+				my $component;
+				my $partNumber = -1;
+				my $preAssemblyCtgId = 0;
+				foreach (split "\n", $fpcOrAgp[8])
 				{
-					chomp;
-					my @agpLine = split/\t/;
-					if ($agpLine[4] =~/D/){
-						$object->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[0];
-						$objectBeg->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[1];
-						$objectEnd->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[2];
-						$partNumber->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[3];
-						$orientation->{$agpLine[5]}->{$agpLine[6]}->{$agpLine[7]} = $agpLine[8];
+					/^#/ and next;
+					my @agpLine = split/\t/, $_;
+					if ($agpLine[4] =~ /D/)
+					{
+						if (exists $component->{$agpLine[5]})
+						{							
+							#a component can't be used twice or more.
+							$partNumber = $agpLine[3];
+							next;
+						}
+						else
+						{
+							#set assemblySeq orientation based on $agpLine[8] and range based on "$agpLine[6]&$agpLine[7]"
+							my $agpOrientation = ($agpLine[8] ne '-') ?  "1" : "-1";
+							my $assemblySeqByName = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ? AND name LIKE ?");
+							$assemblySeqByName->execute($assemblyId,$agpLine[5]);
+							my @assemblySeqByName = $assemblySeqByName->fetchrow_array();
+							my $updateAssemblySeq=$dbh->prepare("UPDATE matrix SET barcode = ?, note = ? WHERE id = ?");
+							$updateAssemblySeq->execute($agpOrientation,"$agpLine[6],$agpLine[7]",$assemblySeqByName[0]);
+							if ($agpLine[3] - $partNumber == 1) #connected
+							{
+								#merge pre and current assemblyCtg
+								unless($assemblySeqCtgId->{$assemblySeqByName[5]} == $preAssemblyCtgId)
+								{
+									my $assemblyPreCtg=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+									$assemblyPreCtg->execute($preAssemblyCtgId);
+									my @assemblyPreCtg = $assemblyPreCtg->fetchrow_array();
+									my $assemblyCurrentCtg=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+									$assemblyCurrentCtg->execute($assemblySeqCtgId->{$assemblySeqByName[5]});
+									my @assemblyCurrentCtg = $assemblyCurrentCtg->fetchrow_array();
+									my $mergedName = ($assemblyPreCtg[2] < $assemblyCurrentCtg[2]) ? $assemblyPreCtg[2] : $assemblyCurrentCtg[2];
+									my $mergedAssemblySeq = "$assemblyPreCtg[8],$assemblyCurrentCtg[8]";
+									foreach (split ",", $mergedAssemblySeq)
+									{
+										next unless ($_);
+										$_ =~ s/[^a-zA-Z0-9]//g;
+										my $assemblySeq = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+										$assemblySeq->execute($_);
+										my @assemblySeq = $assemblySeq->fetchrow_array();
+										$assemblySeqCtg->{$assemblySeq[5]} = $mergedName;
+										$assemblySeqCtgId->{$assemblySeq[5]} = $assemblyPreCtg[0];
+									}
+									my $updatedAssemblyCtg = $dbh->prepare("UPDATE matrix SET name = ?, note = ? WHERE id = ?");
+									$updatedAssemblyCtg->execute($mergedName,$mergedAssemblySeq,$assemblyPreCtg[0]);
+									my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCurrentCtg[0]");
+								}
+							}
+							else
+							{
+								unless($fpcOrAgp[5] != 1) # Chr-Seq
+								{
+									#set assemblyCtg position based on $agpLine[1] and chrNumber based on $agpLine[0]
+									($agpLine[0] =~ /^ChrUN/) and next;
+									($agpLine[0] =~ /^Ctg/) and next;
+									my $chrNumber = ($agpLine[0] =~ /(\d+)/) ? $1 : 0;
+									my $updatedAssemblyCtg = $dbh->prepare("UPDATE matrix SET x = ?, z = ? WHERE id = ?");
+									$updatedAssemblyCtg->execute($chrNumber,$agpLine[1],$assemblySeqCtgId->{$assemblySeqByName[5]});
+								}
+								# Ctg-Seq or unknown, no chrNumber and position assigned
+								#do nothing
+								$preAssemblyCtgId = $assemblySeqCtgId->{$assemblySeqByName[5]};
+							}
+							$partNumber = $agpLine[3];
+							$component->{$agpLine[5]} = 1;
+						}
 					}
 				}
 			}
-
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		}
 

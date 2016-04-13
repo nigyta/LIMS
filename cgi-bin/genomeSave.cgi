@@ -5,6 +5,7 @@ use CGI::Carp qw ( fatalsToBrowser );
 use JSON;
 use DBI;
 use Bio::SeqIO;
+use File::Basename;
 use lib "lib/";
 use lib "lib/pangu";
 use pangu;
@@ -36,6 +37,15 @@ my $genomeDescription = param('description') || '';
 my $genomeFile = upload ('genomeFile');
 my $genomeFilePath = param ('genomeFilePath') || '';
 my $agpFile = upload ('agpFile');
+my $agpFilename = param("agpFile");
+
+my $safeFilenameCharacters = "a-zA-Z0-9_.-";
+my ( $filename, $filepath, $extension ) = fileparse ( $agpFilename, '..*' );
+$agpFilename = $filename . $extension;
+$agpFilename =~ tr/ /_/;
+$agpFilename =~ s/[^$safeFilenameCharacters]//g;
+
+my $agpObjectComponent = param ('agpObjectComponent') || '0';
 my $genomeInfile = "/tmp/$$.genome";
 my $agpInfile = "/tmp/$$.agp";
 my $json = JSON->new->allow_nonref;
@@ -96,8 +106,8 @@ if($genomeName)
 					$checkAgp->execute($genomeId);
 					if($checkAgp->rows < 1)
 					{
-						my $insertAgp=$dbh->prepare("INSERT INTO matrix VALUES ('', 'agp', ?, ?, ?, 0, 0, 0, ?, ?, NOW())");
-						$insertAgp->execute($genomeName,$version,$genomeId,$agpDetails,$userName);
+						my $insertAgp=$dbh->prepare("INSERT INTO matrix VALUES ('', 'agp', ?, ?, ?, ?, 0, 0, ?, ?, NOW())");
+						$insertAgp->execute($agpFilename,$version,$genomeId,$agpObjectComponent,$agpDetails,$userName);
 						my $agpId = $dbh->{mysql_insertid};
 					}
 					else
@@ -107,8 +117,8 @@ if($genomeName)
 							$version = $checkAgp[3] if ($checkAgp[3] > $version);
 						}
 						$version++;
-						my $insertAgp=$dbh->prepare("INSERT INTO matrix VALUES ('', 'agp', ?, ?, ?, 0, 0, 0, ?, ?, NOW())");
-						$insertAgp->execute($genomeName,$version,$genomeId,$agpDetails,$userName);
+						my $insertAgp=$dbh->prepare("INSERT INTO matrix VALUES ('', 'agp', ?, ?, ?, ?, 0, 0, ?, ?, NOW())");
+						$insertAgp->execute($agpFilename,$version,$genomeId,$agpObjectComponent,$agpDetails,$userName);
 						my $agpId = $dbh->{mysql_insertid};
 					}
 					unlink ($agpInfile);
@@ -277,8 +287,8 @@ END
 						}
 						close(AGP);
 						my $version = 1;
-						my $insertAgp=$dbh->prepare("INSERT INTO matrix VALUES ('', 'agp', ?, ?, ?, 0, 0, 0, ?, ?, NOW())");
-						$insertAgp->execute($genomeName,$version,$genomeId,$agpDetails,$userName);
+						my $insertAgp=$dbh->prepare("INSERT INTO matrix VALUES ('', 'agp', ?, ?, ?, ?, 0, 0, ?, ?, NOW())");
+						$insertAgp->execute($agpFilename,$version,$genomeId,$agpObjectComponent,$agpDetails,$userName);
 						my $agpId = $dbh->{mysql_insertid};
 					}
 					if($genomeFilePath)

@@ -15,6 +15,11 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my $objectComponent;
+$objectComponent->{0} = "Unknown";
+$objectComponent->{1} = "Chr-Seq";
+$objectComponent->{2} = "Ctg-Seq";
+
 undef $/;# enable slurp mode
 my $html = <DATA>;
 my $targetId = param ('targetId') || '';
@@ -38,7 +43,7 @@ elsif($target[1] eq 'genome')
 	$agpList->execute($targetId);
 	while (my @agpList = $agpList->fetchrow_array())
 	{
-		$fpcOrAgpId .= "<option value='$agpList[0]'>AGP: $agpList[2] v.$agpList[3]</option>";
+		$fpcOrAgpId .= "<option value='$agpList[0]' title='$objectComponent->{$agpList[5]} AGP'>AGP: $agpList[2] v.$agpList[3]</option>";
 	}
 }
 if($fpcOrAgpId)

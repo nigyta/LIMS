@@ -26,6 +26,10 @@ eof
 
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
+my $objectComponent;
+$objectComponent->{0} = "Unknown";
+$objectComponent->{1} = "Chr-Seq";
+$objectComponent->{2} = "Ctg-Seq";
 
 undef $/;# enable slurp mode
 my $html = <DATA>;
@@ -61,9 +65,8 @@ while (my @allGenome = $allGenome->fetchrow_array())
 	$agpList->execute($allGenome[0]);
 	while (my @agpList = $agpList->fetchrow_array())
 	{
-		$agpAvailable .= ($agpAvailable) ? ", <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>" : "(AGP: <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>";
+		$agpAvailable .= ($agpAvailable) ? "<br> <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a>" : " Available AGP:<br> <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a>";
 	}
-	$agpAvailable .= ")" if ($agpAvailable);
 
 	$genomes = "<form id='genomeList$$' name='genomeList$$'>
 		<table id='genomes$$' class='display' style='width: 100%;'>
@@ -83,7 +86,7 @@ while (my @allGenome = $allGenome->fetchrow_array())
 	$genomes .= "<tr>
 		<td title='Genome'><a id='genomeId$allGenome[0]$$' onclick='openDialog(\"genomeView.cgi?genomeId=$allGenome[0]\")' title='View'>$allGenome[2]</a></td>
 		<td title='Click to download $allGenome[3] Sequences'><a href='download.cgi?genomeId=$allGenome[0]' target='hiddenFrame'>$allGenome[3]</a></td>
-		<td title='For reassembly with GPM'>$yesOrNo{$allGenome[4]} $agpAvailable</td>
+		<td>$yesOrNo{$allGenome[4]}. $agpAvailable</td>
 		<td title='As a reference for assembly'>$yesOrNo{$allGenome[5]}</td>
 		<td title='Related Library'>$relatedLibraries</td>
 		<td><ul class='gridGenomeList'>$relatedAssemblies</ul></td>

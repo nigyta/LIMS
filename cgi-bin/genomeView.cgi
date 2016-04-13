@@ -29,6 +29,11 @@ $genomeStatus->{0} = "Sequences not";
 $genomeStatus->{-1} = "Sequences are being";
 $genomeStatus->{1} = "$genome[3] sequences";
 
+my $objectComponent;
+$objectComponent->{0} = "Unknown";
+$objectComponent->{1} = "Chr-Seq";
+$objectComponent->{2} = "Ctg-Seq";
+
 my $relatedLibraries = 'None.';
 if ($genome[6])
 {
@@ -160,9 +165,10 @@ my $agpList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'agp' AND x
 $agpList->execute($genome[0]);
 while (my @agpList = $agpList->fetchrow_array())
 {
-	$agpAvailable .= ($agpAvailable) ? ", <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>" : "(AGP: <a href='download.cgi?agpId=$agpList[6]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>";
+	$agpAvailable .= ($agpAvailable) ? "<li><a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a></li>" : "Available AGP:<ul><li><a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a></li>";
 }
-$agpAvailable .= ")" if ($agpAvailable);
+$agpAvailable .= ($agpAvailable) ? '</ul>' : '';
+
 $html =~ s/\$agpAvailable/$agpAvailable/g;
 $html =~ s/\$relatedLibraries/$relatedLibraries/g;
 $html =~ s/\$genomeStatus/$genomeStatus->{$genome[7]}/g;

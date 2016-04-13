@@ -29,6 +29,11 @@ $genomeStatus->{0} = "Sequences not loaded";
 $genomeStatus->{-1} = "Sequences are being loaded";
 $genomeStatus->{1} = "$genome[3] sequences loaded";
 
+my $objectComponent;
+$objectComponent->{0} = "Unknown";
+$objectComponent->{1} = "Chr-Seq";
+$objectComponent->{2} = "Ctg-Seq";
+
 $html =~ s/\$genomeId/$genomeId/g;
 $html =~ s/\$genomeName/$genome[2]/g;
 
@@ -66,12 +71,17 @@ my $agpList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'agp' AND x
 $agpList->execute($genome[0]);
 while (my @agpList = $agpList->fetchrow_array())
 {
-	$agpAvailable .= ($agpAvailable) ? ", <a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>" : "<br>(Available AGP: <a href='download.cgi?agpId=$agpList[6]' target='hiddenFrame'>$agpList[2] v.$agpList[3]</a>";
+	$agpAvailable .= ($agpAvailable) ? "<li><a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a><span class='ui-icon ui-icon-trash' onclick='deleteItem($agpList[0])' title='Delete this AGP' style='display:inline-block;'></span></li>" : "<br>Available AGP:<ul><li><a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a><span class='ui-icon ui-icon-trash'  onclick='deleteItem($agpList[0])' title='Delete this AGP' style='display:inline-block;'></span></li>";
 }
-$agpAvailable .= ")" if ($agpAvailable);
-
+$agpAvailable .= ($agpAvailable) ? '</ul>' : '';
+my $agpObjectComponent;
+for (sort keys %{$objectComponent})
+{
+	$agpObjectComponent .= ($_ == 1) ? "<option value='$_' title='$objectComponent->{$_}' selected>$objectComponent->{$_}</option>" : "<option value='$_' title='$objectComponent->{$_}'>$objectComponent->{$_}</option>";
+}
 
 $html =~ s/\$libraryId/$libraryId/g;
+$html =~ s/\$agpObjectComponent/$agpObjectComponent/g;
 $html =~ s/\$agpAvailable/$agpAvailable/g;
 $html =~ s/\$genomeStatus/$genomeStatus->{$genome[7]}/g;
 $html =~ s/\$genomeDescription/$genome[8]/g;
@@ -101,7 +111,7 @@ __DATA__
 			<input type="checkbox" id="editGenomeAssignChr" name="assignChr" value="1"><label for="editGenomeAssignChr">Assign chromosome number based on sequence name</label><br><sub>Manual assignment for sequences on unknown chromosomes is required after uploading.</sub><hr width="80%">
 			<input type="checkbox" id="editGenomeSplit" name="split" value="1"> <label for="editGenomeSplit">Split gapped sequences</label><hr width="80%">
 			<input type="checkbox" id="editGenomeForAssembly" name="forAssembly" value="1"$editGenomeForAssembly><label for="editGenomeForAssembly">Enable this genome to be reassembled with GPM</label><br>
-			<sub><label for="editAgpFile"><b>New AGP file for guiding re-assembling</b></label></sub> <input name="agpFile" id="editAgpFile" type="file" />$agpAvailable<hr width="80%">
+			<sub><label for="editAgpFile"><b>New <select class='ui-widget-content ui-corner-all' name='agpObjectComponent' id='editAgpObjectComponent'>$agpObjectComponent</select> AGP file for guiding re-assembling</b></label></sub>  <input name="agpFile" id="editAgpFile" type="file" />(<a title="You may upload an AGP with a long file name, but only the first 32 characters will be saved.">Maximum 32 characters</a>) $agpAvailable<hr width="80%">
 			<input type="checkbox" id="editGenomeAsReference" name="asReference" value="1"$editGenomeAsReference><label for="editGenomeAsReference">Enable this genome to be used as a reference</label>
 			<hr>
 		</td>

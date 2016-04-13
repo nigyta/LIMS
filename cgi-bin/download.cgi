@@ -111,9 +111,18 @@ elsif (param ('agpId'))
 	my $getAgp = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$getAgp->execute($agpId);
 	my @getAgp =  $getAgp->fetchrow_array();
-	print header(-type=>'application/octet-stream',
-		-attachment=> "agp-$agpId.$getAgp[2].agp"
-		);
+	if ($getAgp[2] =~ /\.agp$/)
+	{
+		print header(-type=>'application/octet-stream',
+			-attachment=> "$getAgp[2]"
+			);
+	}
+	else
+	{
+		print header(-type=>'application/octet-stream',
+			-attachment=> "$getAgp[2].agp"
+			);
+	}
 	print $getAgp[8];
 }
 elsif (param ('genomeId'))
