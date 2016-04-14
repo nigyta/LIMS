@@ -185,9 +185,9 @@ print $html;
 __DATA__
 <table>
 	<tr><td style='text-align:right;white-space: nowrap;'><b>Genome</b></td><td>$genomeName<br>$genomeStatus <sup class='ui-state-disabled'>loaded by $genomeCreator on $genomeCreationDate</sup></td></tr>
-	<tr><td style='text-align:right'></td><td>For Reassembly? $genomeForGPM. $agpAvailable</td></tr>
-	<tr><td style='text-align:right'></td><td>As Reference? $genomeAsReference.</td></tr>
-	<tr><td style='text-align:right'></td><td>Link to library: $relatedLibraries</td></tr>
+	<tr><td style='text-align:right;white-space: nowrap;'>For Reassembly?</td><td>$genomeForGPM. $agpAvailable</td></tr>
+	<tr><td style='text-align:right;white-space: nowrap;'>As Reference?</td><td>$genomeAsReference.</td></tr>
+	<tr><td style='text-align:right;white-space: nowrap;'>Link to library:</td><td>$relatedLibraries</td></tr>
 	<tr><td style='text-align:right;white-space: nowrap;'><b>$sequenceNumber</b><br>Total: $totalLength bp<br>N50: $n50Length bp<br>Median: $medianLength bp<br><hr>$gapStats</td><td>$sequences</td></tr>
 	<tr><td style='text-align:right'><b>Description</b></td><td>$genomeDescription</td></tr>
 </table>
