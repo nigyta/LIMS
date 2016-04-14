@@ -159,6 +159,19 @@ END
 		}
 		elsif($item[1] eq 'asbProject')
 		{
+			my $childInAsbProject = $dbh->prepare("SELECT * FROM link WHERE parent = $_ AND type LIKE 'asbProject'");
+			$childInAsbProject->execute();
+			if($childInAsbProject->rows > 0)
+			{
+				print <<END;
+<script>
+	parent.closeDialog();
+	parent.errorPop("Please unlink related libraries/genomes first!");
+</script>	
+END
+				exit;
+			}
+
 			my $deleteAsbProject=$dbh->do("DELETE FROM matrix WHERE id = $_");
 			my $deleteLink=$dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'asbProject'");
 			print <<END;
@@ -305,9 +318,9 @@ END
 				exit;
 			}
 
-			my $assemblyForGenome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = $_");
-			$assemblyForGenome->execute();
-			if ($assemblyForGenome->rows > 0)
+			my $genomeForAssembly = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = $_");
+			$genomeForAssembly->execute();
+			if ($genomeForAssembly->rows > 0)
 			{
 				print <<END;
 <script>
