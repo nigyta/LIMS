@@ -59,7 +59,9 @@ if (param ('seqId'))
 	$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 	$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 	$getSequences[2] = $getSequences[0] unless ($getSequences[2]);
-	print ">$getSequences[0]-$getSequences[4]-$getSequences[2]-$seqType{$getSequences[3]}-$getSequences[6] $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}\n";
+	$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
+	$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
+	print ">$getSequences[0]-$getSequences[4]-$getSequences[2]-$seqType{$getSequences[3]}-$getSequences[6] $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 }
 elsif (param ('jobId'))
 {
@@ -102,7 +104,9 @@ elsif (param ('jobId'))
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$getSequences[2] = $getSequences[0] unless ($getSequences[2]);
-		print ">$getSequences[0]-$getSequences[4]-$getSequences[2]-$seqType{$getSequences[3]}-$getSequences[6] $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}\n";
+		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
+		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
+		print ">$getSequences[0]-$getSequences[4]-$getSequences[2]-$seqType{$getSequences[3]}-$getSequences[6] $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 	}		
 }
 elsif (param ('agpId'))
@@ -143,7 +147,9 @@ elsif (param ('genomeId'))
 		$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
-		print ">$sequenceDetails->{'id'} $getSequences[2] $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}\n";
+		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
+		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
+		print ">$sequenceDetails->{'id'} $getSequences[2] $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 	}		
 }
 elsif(param ('libraryId'))
@@ -174,7 +180,9 @@ elsif(param ('libraryId'))
 			$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
-			print ">$getSequences[0]-$getSequences[4]-$getClones[1]-$getSequences[2]-$seqType{$getSequences[3]}-$getSequences[6] $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}\n";
+			$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
+			$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
+			print ">$getSequences[0]-$getSequences[4]-$getClones[1]-$getSequences[2]-$seqType{$getSequences[3]}-$getSequences[6] $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 		}		
 	}
 }
@@ -261,7 +269,9 @@ elsif(param ('besLibraryId'))
 		$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
-		print ">$getSequences[0]-$getSequences[4]-$seqType{$getSequences[3]}-$getSequences[2].$seqDir{$getSequences[6]} $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}\n";
+		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
+		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
+		print ">$getSequences[0]-$getSequences[4]-$seqType{$getSequences[3]}-$getSequences[2].$seqDir{$getSequences[6]} $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 	}		
 }
 elsif(param ('assemblyCtgId'))
@@ -300,6 +310,7 @@ elsif(param ('assemblyCtgId'))
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
+		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 		if($pseudo)
 		{
 			if($ctgSequence)
@@ -362,25 +373,25 @@ elsif(param ('assemblyCtgId'))
 				}
 				for my $position(@position)
 				{
-					$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 					my $sequence = substr($sequenceDetails->{'sequence'}, $position->[0] - 1, $position->[1] - $position->[0] + 1);		
 					$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-					$ctgSequence .= "$sequence\n";
+					$ctgSequence .= $sequence;
 				}
 			}
 			else
 			{
-				$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 				my $sequence = substr($sequenceDetails->{'sequence'}, $assemblySeqStart - 1, $assemblySeqEnd - $assemblySeqStart + 1);		
 				$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-				$ctgSequence .= "$sequence\n";
+				$ctgSequence .= $sequence;
 			}
 		}
 		else
 		{
-			print "$assemblySequence[2].$assemblySequence[0] $assemblySequence[4]-$seqType{$assemblySequence[3]} $assemblySequence[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}\n";
+			$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
+			print "$assemblySequence[2].$assemblySequence[0] $assemblySequence[4]-$seqType{$assemblySequence[3]} $assemblySequence[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 		}
 	}
+	$ctgSequence = multiLineSeq($ctgSequence,80);
 	print ")\n$ctgSequence" if($pseudo);
 }
 elsif(param ('assemblyCtgIdForAgp'))
@@ -491,6 +502,7 @@ elsif(param ('assemblyId'))
 	if($unit eq 'chr')
 	{
 		my $preChr = 'na';
+		my $chrUn = 1;
 		my $chrSequence;
 		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
 		$assemblyCtg->execute($assemblyId);
@@ -503,7 +515,9 @@ elsif(param ('assemblyId'))
 
 			if($assemblyCtg[4] == 0)
 			{
-				print ">Ctg$assemblyCtg[2] (";
+				my $chrUnNumber = sprintf "%0*d", 2, $chrUn;
+				$chrUn++;
+				print ">ChrUN$chrUnNumber (Ctg$assemblyCtg[2]-";
 				my $ctgSequence = '';
 				foreach (split ",", $assemblyCtg[8])
 				{
@@ -521,6 +535,7 @@ elsif(param ('assemblyId'))
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
+					$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 					if($ctgSequence)
 					{
 						print ",$assemblySeq[2].$assemblySeq[5]";
@@ -583,16 +598,17 @@ elsif(param ('assemblyId'))
 						{
 							my $sequence = substr($sequenceDetails->{'sequence'}, $position->[0] - 1, $position->[1] - $position->[0] + 1);		
 							$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-							$ctgSequence .= "$sequence\n";
+							$ctgSequence .= $sequence;
 						}
 					}
 					else
 					{
 						my $sequence = substr($sequenceDetails->{'sequence'}, $assemblySeqStart - 1, $assemblySeqEnd - $assemblySeqStart + 1);		
 						$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-						$ctgSequence .= "$sequence\n";
+						$ctgSequence .= $sequence;
 					}
 				}
+				$ctgSequence = multiLineSeq($ctgSequence,80);
 				print ")\n$ctgSequence";
 			}
 			else
@@ -600,12 +616,13 @@ elsif(param ('assemblyId'))
 				if ($preChr ne $assemblyCtg[4])
 				{
 					my $chrNumber = sprintf "%0*d", 2, $assemblyCtg[4];
+					$chrSequence->{$preChr} = multiLineSeq($chrSequence->{$preChr},80);
 					print ")\n$chrSequence->{$preChr}" if ($preChr ne 'na');
 					print ">Chr$chrNumber (";
 					$preChr = $assemblyCtg[4];
-					$chrSequence->{$assemblyCtg[4]} = 'N'x100 . "\n";  #left telomere
+					$chrSequence->{$assemblyCtg[4]} = 'N'x100;  #left telomere
 				}
-				if(length ($chrSequence->{$assemblyCtg[4]}) > 101)
+				if(length ($chrSequence->{$assemblyCtg[4]}) > 100)
 				{
 					print ";Ctg$assemblyCtg[2]-";
 				}
@@ -630,6 +647,7 @@ elsif(param ('assemblyId'))
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
+					$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 					if($ctgSequence)
 					{
 						print ",$assemblySeq[2].$assemblySeq[5]";
@@ -692,19 +710,20 @@ elsif(param ('assemblyId'))
 						{
 							my $sequence = substr($sequenceDetails->{'sequence'}, $position->[0] - 1, $position->[1] - $position->[0] + 1);		
 							$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-							$ctgSequence .= "$sequence\n";
+							$ctgSequence .= $sequence;
 						}
 					}
 					else
 					{
 						my $sequence = substr($sequenceDetails->{'sequence'}, $assemblySeqStart - 1, $assemblySeqEnd - $assemblySeqStart + 1);		
 						$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-						$ctgSequence .= "$sequence\n";
+						$ctgSequence .= $sequence;
 					}
 				}
-				$chrSequence->{$assemblyCtg[4]} .= "$ctgSequence" .  'N'x100 . "\n";
+				$chrSequence->{$assemblyCtg[4]} .= $ctgSequence .  'N'x100;
 			}
 		}
+		$chrSequence->{$preChr} = multiLineSeq($chrSequence->{$preChr},80);
 		print ")\n$chrSequence->{$preChr}" if ($preChr ne 'na');
 	}
 	else
@@ -735,6 +754,7 @@ elsif(param ('assemblyId'))
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
+				$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 				if($ctgSequence)
 				{
 					print ",$assemblySeq[2].$assemblySeq[5]";
@@ -743,7 +763,6 @@ elsif(param ('assemblyId'))
 				{
 					print "$assemblySeq[2].$assemblySeq[5]";
 				}
-				$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 				my $assemblySeqStart;
 				my $assemblySeqEnd;
 				if($assemblySeq[8])
@@ -797,16 +816,17 @@ elsif(param ('assemblyId'))
 					{
 						my $sequence = substr($sequenceDetails->{'sequence'}, $position->[0] - 1, $position->[1] - $position->[0] + 1);		
 						$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-						$ctgSequence .= "$sequence\n";
+						$ctgSequence .= $sequence;
 					}
 				}
 				else
 				{
 					my $sequence = substr($sequenceDetails->{'sequence'}, $assemblySeqStart - 1, $assemblySeqEnd - $assemblySeqStart + 1);		
 					$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
-					$ctgSequence .= "$sequence\n";
+					$ctgSequence .= $sequence;
 				}
 			}
+			$ctgSequence = multiLineSeq($ctgSequence,80);
 			print ")\n$ctgSequence";
 		}
 	}

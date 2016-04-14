@@ -503,7 +503,6 @@ END
 			}
 			elsif($fpcOrAgp[1] eq 'agp')
 			{
-				#to be added
 				my $component;
 				my $partNumber = -1;
 				my $preAssemblyCtgId = 0;
@@ -1928,11 +1927,11 @@ END
 		#add log info
 		$assemblyDetails->{'log'} .= "==== ". localtime() . " ====\n"
 			."New Assembly: $replace;\n"
-			."Reference FPC/AGP: $fpcOrAgpId;\n"
-			."Reference Genome: $refGenomeId;Assign Chr: $assignChr; Orient Contigs: $orientContigs;\n"
-			."Seq to Seq: $seqToSeq, Identity:$identitySeqToSeq, Overlap:$minOverlapSeqToSeq;\n"
-			."Seq to Genome: $seqToGenome, Identity:$identitySeqToGenome, Overlap:$minOverlapSeqToGenome;\n"
-			."End to End: $endToEnd, Identity:$identityEndToEnd, Overlap:$minOverlapEndToEnd;\n"
+			."Physical Reference: $fpcOrAgpId;\n"
+			."Reference Genome: $refGenomeId; Assign Chr: $assignChr; Orient Contigs: $orientContigs;\n"
+			."Seq-to-Seq: $seqToSeq, Identity:$identitySeqToSeq, Overlap:$minOverlapSeqToSeq;\n"
+			."Seq-to-Genome: $seqToGenome, Identity:$identitySeqToGenome, Overlap:$minOverlapSeqToGenome;\n"
+			."End-to-End: $endToEnd, Identity:$identityEndToEnd, Overlap:$minOverlapEndToEnd;\n"
 			."Filter Redundancy: Seq - $redundancyFilterSeq ($redundancySeq Hidden), Overlap - $redundancyFilterOverlap;\n"
 			."Auto-Orient Seqs: $orientSeqs;\n"
 			."Renumber Contigs: $renumber."
