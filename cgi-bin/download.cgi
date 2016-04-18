@@ -149,7 +149,14 @@ elsif (param ('genomeId'))
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
-		print ">$sequenceDetails->{'id'} $getSequences[2] $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
+		if($sequenceDetails->{'id'} eq $getSequences[2])
+		{
+			print ">$sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
+		}
+		else
+		{
+			print ">$sequenceDetails->{'id'} $getSequences[2] $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
+		}
 	}		
 }
 elsif(param ('libraryId'))
@@ -504,7 +511,7 @@ elsif(param ('assemblyId'))
 		my $preChr = 'na';
 		my $chrUn = 1;
 		my $chrSequence;
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
 		$assemblyCtg->execute($assemblyId);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{
@@ -728,7 +735,7 @@ elsif(param ('assemblyId'))
 	}
 	else
 	{
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
 		$assemblyCtg->execute($assemblyId);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{
@@ -853,7 +860,7 @@ elsif(param ('assemblyIdForAgp'))
 		my $begin;
 		$begin->{0} = 1;
 		my $gapLength = 100;
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
 		$assemblyCtg->execute($assemblyIdForAgp);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{
@@ -1087,7 +1094,7 @@ elsif(param ('assemblyIdForAgp'))
 	}
 	else
 	{
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
 		$assemblyCtg->execute($assemblyIdForAgp);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{
