@@ -9,9 +9,20 @@ use user;
 use userCookie;
 my $userCookie = new userCookie;
 my $userId = (cookie('cid')) ? $userCookie->checkCookie(cookie('cid')) : 0;
-print header;
+
 if ($userId)
 {
+	if(cookie('rememberMe'))
+	{
+		my $cookieId = cookie('cid');
+		my $setCookie = cookie(-name=>'cid', -value=>$cookieId, -expires=>'+7d'); # extend another 7 days but will expire in 7 days if no activities
+		my $rememberMe = cookie(-name=>'rememberMe', -value=>1, -expires=>'+365d');
+		print header(-cookie=>[$setCookie,$rememberMe]);
+	}
+	else
+	{
+		print header;
+	}
 	my $user = new user;
 	my $userDetail = $user->getAllFieldsWithUserId($userId);
 	my $userName = $userDetail->{"userName"};
@@ -23,6 +34,7 @@ eof
 }
 else
 {
+	print header;
 	print  <<eof;
 	<div style="clear:left;"><a onclick="openDialog('login.cgi')"><span class="ui-icon ui-icon-power" style="float: left; margin-right: .3em;"></span>Login</a></div>
 	<div style="clear:left;"><a onclick="openDialog('register.cgi')"><span class="ui-icon ui-icon-person" style="float: left; margin-right: .3em;"></span>Register</a></div>
