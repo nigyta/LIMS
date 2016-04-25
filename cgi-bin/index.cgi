@@ -435,7 +435,6 @@ __DATA__
 		$('#'+iconName).removeClass('ui-state-hover');
 	}
 
-
 	function deleteItem(itemId)
 	{
 		var r=confirm("Are you sure to delete this?");

@@ -17,6 +17,22 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 
 my $assemblyId = param ('assemblyId') || '';
 
+my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+$assembly->execute($assemblyId);
+my @assembly = $assembly->fetchrow_array();
+
+unless ($assembly[7] == 1 || $assembly[7] == 0) # exit if for frozen or running assembly
+{
+	print header;
+	print <<END;
+<script>
+	closeDialog();
+	errorPop("This assembly is running or frozen.");
+</script>	
+END
+	exit;
+}
+
 undef $/;# enable slurp mode
 my $html = <DATA>;
 

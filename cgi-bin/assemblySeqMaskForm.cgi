@@ -51,6 +51,7 @@ my %seqDir = (
 
 if ($assemblySeqId)
 {
+	print header;
 	my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$assemblySeq->execute($assemblySeqId);
 	my @assemblySeq = $assemblySeq->fetchrow_array();
@@ -59,6 +60,16 @@ if ($assemblySeqId)
 	$assembly->execute($assemblySeq[3]);
 	my @assembly = $assembly->fetchrow_array();
 
+	unless ($assembly[7] == 1 || $assembly[7] == 0) # exit if for frozen or running assembly
+	{
+		print <<END;
+<script>
+	closeDialog();
+	errorPop("This assembly is running or frozen.");
+</script>	
+END
+		exit;
+	}
 	my $target=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$target->execute($assembly[4]);
 	my @target = $target->fetchrow_array();
@@ -90,7 +101,6 @@ if ($assemblySeqId)
 	$html =~ s/\$seqEnd/$seqEnd/g;
 	$html =~ s/\$sequenceIdSelector/$sequenceIdSelector/g;
 	$html =~ s/\$\$/$$/g;
-	print header;
 	print $html;
 }
 else

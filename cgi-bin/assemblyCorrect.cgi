@@ -35,6 +35,21 @@ print header;
 
 if ($assemblyId)
 {
+	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+	$assembly->execute($assemblyId);
+	my @assembly = $assembly->fetchrow_array();
+
+	unless ($assembly[7] == 1 || $assembly[7] == 0) # exit if for frozen or running assembly
+	{
+		print <<END;
+<script>
+	closeDialog();
+	parent.errorPop("This assembly is running or frozen.");
+</script>	
+END
+		exit;
+	}
+
 	my $validateAssemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY name");
 	$validateAssemblyCtg->execute($assemblyId);
 	while(my @validateAssemblyCtg = $validateAssemblyCtg->fetchrow_array())

@@ -59,18 +59,35 @@ if($assemblyId)
 		print <<END;
 <script>
 	parent.closeDialog();
-	parent.refresh("menu");
-	parent.errorPop("It's running! This processing might take several minutes.");
 </script>	
 END
 	}
 	elsif($pid == 0){
-		close (STDOUT);
 		#connect to the mysql server
 		my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 		my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$assembly->execute($assemblyId);
 		my @assembly = $assembly->fetchrow_array();
+		if ($assembly[7] > 1 || $assembly[7] < 0) # exit if not for assembly
+		{
+			print <<END;
+<script>
+	parent.errorPop("This assembly is frozen or running. Nothing changed.");
+</script>	
+END
+			exit;
+		}
+		else
+		{
+		print <<END;
+<script>
+	parent.refresh("menu");
+	parent.errorPop("It's running! This processing might take several minutes.");
+</script>	
+END
+		}
+		close (STDOUT);
+
 		my $target=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$target->execute($assembly[4]);
 		my @target = $target->fetchrow_array();
