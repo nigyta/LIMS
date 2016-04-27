@@ -28,7 +28,7 @@ if ($fpcId)
 	$fpcDetails .= "<ul class='fpcMenu' style='left: 0px;top: 0px;display:inline-block;width: 120px;'>
 				<li><a><span class='ui-icon ui-icon-wrench'></span>FPC Tools</a>
 					<ul style='z-index: 1000;white-space: nowrap;'>
-						<li><a href='fpcCloneList.cgi?fpcId=$fpc[0]' target='hiddenFrame'><span class='ui-icon ui-icon-disk'></span>Download Clone List</a></li>
+						<li><a href='download.cgi?fpcId=$fpc[0]' target='hiddenFrame'><span class='ui-icon ui-icon-disk'></span>Download Clone List</a></li>
 						<li><a href='fpcPickMTP.cgi?fpcId=$fpc[0]' target='hiddenFrame'><span class='ui-icon ui-icon-search'></span>Pick Up MTP Clone</a></li>
 						<li><a onclick='openDialog(\"fpcMarkMTPForm.cgi?fpcId=$fpc[0]\")'><span class='ui-icon ui-icon-flag'></span>Mark MTP Clones</a></li>
 					</ul>

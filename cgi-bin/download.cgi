@@ -281,6 +281,76 @@ elsif(param ('besLibraryId'))
 		print ">$getSequences[0]-$getSequences[4]-$seqType{$getSequences[3]}-$getSequences[2].$seqDir{$getSequences[6]} $getSequences[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 	}		
 }
+elsif(param ('cloneLibraryId'))
+{
+	my $cloneLibraryId = param ('cloneLibraryId');
+	print header(-type=>'application/octet-stream',
+		-attachment=>"cloneList$cloneLibraryId.txt"
+		);
+	my $poolClone;
+	my $poolClones = $dbh->prepare("SELECT link.* FROM link,clones WHERE link.type LIKE 'poolClone' AND link.child = clones.name AND clones.libraryId = ? ORDER BY link.child");
+	$poolClones->execute($cloneLibraryId);
+	while(my @poolClones = $poolClones->fetchrow_array())
+	{
+		$poolClone->{$poolClones[1]} = $poolClones[0];
+	}
+	my $getClones = $dbh->prepare("SELECT * FROM clones WHERE libraryId = ?");
+	$getClones->execute($cloneLibraryId);
+	print "Clone\tOriginal\tSequence\n";
+	while(my @getClones= $getClones->fetchrow_array())
+	{
+		if(exists $poolClone->{$getClones[1]})
+		{
+			print "$getClones[1]\t$getClones[5]\t$getClones[6]\tPooled\n";
+		}
+		else
+		{
+			print "$getClones[1]\t$getClones[5]\t$getClones[6]\n";
+		}
+	}
+}
+elsif(param ('tagLibraryId'))
+{
+	my $tagLibraryId = param ('tagLibraryId');
+	print header(-type=>'application/octet-stream',
+		-attachment=>"tagList$tagLibraryId.tag"
+		);
+	my $getTags = $dbh->prepare("SELECT * FROM matrix WHERE x = ? AND container LIKE 'tag' ORDER BY o");
+	$getTags->execute($tagLibraryId);
+	my $lastTag='';
+	while(my @getTags= $getTags->fetchrow_array())
+	{
+		if($lastTag eq $getTags[3])
+		{
+			print "$getTags[2],";
+		}
+		else
+		{
+			if($lastTag)
+			{
+				print "\n$getTags[8] $getTags[3] $getTags[2],";
+			}
+			else
+			{
+				print "$getTags[8] $getTags[3] $getTags[2],";
+			}
+		}
+		$lastTag = $getTags[3];
+	}
+}
+elsif(param ('fpcId'))
+{
+	my $fpcId = param ('fpcId');
+	print header(-type=>'application/octet-stream',
+		-attachment=>"fpcCloneList$fpcId.txt"
+		);
+	my $getFpcClones = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpcClone' AND o = ? ORDER BY name");
+	$getFpcClones->execute($fpcId);
+	while(my @getFpcClones= $getFpcClones->fetchrow_array())
+	{
+		print ">$getFpcClones[2]\n$getFpcClones[8]\n";
+	}
+}
 elsif(param ('assemblyCtgId'))
 {
 	my $assemblyCtgId = param ('assemblyCtgId');
