@@ -527,7 +527,7 @@ END
 				{
 					/^#/ and next;
 					my @agpLine = split/\t/, $_;
-					if ($agpLine[4] =~ /D/)
+				    if ($agpLine[4] ne 'N' && $agpLine[4] ne 'U' )
 					{
 						if (exists $component->{$agpLine[5]})
 						{							
