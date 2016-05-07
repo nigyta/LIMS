@@ -33,6 +33,18 @@ for my $assemblyCtgId(@assemblyCtgId)
 	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$assembly->execute($assemblyCtg[3]);
 	my @assembly = $assembly->fetchrow_array();
+	unless ($assembly[7] == 1 || $assembly[7] == 0) # exit if for frozen or running assembly
+	{
+		print header;
+		print <<END;
+<script>
+	closeDialog();
+	errorPop("This assembly is running or frozen.");
+</script>	
+END
+		exit;
+	}
+
 	if ($assembly[5])
 	{
 		if ($chrNumber == 0)
