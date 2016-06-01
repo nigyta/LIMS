@@ -62,11 +62,13 @@ __DATA__
 	<tr><td style='text-align:right'><label for="newAssemblySeqToGenome"><b>Reference Genome</b></label></td>
 	<td colspan='2'><select class='ui-widget-content ui-corner-all' name="refGenomeId" id="newAssemblySeqToGenome">$refGenomeId</select></td>
 	</tr>
-	<tr><td><b>Alignment Settings:</b></td><td style='text-align:left' colspan='2'><input type="checkbox" id="newAssemblyRedoAllSeqToGenomeCheckbox" name="redoAllSeqToGenome" value="1"><label for="newAssemblyRedoAllSeqToGenomeCheckbox">For All Sequences</label><br>
-		<input type="checkbox" id="newAssemblyMarkRepeatRegionCheckbox" name="markRepeatRegion" value="1" checked="checked"><label for="newAssemblyMarkRepeatRegionCheckbox">Mark Repeat Region</label>
-		</td></tr>
+	<tr><td><b>Alignment Settings:</b></td><td style='text-align:left' colspan='2'><label for="alignEngine"><b>Engine</b></label> <select class='ui-widget-content ui-corner-all' name="newAssemblylignEngine" id="newAssemblyEngine"><option value="blastn">blastn</option><option value="BLAT">BLAT</option></select><br></td></tr>
+	<tr><td></td><td style='text-align:left' colspan='2'><input type="checkbox" id="newAssemblyRedoAllSeqToGenomeCheckbox" name="redoAllSeqToGenome" value="1"><label for="newAssemblyRedoAllSeqToGenomeCheckbox">For All Sequences</label><br>
+		<input type="checkbox" id="newAssemblyMarkRepeatRegionCheckbox" name="markRepeatRegion" value="1" checked="checked"><label for="newAssemblyMarkRepeatRegionCheckbox">Mark Repeat Region</label></td></tr>
 	<tr><td></td><td style='text-align:right'><label for="newAssemblySeqToGenomeMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToGenome" id="newAssemblySeqToGenomeMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" /></td></tr>
 	<tr><td></td><td style='text-align:right'><label for="newAssemblySeqToGenomeIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToGenome" id="newAssemblySeqToGenomeIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOGNMIDENTITY" /></td></tr>
+	<tr><td></td><td style='text-align:left'><input type="checkbox" id="newAssemblyMegablastCheckbox" name="megablast" value="1"><label for="newAssemblyMegablastCheckbox">Megablast</label></td></tr>
+	<tr><td></td><td style='text-align:left'><input type="checkbox" id="newAssemblySoftMaskingCheckbox" name="softMasking" value="1"><label for="newAssemblySoftMaskingCheckbox">Soft Masking (blastn only)</label></td></tr>
 	</table>
 </form>
 <script>

@@ -27,10 +27,17 @@ my $assemblyId = param ('assemblyId') || '';
 my $refGenomeId = param ('refGenomeId') || '';
 my $identitySeqToGenome = param ('identitySeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
 my $minOverlapSeqToGenome = param ('minOverlapSeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
+
+my $alignEngine =  = param ('alignEngine') || 'blastn';
+my $megablast =  = param ('megablast') || 'blastn';
+my $softMasking = param ('softMasking') || 'blastn';
+
 my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
 my $markRepeatRegion = param ('markRepeatRegion') || '0';
+
 my $blastn = 'blast+/bin/blastn';
 my $makeblastdb = 'blast+/bin/makeblastdb';
+
 
 print header;
 
@@ -79,8 +86,22 @@ END
 			print GENOME ">$getGenome[0]\n$sequenceDetails->{'sequence'}\n";
 		}
 		close(GENOME);
-		system( "$makeblastdb -in /tmp/$refGenomeId.$$.genome -dbtype nucl" );
-
+		
+		if($alignEngine eq 'blastn')
+		{
+			if($softMask)
+			{
+				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome  -infmt fasta -mk_counts -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.counts" )
+				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome  -infmt fasta -ustat /tmp/$refGenomeId.$$.genome_mask.counts -outfmt maskinfo_asn1_bin -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.asnb" )
+				system( "$makeblastdb -in /tmp/$refGenomeId.$$.genome -inputtype fasta -dbtype nucl -parse_seqids -mask_data /tmp/$refGenomeId.$$.genome_mask.asnb" );
+			}
+			else
+			{
+				system( "$makeblastdb -in /tmp/$refGenomeId.$$.genome -dbtype nucl" );
+			}
+		}
+		
+		
 		open (SEQALL,">/tmp/$assembly[4].$$.seq") or die "can't open file: /tmp/$assembly[4].$$.seq";
 		open (SEQNEW,">/tmp/$assembly[4].$$.new.seq") or die "can't open file: /tmp/$assembly[4].$$.new.seq";
 		if($target[1] eq 'library')
@@ -123,11 +144,42 @@ END
 		my $newSeqToGenomeFound;
 		if($redoAllSeqToGenome)
 		{
-			open (CMD,"$blastn -query /tmp/$assembly[4].$$.seq -db /tmp/$refGenomeId.$$.genome -dust no -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			if($alignEngine eq 'blastn')
+			{
+				if($softMasking)
+				{
+					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				}
+				else
+				{
+					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				}
+			}
+			else
+			{
+				open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq |") or die "can't open CMD: $!";
+			}
+		
 		}
 		else
 		{
-			open (CMD,"$blastn -query /tmp/$assembly[4].$$.new.seq -db /tmp/$refGenomeId.$$.genome -dust no -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			if($alignEngine eq 'blastn')
+			{
+				if($softMask)
+				{
+					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				}
+				else
+				{
+					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				}
+			}
+			else
+			{
+				open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.new.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
+			}
+			
+	
 		}
 		while(<CMD>)
 		{
@@ -144,6 +196,8 @@ END
 			#write to alignment
 			my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', 'SEQtoGNM\_$refGenomeId\_1e-200\_$identitySeqToGenome\_$minOverlapSeqToGenome', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 			$insertAlignment->execute(@hit);
+		
+		
 		}
 		close(CMD);
 		unlink("/tmp/$assembly[4].$$.seq");
