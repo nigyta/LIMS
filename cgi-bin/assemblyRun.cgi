@@ -39,8 +39,8 @@ my $identitySeqToGenome = param ('identitySeqToGenome') || $userConfig->getField
 my $minOverlapSeqToGenome = param ('minOverlapSeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
 
 my $alignEngine =  = param ('alignEngine') || 'blastn';
-my $megablast =  = param ('megablast') || 'blastn';
-my $softMasking = param ('softMasking') || 'blastn';
+my $task =  = param ('megablast') || 'blastn';
+my $softMasking = param ('softMasking') || '0';
 
 my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
 my $markRepeatRegion = param ('markRepeatRegion') || '0';
@@ -685,11 +685,11 @@ END
 					{
 						if($softMask)
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 						else
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 					}
 					else
@@ -706,11 +706,11 @@ END
 					{
 						if($softMask)
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 						else
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $megablast -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 					}
 					else
