@@ -27,14 +27,7 @@ jQuery http://jquery.com/
 jQuery UI http://jqueryui.com/
 
 ## Contact
-Jianwei Zhang
+Jianwei Zhang (jzhang@mail.hzau.edu.cn or jzhang@cals.arizona.edu.cn)
 
-Arizona Genomics Institute
-
-Thomas W. Keating Bioresearch Building
-
-The University of Arizona
-
-1657 E. Helen Street
-
-Tucson, AZ 85719
+## How to cite
+Zhang, J. et al. Genome Puzzle Master (GPM) - An integrated pipeline for building and editing pseudomolecules from fragmented sequences. Bioinformatics, in press (doi: 10.1093/bioinformatics/btw370).
