@@ -157,7 +157,7 @@ END
 			}
 			else
 			{
-				open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
 			}
 		
 		}
