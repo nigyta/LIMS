@@ -102,7 +102,8 @@ if ($assemblyId)
 							<ul style='z-index: 1000;white-space: nowrap;'>
 								<li><a onclick='openDialog(\"assemblySeqToSeqForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Seq to Seq</a></li>
 								<li><a onclick='openDialog(\"assemblySeqToGenomeForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Seq to Genome</a></li>";
-	$assemblyList .= ($target[1] eq 'library') ? "<li><a onclick='openDialog(\"assemblyBesToSeqForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li>" 
+	$assemblyList .= ($target[1] eq 'library') ? "<li><a onclick='openDialog(\"besToSeqForm.cgi?libraryId=$assembly[4]&targetId=$assembly[5]\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li>" 
+						: ($target[6] > 0) ? "<li><a onclick='openDialog(\"besToSeqForm.cgi?libraryId=$target[6]&targetId=$assembly[5]\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li>" 
 						: "";
 	$assemblyList .= "</ul>
 						</li>

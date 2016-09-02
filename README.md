@@ -7,6 +7,8 @@ We developed a web-based LIMS to manage and analyze genomic data at different le
 http://www.genome.arizona.edu/lims-demo (coming soon)
 
 ## Installation 
+https://github.com/Jianwei-Zhang/LIMS/wiki
+
 
 ## Required Programs, JavaScript Libraries and Perl Modules
 
@@ -30,4 +32,4 @@ jQuery UI http://jqueryui.com/
 Jianwei Zhang (jzhang@mail.hzau.edu.cn or jzhang@cals.arizona.edu)
 
 ## How to cite
-Zhang, J. et al. Genome Puzzle Master (GPM) - An integrated pipeline for building and editing pseudomolecules from fragmented sequences. Bioinformatics, in press (doi: 10.1093/bioinformatics/btw370).
+Zhang, J. et al. Genome Puzzle Master (GPM): an integrated pipeline for building and editing pseudomolecules from fragmented sequences. Bioinformatics, 2016, in press (https://doi.org/10.1093/bioinformatics/btw370).

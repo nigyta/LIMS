@@ -22,13 +22,28 @@ my $BESTOSEQIDENTITY = $userConfig->getFieldValueWithUserIdAndFieldName($userId,
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
-my $assemblyId = param ('assemblyId') || '';
-my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-$assembly->execute($assemblyId);
-my @assembly = $assembly->fetchrow_array();
+my $libraryId = param ('libraryId') || '';
 
-$html =~ s/\$assemblyId/$assemblyId/g;
-$html =~ s/\$assemblyName/$assembly[2]/g;
+my $library=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+$library->execute($libraryId);
+my @library = $library->fetchrow_array();
+
+my $fixedTargetId = param ('targetId') || '';
+
+my $targetId = "<option value='$libraryId'>$library[2] BAC Sequences</option>";
+
+my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE (z = ? OR id = ?) AND container LIKE 'genome'");
+$genomeList->execute($libraryId, $fixedTargetId);
+while (my @genomeList = $genomeList->fetchrow_array())
+{
+	$targetId .= ($genomeList[0] eq $fixedTargetId) ?
+		"<option value='$genomeList[0]' selected>$genomeList[2]</option>" :
+		"<option value='$genomeList[0]'>$genomeList[2]</option>";
+}
+
+$html =~ s/\$libraryId/$libraryId/g;
+$html =~ s/\$libraryName/$library[2]/g;
+$html =~ s/\$targetId/$targetId/g;
 $html =~ s/\$BESTOSEQMINOVERLAP/$BESTOSEQMINOVERLAP/g;
 $html =~ s/\$BESTOSEQIDENTITY/$BESTOSEQIDENTITY/g;
 
@@ -37,11 +52,10 @@ print header;
 print $html;
 
 __DATA__
-<form id="besToSeq" name="besToSeq" action="assemblyBesToSeq.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
-	<input name="assemblyId" id="newAssemblyId" type="hidden" value="$assemblyId" />
+<form id="besToSeq" name="besToSeq" action="besToSeq.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<table>
-	<tr><td><b>Alignment Settings:</b></td><td style='text-align:left' colspan='2'><input type="checkbox" id="newAssemblyRedoAllBesToSeqCheckbox" name="redoAllBesToSeq" value="1"><label for="newAssemblyRedoAllBesToSeqCheckbox">For All Sequences</label></td></tr>
-	<tr><td></td><td style='text-align:right'><label for="besToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapBesToSeq" id="besToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$BESTOSEQMINOVERLAP" /></td></tr>
+	<tr><td></td><td style='text-align:left' colspan='2'><input name="libraryId" id="newLibraryId" type="hidden" value="$libraryId" />Align $libraryName BES to <select class='ui-widget-content ui-corner-all' name='targetId' id='newTargetId'>$targetId</select></td></tr>
+	<tr><td><b>Settings:</b></td><td style='text-align:right'><label for="besToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapBesToSeq" id="besToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$BESTOSEQMINOVERLAP" /></td></tr>
 	<tr><td></td><td style='text-align:right'><label for="besToSeqIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityBesToSeq" id="besToSeqIdentity" size="4" type="text" maxlength="4" VALUE="$BESTOSEQIDENTITY" /></td></tr>
 	</table>
 </form>

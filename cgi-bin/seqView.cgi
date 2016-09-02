@@ -220,5 +220,5 @@ __DATA__
 buttonInit();
 $( "#assemblySeqTabs$$" ).tabs();
 $('#dialog').dialog("option", "title", "View Sequence $seqName");
-$( "#dialog" ).dialog( "option", "buttons", [ { text: "Delete", click: function() { deleteItem($seqId); } }, { text: "Print", click: function() {printDiv('viewSeq$$'); } }, { text: "OK", click: function() {closeDialog(); } } ] );
+$( "#dialog" ).dialog( "option", "buttons", [ { text: "Browse", click: function() {closeDialog(); closeViewer();openViewer("seqBrowse.cgi?seqId=$seqId")} }, { text: "Delete", click: function() { deleteItem($seqId); } }, { text: "Print", click: function() {printDiv('viewSeq$$'); } }, { text: "OK", click: function() {closeDialog(); } } ] );
 </script>

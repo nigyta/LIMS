@@ -34,24 +34,15 @@ $objectComponent->{0} = "Unknown";
 $objectComponent->{1} = "Chr-Seq";
 $objectComponent->{2} = "Ctg-Seq";
 
-my $relatedLibraries = 'None.';
-if ($genome[6])
-{
-	my $relatedLibrary=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-	$relatedLibrary->execute($genome[6]);
-	my @relatedLibrary = $relatedLibrary->fetchrow_array();
-	$relatedLibraries = "<a onclick='closeDialog();openDialog(\"libraryView.cgi?libraryId=$genome[6]\")'>$relatedLibrary[2]</a> ";
-}
-
 my $sequences = "
 	<table id='genome$$' class='display'>
 		<thead>
 			<tr>
-				<th><b>Seq Name</b></th>
-				<th><b title='numbers in this column may be inaccurate and are editable.'>Chr</b></th>
-				<th><b>Length (bp)</b></th>
-				<th><b>Gap#</b></th>
-				<th><b>Action</b></th>
+				<th style='white-space: nowrap;'><b>Seq Name</b></th>
+				<th style='white-space: nowrap;'><b title='numbers in this column may be inaccurate and are editable.'>Chr</b></th>
+				<th style='white-space: nowrap;'><b>Length (bp)</b></th>
+				<th style='white-space: nowrap;'><b>Gap#</b></th>
+				<th style='white-space: nowrap;'><b>Action</b></th>
 			</tr>
 		</thead>
 		<tbody>";
@@ -90,8 +81,9 @@ while (my @getSequences =  $getSequences->fetchrow_array())
 	{
 		$gapCount->{$gaps} = 1;
 	}
-	$sequences .= "<tr><td><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequences[0]\")' title='View $getSequences[2]'>$getSequences[2]</a><br><sup>$sequenceDetails->{'description'}</sup></td><td><div id='seqChr$getSequences[0]' style='position: relative;'><a id='seqChr$getSequences[0]$$' onmouseover='editIconShow(\"seqChr$getSequences[0]$$\")' onmouseout='editIconHide(\"seqChr$getSequences[0]$$\")' onclick='loaddiv(\"seqChr$getSequences[0]\",\"seqChrEdit.cgi?seqId=$getSequences[0]\")' title='Edit this chromosome number'>$getSequences[6]</a></div></td><td>$getSequences[5]</td><td>$gaps</td><td><a onclick='closeDialog();closeViewer();openViewer(\"seqBrowse.cgi?seqId=$getSequences[0]\")'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-image' title='Browse'></span></a></td></tr>";
+	$sequences .= "<tr><td style='white-space: nowrap;'><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequences[0]\")' title='View $getSequences[2]'>$getSequences[2]</a><br><sup>$sequenceDetails->{'description'}</sup></td><td><div id='seqChr$getSequences[0]' style='position: relative;'><a id='seqChr$getSequences[0]$$' onmouseover='editIconShow(\"seqChr$getSequences[0]$$\")' onmouseout='editIconHide(\"seqChr$getSequences[0]$$\")' onclick='loaddiv(\"seqChr$getSequences[0]\",\"seqChrEdit.cgi?seqId=$getSequences[0]\")' title='Edit this chromosome number'>$getSequences[6]</a></div></td><td>$getSequences[5]</td><td>$gaps</td><td><a style='float: right;' onclick='closeDialog();closeViewer();openViewer(\"seqBrowse.cgi?seqId=$getSequences[0]\")'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-image' title='Browse'></span></a></td></tr>";
 }
+
 my $median = int ($#sequenceLength/2);
 my $medianLength = $sequenceLength[$median];
 my $n50Length = 0;
@@ -169,10 +161,9 @@ while (my @agpList = $agpList->fetchrow_array())
 {
 	$agpAvailable .= ($agpAvailable) ? "<li><a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a></li>" : "Available AGP:<ul><li><a href='download.cgi?agpId=$agpList[0]' target='hiddenFrame' title='$objectComponent->{$agpList[5]} AGP v.$agpList[3]'>$agpList[2]</a></li>";
 }
-$agpAvailable .= ($agpAvailable) ? '</ul>' : '';
+$agpAvailable .= ($agpAvailable) ? '</ul>' : '<br>';
 
 $html =~ s/\$agpAvailable/$agpAvailable/g;
-$html =~ s/\$relatedLibraries/$relatedLibraries/g;
 $html =~ s/\$genomeStatus/$genomeStatus->{$genome[7]}/g;
 $genome[8] = escapeHTML($genome[8]);
 $genome[8] =~ s/\n/<br>/g;
@@ -186,16 +177,15 @@ print $html;
 
 __DATA__
 <table>
-	<tr><td style='text-align:right;white-space: nowrap;'><b>Genome</b></td><td>$genomeName<br>$genomeStatus <sup class='ui-state-disabled'>loaded by $genomeCreator on $genomeCreationDate</sup></td></tr>
-	<tr><td style='text-align:right;white-space: nowrap;'>For Reassembly?</td><td>$genomeForGPM. $agpAvailable</td></tr>
-	<tr><td style='text-align:right;white-space: nowrap;'>As Reference?</td><td>$genomeAsReference.</td></tr>
-	<tr><td style='text-align:right;white-space: nowrap;'>Link to library:</td><td>$relatedLibraries</td></tr>
-	<tr><td style='text-align:right;white-space: nowrap;'><b>$sequenceNumber</b><br>Total: $totalLength bp<br>N50: $n50Length bp<br>Median: $medianLength bp<br><hr>$gapStats</td><td>$sequences</td></tr>
-	<tr><td style='text-align:right'><b>Description</b></td><td>$genomeDescription</td></tr>
+	<tr><td style='text-align:left;white-space: nowrap;'><h3><a onclick='openDialog("genomeView.cgi?genomeId=$genomeId")' title='View'>$genomeName</a> <sub class='ui-state-disabled'>$sequenceNumber</sub></h3></td><td></td></tr>
+	<tr><td style='text-align:right;white-space: nowrap;'>$sequences</td><td>For Reassembly? $genomeForGPM. $agpAvailable 
+		As Reference? $genomeAsReference. <br>
+		Total: $totalLength bp;
+		N50: $n50Length bp;
+		Median: $medianLength bp<br>
+		$gapStats<br><b>Description:</b> $genomeDescription</td></tr>
 </table>
 <script>
-$('#dialog').dialog("option", "title", "View Genome");
-$( "#dialog" ).dialog( "option", "buttons", [{ text: "Edit", click: function() { closeDialog();openDialog("genomeEdit.cgi?genomeId=$genomeId"); } }, { text: "OK", click: function() {closeDialog(); } } ] );
 $( "#gap$$" ).dataTable({
 	"dom": 'lfrtip',
 	"scrollY": "300px",

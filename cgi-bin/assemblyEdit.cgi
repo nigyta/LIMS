@@ -74,8 +74,8 @@ while (my @genomeList = $genomeList->fetchrow_array())
 	next if ($genomeList[0] eq $assembly[4]);
 	next if ($genomeList[5] < 1); #remove not for reference
 	$refGenomeId .= ($genomeList[0] eq $assembly[5] ) ?
-		"<option value='$genomeList[0]' title='$genomeList[8]' selected>$genomeList[2]</option>" :
-		"<option value='$genomeList[0]' title='$genomeList[8]'>$genomeList[2]</option>";
+		"<option value='$genomeList[0]' selected>$genomeList[2]</option>" :
+		"<option value='$genomeList[0]'>$genomeList[2]</option>";
 }
 if($refGenomeId)
 {

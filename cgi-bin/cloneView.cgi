@@ -157,7 +157,7 @@ __DATA__
 	<tr><td style='text-align:right;white-space: nowrap;'><b>Clone Name</b></td><td>$cloneName</td></tr>
 	$originalClone
 	$relatedClone
-	<tr><td style='text-align:right'><b>WGP FPC</b></td><td>$fpcView</td></tr>
+	<tr><td style='text-align:right'><b>FPC</b></td><td>$fpcView</td></tr>
 	<tr><td style='text-align:right'><b>Sequence</b></td><td>$sequenced</td></tr>
 	</table>
 </div>

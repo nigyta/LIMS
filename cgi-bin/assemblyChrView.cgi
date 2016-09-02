@@ -596,7 +596,7 @@ if ($assemblyId && $chr)
 		my $assemblySeqHide;
 		my $assemblySeqFpcCtg;
 		my $order = 0;
-		my $filterLength;
+		my $filterLength = 0;
 		foreach (split ",", $assemblyCtgList[8])
 		{
 			next unless ($_);

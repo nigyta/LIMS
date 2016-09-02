@@ -29,6 +29,9 @@ my $nonOrderableTargets;
 my $activeFpc = 0;
 my $acitveFpcDetector = 0;
 my $cookieFpc = cookie('fpc') || '';
+my $activeGenome = 0;
+my $acitveGenomeDetector = 0;
+my $cookieGenome = cookie('genome') || '';
 if ($libraryId)
 {
 	my $library=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
@@ -82,6 +85,21 @@ if ($libraryId)
 	}
 	$relatedFpc .= "</div>" if($relatedFpc);
 
+	my $relatedGenome = 0;
+	my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE z = ? AND container LIKE 'genome'");
+	$genomeList->execute($libraryId);
+	while (my @genomeList = $genomeList->fetchrow_array())
+	{
+		$relatedGenome = "<div id='genomeList$libraryId$$'>" unless ($relatedGenome);
+		$relatedGenome .= "<h3 title='$genomeList[8]'>
+			<a href='libraryGenome.cgi?genomeId=$genomeList[0]'>$genomeList[2] ($genomeList[3] Sequences) <sup class='ui-state-disabled'>loaded by $genomeList[9] on $genomeList[10]</sup></a>
+			</h3>
+			<div><img src='$commoncfg->{HTDOCS}/css/images/loading.gif'>Loading...</div>";
+		$activeGenome = $acitveGenomeDetector if ($genomeList[0] eq $cookieGenome);
+		$acitveGenomeDetector++;
+	}
+	$relatedGenome .= "</div>" if($relatedGenome);
+
 	$button = "<ul id='libraryInfoMenu$libraryId$$' style='margin-top: .3em;width: 250px;'><li><a><span class='ui-icon ui-icon-triangle-1-e'></span><b>Library '$library[2]'</b></a>
 				<ul style='z-index: 1000;white-space: nowrap;'>
 				<li><a onclick='openDialog(\"libraryEdit.cgi?libraryId=$libraryId\")' title='Edit/Delete $library[2]'><span class='ui-icon ui-icon-pencil'></span>Edit/Delete</a></li>
@@ -89,7 +107,7 @@ if ($libraryId)
 	$button .= ($library[3] > 0) ? "<li><a onclick='openDialog(\"cloneNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-bullet'></span>Generate</a></li>" : "<li class='ui-state-disabled'><a><span class='ui-icon ui-icon-bullet'></span>Generate</a></li>";
 	$button .= ($cloneList->rows > 0) ? "<li><a href='download.cgi?cloneLibraryId=$libraryId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Download</a></li></ul></li>" : "<li class='ui-state-disabled'><a><span class='ui-icon ui-icon-bullet'></span>Download</a></li></ul></li>";
 	$button .= ($tagList->rows > 0) ? "<li><a><span class='ui-icon ui-icon-tag'></span>WGP Tags</a><ul style='z-index: 1000;'><li><a href='download.cgi?tagLibraryId=$libraryId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Download</a></li><li><a onclick='openDialog(\"tagNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-bullet'></span>Load New</a></li></ul></li>" : "<li><a onclick='openDialog(\"tagNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-tag'></span>Load WGP Tags</a></li>";
-	$button .= ($besList->rows > 0) ? "<li><a><span class='ui-icon ui-icon-seek-end'></span>BAC End Sequences</a><ul style='z-index: 1000;'><li><a href='download.cgi?besLibraryId=$libraryId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Download</a></li><li><a onclick='openDialog(\"besNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-bullet'></span>Load New BES</a></li></ul></li>" : "<li><a onclick='openDialog(\"besNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-seek-end'></span>Load BAC End Sequences</a></li>";
+	$button .= ($besList->rows > 0) ? "<li><a><span class='ui-icon ui-icon-seek-end'></span>BAC End Seqs</a><ul style='z-index: 1000;'><li><a onclick='openDialog(\"besNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-bullet'></span>Load New BES</a></li><li><a href='download.cgi?besLibraryId=$libraryId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Download</a></li><li><a onclick='openDialog(\"besToSeqForm.cgi?libraryId=$libraryId&targetId=\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li><li><a onclick='openDialog(\"besReport.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-bullet'></span>Report</a></li></ul></li>" : "<li><a onclick='openDialog(\"besNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-seek-end'></span>Load BAC End Seqs</a></li>";
 	$button .= "<li><a onclick='openDialog(\"fpcNew.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-document-b'></span>Load FPC</a></li>";
 	$button .= ($library[7]) ? "<li><a onclick='openDialog(\"seqLibraryReport.cgi?libraryId=$libraryId\")'><span class='ui-icon ui-icon-note'></span>Sequencing Report</a></li>
 					<li><a href='download.cgi?libraryId=$libraryId' target='hiddenFrame'><span class='ui-icon ui-icon-disk'></span>Download Sequences</a></li>" : "";
@@ -102,7 +120,8 @@ if ($libraryId)
 				<li><a href='libraryPlate.cgi?libraryId=$libraryId'>Plates</a></li>
 				";
 				
-	$button .= ($relatedFpc) ? "<li><a href='#fpcList$libraryId$$'>Related FPC</a></li>" : "";
+	$button .= ($relatedFpc) ? "<li><a href='#fpcList$libraryId$$'>FPC</a></li>" : "";
+	$button .= ($relatedGenome) ? "<li><a href='#genomeList$libraryId$$'>Genome</a></li>" : "";
 	$button .= ($library[7]) ? "<li><a href='seqLibrary.cgi?libraryId=$libraryId'>Sequencing</a></li>" : "";
 	$button .= "</ul>
 				<div id='viewLibraryTabs-1'>
@@ -253,12 +272,14 @@ if ($libraryId)
 				</div>
 				";
 	$button .= ($relatedFpc) ? $relatedFpc : "";
+	$button .= ($relatedGenome) ? $relatedGenome : "";
 	$button .= "</div>";
 	$html =~ s/\$button/$button/g;
 	$html =~ s/\$libraryId/$libraryId/g;
 	$html =~ s/\$\$/$$/g;
 	$html =~ s/\$nonOrderableTargets/$nonOrderableTargets/g;
 	$html =~ s/\$activeFpc/$activeFpc/g;
+	$html =~ s/\$activeGenome/$activeGenome/g;
 	$html =~ s/\$commoncfg->{HTDOCS}/$commoncfg->{HTDOCS}/g;
 
 	print header(-cookie=>[cookie(-name=>'library',-value=>$libraryId),cookie(-name=>'sample',-value=>0)]);
@@ -283,6 +304,16 @@ $( "#viewLibraryTabs$libraryId" ).tabs({
 $( "#libraryInfoMenu$libraryId$$" ).menu();
 $( "#fpcList$libraryId$$" ).accordion({
         active:$activeFpc,
+        create:function(event, ui) {
+            ui.panel.load(ui.header.find('a').attr('href'));
+        },
+        activate:function(event, ui) {
+            ui.newPanel.load(ui.newHeader.find('a').attr('href'));
+        },
+        heightStyle: "content"
+});
+$( "#genomeList$libraryId$$" ).accordion({
+        active:$activeGenome,
         create:function(event, ui) {
             ui.panel.load(ui.header.find('a').attr('href'));
         },
