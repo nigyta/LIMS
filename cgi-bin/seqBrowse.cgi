@@ -155,7 +155,7 @@ if ($seqId)
 	my @lengthList;
 	my $totalLength = 0;
 	my $besId = 0;
-	open (BES, ">/tmp/BES-$refSequence[2].list");
+	open (BES,">$commoncfg->{TMPDIR}/BES-$refSequence[2].txt") or die "can't open file: $commoncfg->{TMPDIR}/BES-$refSequence[2].txt";
 	my $besList=$dbh->prepare("SELECT * FROM alignment WHERE subject = ? AND program LIKE 'BES%' ORDER BY s_start");
 	$besList->execute($seqId);
 	while (my @besList = $besList->fetchrow_array())
@@ -197,6 +197,10 @@ if ($seqId)
 		}
 	}
 	close (BES);
+	`gzip -f $commoncfg->{TMPDIR}/BES-$refSequence[2].txt`;
+	my $besEvaluation = "<a href='$commoncfg->{TMPURL}/BES-$refSequence[2].txt.gz' target='hiddenFrame'>Download BES Evaluation</a>" if (-e "$commoncfg->{TMPDIR}/BES-$refSequence[2].txt.gz");
+
+
 	my @besCloneList = sort { $besLeftPosition->{$a} <=> $besLeftPosition->{$b} } keys %$besRightPosition;
 
     my $besClone=$svg->group(
@@ -342,6 +346,7 @@ if ($seqId)
 	$dialogWidth = ($svgWidth > 1000 ) ? 1050 : ($svgWidth < 550) ? 600 : $svgWidth + 50;
 	$seqDetails =~ s/\$svgWidth/$svgWidth/g;
 	$seqDetails =~ s/\$svgHeight/$svgHeight/g;
+	$html =~ s/\$besEvaluation/$besEvaluation/g;
 	$html =~ s/\$seqDetails/$seqDetails/g;
 	$html =~ s/\$dialogWidth/$dialogWidth/g;
 	$html =~ s/\$seqName/$refSequence[2]/g;
@@ -360,6 +365,7 @@ else
 
 __DATA__
 $seqDetails
+$besEvaluation
 <script>
 $('#viewer').dialog("option", "title", "Seq Browser: $seqName");
 $('#viewer').dialog("option", "width", "$dialogWidth");
