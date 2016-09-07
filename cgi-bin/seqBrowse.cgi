@@ -20,6 +20,12 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
+my %seqDir = (
+	0=>'NA',
+	1=>'f',
+	2=>'r'
+	);
+
 my $svg;
 
 my $seqId = param ('seqId') || '';
@@ -187,7 +193,8 @@ if ($seqId)
 			$besRightPosition->{$besSequence[2]} = ($besList[11] > $besList[10]) ? $besList[11] : $besList[10];
 			$besRightAlignment->{$besSequence[2]} = ($besList[11] > $besList[10]) ? "+" : "-";
 			$totalLength += $besDistance;
-			print BES "$besSequence[2]\t$refSequence[2]\t$besLeftPosition->{$besSequence[2]}\t$besDistance\t$besLeftDirection->{$besSequence[2]}\t$besSequence[6]\t$besLeftAlignment->{$besSequence[2]}\t$besRightAlignment->{$besSequence[2]}\n";
+
+			print BES "$besSequence[2]\t$refSequence[2]\t$besLeftPosition->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$besSequence[2]}\t$besRightAlignment->{$besSequence[2]}\n";
 		}
 		else
 		{

@@ -69,7 +69,7 @@ if(param ('libraryId'))
 					$besRightDirection->{$refSequence[0]}->{$besSequence[2]} = $besSequence[6];
 					$besRightPosition->{$refSequence[0]}->{$besSequence[2]} = ($besList[11] > $besList[10]) ? $besList[11] : $besList[10];
 					$besRightAlignment->{$refSequence[0]}->{$besSequence[2]} = ($besList[11] > $besList[10]) ? "+" : "-";
-					$besToGenome->{$genomeList[0]}->{$besSequence[2]} = "$refSequence[2] $besLeftPosition->{$refSequence[0]}->{$besSequence[2]} $besDistance $besLeftDirection->{$refSequence[0]}->{$besSequence[2]} $besSequence[6] $besLeftAlignment->{$refSequence[0]}->{$besSequence[2]} $besRightAlignment->{$refSequence[0]}->{$besSequence[2]}";
+					$besToGenome->{$genomeList[0]}->{$besSequence[2]} = "$refSequence[2] $besLeftPosition->{$refSequence[0]}->{$besSequence[2]} $besDistance $seqDir{$besLeftDirection->{$refSequence[0]}->{$besSequence[2]}} $seqDir{$besSequence[6]} $besLeftAlignment->{$refSequence[0]}->{$besSequence[2]} $besRightAlignment->{$refSequence[0]}->{$besSequence[2]}";
 				}
 				else
 				{
@@ -108,7 +108,7 @@ if(param ('libraryId'))
 	{
 			$besDetails .= "<td><th style='text-align:left'><b>$targetGenome->{$_}</b></th></td>";
 	}
-	$besDetails = "</tr>
+	$besDetails .= "</tr>
 			</thead>
 			<tbody>";
 	my $paredBesNumber = 0;
