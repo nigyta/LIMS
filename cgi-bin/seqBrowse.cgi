@@ -158,6 +158,9 @@ if ($seqId)
 	my $besRightDirection;
 	my $besLeftAlignment;
 	my $besRightAlignment;
+	my $fpcContig;
+	my $fpcCloneLeftEnd;
+	my $fpcCloneRightEnd;
 	my @lengthList;
 	my $totalLength = 0;
 	my $besId = 0;
@@ -183,6 +186,27 @@ if ($seqId)
 		my $besSequence=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$besSequence->execute($besList[2]);
 		my @besSequence = $besSequence->fetchrow_array();
+
+		$fpcContig->{$besSequence[2]} = "None" unless (exists $fpcContig->{$besSequence[2]});
+		$fpcCloneLeftEnd->{$besSequence[2]} = 0 unless (exists $fpcCloneLeftEnd->{$besSequence[2]});
+		$fpcCloneRightEnd->{$besSequence[2]} = 0 unless (exists $fpcCloneRightEnd->{$besSequence[2]});
+		
+		my $getFpcClone = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpcClone' AND name LIKE ?");
+		$getFpcClone->execute($besSequence[2]);
+		while (my @getFpcClone = $getFpcClone->fetchrow_array())
+		{
+			$fpcContig->{$besSequence[2]} = 'Ctg0';
+			if ($getFpcClone[8] =~ /Map "(.*)" Ends Left (\d*)/)
+			{
+				$fpcContig->{$besSequence[2]} = ucfirst ($1);
+				$fpcCloneLeftEnd->{$besSequence[2]} = $2;
+			}
+			if ($getFpcClone[8] =~ /Ends Right (\d*)/)
+			{
+				$fpcCloneRightEnd->{$besSequence[2]} = $1;
+			}
+		}
+
 		if (exists $besLeftPosition->{$besSequence[2]})
 		{
 			my $besDistance = $besList[10] - $besLeftPosition->{$besSequence[2]};
@@ -194,7 +218,7 @@ if ($seqId)
 			$besRightAlignment->{$besSequence[2]} = ($besList[11] > $besList[10]) ? "+" : "-";
 			$totalLength += $besDistance;
 
-			print BES "$besSequence[2]\t$refSequence[2]\t$besLeftPosition->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$besSequence[2]}\t$besRightAlignment->{$besSequence[2]}\n";
+			print BES "$besSequence[2]\t$refSequence[2]\t$besLeftPosition->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$besSequence[2]}\t$besRightAlignment->{$besSequence[2]}\t$fpcContig->{$besSequence[2]}\t$fpcCloneLeftEnd->{$besSequence[2]}\t$fpcCloneRightEnd->{$besSequence[2]}\n";
 		}
 		else
 		{
@@ -205,7 +229,7 @@ if ($seqId)
 	}
 	close (BES);
 	`gzip -f $commoncfg->{TMPDIR}/BES-$refSequence[2].txt`;
-	my $besEvaluation = "<a href='$commoncfg->{TMPURL}/BES-$refSequence[2].txt.gz' target='hiddenFrame'>Download BES Evaluation</a>" if (-e "$commoncfg->{TMPDIR}/BES-$refSequence[2].txt.gz");
+	my $besEvaluation = "<a href='$commoncfg->{TMPURL}/BES-$refSequence[2].txt.gz' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>BES Evaluation</a>" if (-e "$commoncfg->{TMPDIR}/BES-$refSequence[2].txt.gz");
 
 
 	my @besCloneList = sort { $besLeftPosition->{$a} <=> $besLeftPosition->{$b} } keys %$besRightPosition;
@@ -218,23 +242,6 @@ if ($seqId)
 	push @colPostion, -1;
     for my $currentClone (@besCloneList)
     {
-		my $fpcView = 'None.';
-		my $getFpcClone = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpcClone' AND name LIKE ?");
-		$getFpcClone->execute($currentClone);
-		while (my @getFpcClone = $getFpcClone->fetchrow_array())
-		{
-			$fpcView = "" unless ($fpcView ne 'None.');
-			my $contig = 'Ctg0';
-			if($getFpcClone[8] =~ /Map "(.*)" Ends Left/)
-			{
-				$contig = ucfirst ($1);
-			}
-#			my $fpcList=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-#			$fpcList->execute($getFpcClone[3]);
-#			my @fpcList = $fpcList->fetchrow_array();
-#			$fpcView .= ($fpcView) ? " - $fpcList[2] $contig" : "$fpcList[2] $contig";
-			$fpcView = $contig; # only one contig was showed. 
-		}
 
     	my $col = 0;
     	my $goodCol = @colPostion;
@@ -262,7 +269,7 @@ if ($seqId)
 				id    => "besClone$currentClone$colCount$$"
 			);
 		my $besDistanceText =  commify($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone});
-		my $lable = $currentClone." (~$besDistanceText bp) FPC: $fpcView";
+		my $lable = ($fpcCloneRightEnd->{$currentClone} eq '0') ?  $currentClone." (~$besDistanceText bp)" : $currentClone." (~$besDistanceText bp) FPC: $fpcContig->{$currentClone}($fpcCloneLeftEnd->{$currentClone}-$fpcCloneRightEnd->{$currentClone})";
 		my $lableLength = length $lable;
 		
     	my $textX = $margin + $barHeight + $besLeftPosition->{$currentClone} / $pixelUnit;
@@ -353,7 +360,15 @@ if ($seqId)
 	$dialogWidth = ($svgWidth > 1000 ) ? 1050 : ($svgWidth < 550) ? 600 : $svgWidth + 50;
 	$seqDetails =~ s/\$svgWidth/$svgWidth/g;
 	$seqDetails =~ s/\$svgHeight/$svgHeight/g;
+
+	open (SVGFILE,">$commoncfg->{TMPDIR}/BES-$refSequence[2].svg") or die "can't open file: $commoncfg->{TMPDIR}/BES-$refSequence[2].svg";
+	print SVGFILE $seqDetails;
+	close (SVGFILE);
+	`gzip -f $commoncfg->{TMPDIR}/BES-$refSequence[2].svg`;
+	my $besSvg = "<a href='$commoncfg->{TMPURL}/BES-$refSequence[2].svg.gz' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>SVG</a>" if (-e "$commoncfg->{TMPDIR}/BES-$refSequence[2].svg.gz");
+
 	$html =~ s/\$besEvaluation/$besEvaluation/g;
+	$html =~ s/\$besSvg/$besSvg/g;
 	$html =~ s/\$seqDetails/$seqDetails/g;
 	$html =~ s/\$dialogWidth/$dialogWidth/g;
 	$html =~ s/\$seqName/$refSequence[2]/g;
@@ -371,9 +386,19 @@ else
 
 
 __DATA__
+
+<ul class='seqBrowserMenu' style='width: 100px;float: left; margin-right: .3em; white-space: nowrap;'>
+	<li><a><span class='ui-icon ui-icon-disk'></span>Download</a>
+		<ul style='z-index: 1000;white-space: nowrap;'>
+			<li>$besEvaluation</li>
+			<li>$besSvg</li>
+		</ul>
+	</li>
+</ul>
+<br><br>
 $seqDetails
-$besEvaluation
 <script>
+$( ".seqBrowserMenu" ).menu();
 $('#viewer').dialog("option", "title", "Seq Browser: $seqName");
 $('#viewer').dialog("option", "width", "$dialogWidth");
 $('#viewer').scrollLeft($scrollLeft);
