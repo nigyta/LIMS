@@ -2,6 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
+use JSON;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -31,6 +32,8 @@ if ($projectId)
 	$serviceInProject->execute();
 	while (my @serviceInProject = $serviceInProject->fetchrow_array())
 	{
+		my $serviceDetails = decode_json $serviceInProject[8];
+
 		$serviceInProject[2] = "Unknown service!" unless($serviceInProject[2]);
 		$project = "<div id='inProject$projectId$$'><ul>\n" unless($project);
 		$project .= "<li style='white-space: nowrap;'><a href='service.cgi?serviceId=$serviceInProject[0]' title ='Service: $serviceInProject[0]'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-document-b'></span>$serviceInProject[2]</a></li>\n";
@@ -41,8 +44,10 @@ if ($projectId)
 	$libraryInProject->execute();
 	while (my @libraryInProject = $libraryInProject->fetchrow_array())
 	{
+		my $libraryDetails = decode_json $libraryInProject[8];
+
 		$project = "<div id='inProject$projectId$$'><ul>\n" unless($project);
-		$project .= "<li style='white-space: nowrap;'><a href='library.cgi?libraryId=$libraryInProject[0]' title ='Library: $libraryInProject[2]'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-folder-collapsed'></span>$libraryInProject[2]</a></li>\n";
+		$project .= "<li style='white-space: nowrap;'><a href='library.cgi?libraryId=$libraryInProject[0]' title ='Library: $libraryDetails->{'nickname'}'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-folder-collapsed'></span>$libraryInProject[2]</a></li>\n";
 		$active = $acitveDetector if ($cookieLibrary eq $libraryInProject[0]);
 		$acitveDetector++;
 	}

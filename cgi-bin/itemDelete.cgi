@@ -342,6 +342,32 @@ END
 </script>	
 END
 		}
+		elsif($item[1] eq 'fpc')
+		{
+		
+			my $fpcAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND z = $_");
+			$fpcAsReference->execute();
+			if($fpcAsReference->rows > 0)
+			{
+				print <<END;
+<script>
+	parent.closeDialog();
+	parent.errorPop("Please delete related assemblies using this FPC as a physical reference first!");
+</script>	
+END
+				exit;
+			}
+
+			my $deleteFpcClone=$dbh->do("DELETE FROM matrix WHERE container LIKE 'fpcClone' AND o = $_");
+			my $deleteFpcCtg=$dbh->do("DELETE FROM matrix WHERE container LIKE 'fpcCtg' AND o = $_");
+			my $deleteFpc=$dbh->do("DELETE FROM matrix WHERE id = $_");
+			print <<END;
+<script>
+	parent.closeDialog();
+	parent.refresh("menu");
+</script>	
+END
+		}
 		elsif($item[1] eq 'agp')
 		{
 		

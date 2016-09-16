@@ -31,6 +31,7 @@ if(param ('libraryId'))
 	my $targetGenome;
 	my @targetGenome;
 	my $besToGenome;
+	my $besIdToGenome;
 	my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE z = ? AND container LIKE 'genome'");
 	$genomeList->execute($libraryId);
 	while (my @genomeList = $genomeList->fetchrow_array())
@@ -61,6 +62,7 @@ if(param ('libraryId'))
 			$besList->execute($refSequence[0]);
 			while (my @besList = $besList->fetchrow_array())
 			{
+				$besIdToGenome->{$genomeList[0]}->{$besList[2]} = 1;
 				my $besSequence=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 				$besSequence->execute($besList[2]);
 				my @besSequence = $besSequence->fetchrow_array();
@@ -87,7 +89,7 @@ if(param ('libraryId'))
 				if (exists $besLeftPosition->{$refSequence[0]}->{$besSequence[2]})
 				{
 					my $besDistance = $besList[10] - $besLeftPosition->{$refSequence[0]}->{$besSequence[2]};
-					next if($besDistance > 300000 || $besDistance < 2000);
+					next if($besDistance > 300000 || $besDistance < 25000);
 					next if($besLeftDirection->{$refSequence[0]}->{$besSequence[2]} == $besSequence[6]);
 					$besRightDirection->{$refSequence[0]}->{$besSequence[2]} = $besSequence[6];
 					$besRightPosition->{$refSequence[0]}->{$besSequence[2]} = ($besList[11] > $besList[10]) ? $besList[11] : $besList[10];
@@ -121,6 +123,7 @@ if(param ('libraryId'))
 		$paredBes->{$getSequences[2]} .= $seqDir{$getSequences[6]};
 	}
 	my $totalBes = $getSequences->rows; 
+	$totalBes = "Total $totalBes BESs: ";
 	my $besDetails = "<table id='bes$$' class='display' style='width: 100%;'>
 			<thead>
 				<tr>
@@ -129,7 +132,7 @@ if(param ('libraryId'))
 					<th style='text-align:left'><b>BAC Hits</b></th>";
 	for(@targetGenome)
 	{
-			$besDetails .= "<td><th style='text-align:left'><b>$targetGenome->{$_}</b></th></td>";
+			$besDetails .= "<th style='text-align:left'><b>$targetGenome->{$_}</b></th>";
 	}
 	$besDetails .= "</tr>
 			</thead>
@@ -154,7 +157,9 @@ if(param ('libraryId'))
 	for(@targetGenome)
 	{
 		my $targetGenomeId = $_;
-		$besDetails .= "<td>$paredBesMapped->{$targetGenomeId}</td>";
+		my $besIdToGenomeTotal = scalar (keys %{$besIdToGenome->{$targetGenomeId}});
+		$besDetails .= "<td>Mapped: $besIdToGenomeTotal ($paredBesMapped->{$targetGenomeId} paired)</td>";
+
 		open (BES,">$commoncfg->{TMPDIR}/BES-$targetGenome->{$targetGenomeId}.txt") or die "can't open file: $commoncfg->{TMPDIR}/BES-$targetGenome->{$targetGenomeId}.txt";
 		for (sort keys %{$besToGenome->{$targetGenomeId}})
 		{
@@ -162,6 +167,7 @@ if(param ('libraryId'))
 		}
 		close (BES);
 		`gzip -f $commoncfg->{TMPDIR}/BES-$targetGenome->{$targetGenomeId}.txt`;
+		$totalBes .= ($mappedPairs) ? " and $besIdToGenomeTotal<sup>$targetGenome->{$targetGenomeId}</sup>" : "$besIdToGenomeTotal<sup>$targetGenome->{$targetGenomeId}</sup>";
 		$mappedPairs .= ($mappedPairs) ? " and <a href='$commoncfg->{TMPURL}/BES-$targetGenome->{$targetGenomeId}.txt.gz' target='hiddenFrame'>$paredBesMapped->{$targetGenomeId}</a><sup>$targetGenome->{$targetGenomeId}</sup>" : "<a href='$commoncfg->{TMPURL}/BES-$targetGenome->{$targetGenomeId}.txt.gz' target='hiddenFrame'>$paredBesMapped->{$targetGenomeId}</a><sup>$targetGenome->{$targetGenomeId}</sup>";
 	}
 	$besDetails .= "</tr>"; 
@@ -171,7 +177,7 @@ if(param ('libraryId'))
 	print BESTEXT $besDetails;
 	close (BESTEXT);
 	`gzip -f $commoncfg->{TMPDIR}/BES-report.$libraryId.html`;
-	my $besReport = "<a href='$commoncfg->{TMPURL}/$libraryId.BES-report.html.gz' target='hiddenFrame'>Download Details</a>" if (-e "$commoncfg->{TMPDIR}/BES-report.$libraryId.html.gz");
+	my $besReport = "<a href='$commoncfg->{TMPURL}/BES-report.$libraryId.html.gz' target='hiddenFrame'>Download Details</a>" if (-e "$commoncfg->{TMPDIR}/BES-report.$libraryId.html.gz");
 	$html =~ s/\$besReport/$besReport/g;
 	$html =~ s/\$totalBes/$totalBes/g;
 	$html =~ s/\$paredBesNumber/$paredBesNumber/g;
@@ -187,10 +193,11 @@ else
 
 
 __DATA__
-<button style="float: right; margin-top: .3em; margin-right: .3em;" onclick="printDiv('besReport$$')">Print</button>
 <div id="besReport$$"  name="besReport$$">
-Total $totalBes BESs. ($besReport)<br>
-$paredBesNumber ($mappedPairs mapped) pairs.
+$totalBes mapped. <br><br>
+$paredBesNumber pairs: $mappedPairs mapped. <br><br>
+
+($besReport)
 </div>
 <script>
 buttonInit();

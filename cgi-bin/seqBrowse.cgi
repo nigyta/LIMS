@@ -210,7 +210,7 @@ if ($seqId)
 		if (exists $besLeftPosition->{$besSequence[2]})
 		{
 			my $besDistance = $besList[10] - $besLeftPosition->{$besSequence[2]};
- 			next if($besDistance > 300000 || $besDistance < 2000);
+ 			next if($besDistance > 300000 || $besDistance < 25000);
  			next if($besLeftDirection->{$besSequence[2]} == $besSequence[6]);
 			push @lengthList,$besDistance;
 			$besRightDirection->{$besSequence[2]} = $besSequence[6];
@@ -242,7 +242,7 @@ if ($seqId)
 	push @colPostion, -1;
     for my $currentClone (@besCloneList)
     {
-
+		next if ($fpcCloneRightEnd->{$currentClone} ne '0');
     	my $col = 0;
     	my $goodCol = @colPostion;
     	for(@colPostion)
@@ -264,7 +264,76 @@ if ($seqId)
 				width => ($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone}) / $pixelUnit,
 				height=> $barHeight,
 				style => { stroke => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'red' :'grey',
-							fill => 'white'
+							fill => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'yellow': 'white'
+							},
+				id    => "besClone$currentClone$colCount$$"
+			);
+		my $besDistanceText =  commify($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone});
+		my $lable = ($fpcCloneRightEnd->{$currentClone} eq '0') ?  $currentClone." (~$besDistanceText bp)" : $currentClone." (~$besDistanceText bp) FPC: $fpcContig->{$currentClone}($fpcCloneLeftEnd->{$currentClone}-$fpcCloneRightEnd->{$currentClone})";
+		my $lableLength = length $lable;
+		
+    	my $textX = $margin + $barHeight + $besLeftPosition->{$currentClone} / $pixelUnit;
+    	my $textY = $barY + $barHeight * (1.3 * ($goodCol + 2 ) + 2) - 2;
+    	my $textEnd = $besLeftPosition->{$currentClone}  + $lableLength * $textFontWidth * $pixelUnit;
+		$besClone->text(
+			id      => 'cloneName'.$currentClone.$colCount,
+			onclick => "closeDialog();openDialog('cloneView.cgi?cloneName=$currentClone')",
+			x       => $textX,
+			y       => $textY,
+			style   => {
+				'font-size'   => $textFontSize,
+				'stroke'        => 'black'
+			}
+		)->cdata($lable);
+    	$colPostion[$goodCol] = ($textEnd > $besRightPosition->{$currentClone}) ? $textEnd : $besRightPosition->{$currentClone};
+		$colCount++;
+    }
+	my $colNumber = 0;
+    for(@colPostion)
+	{
+		$colPostion[$colNumber] = $refSequence[5];
+    	$colNumber++;
+    }
+
+	#zone line
+	$ruler->line(
+		id    => "physicalCloneOrNot",
+		style => {
+			stroke => 'blue',
+			'stroke-dasharray' => '3,3'
+			},
+		x1    => $margin,
+		y1    => $barY + $barHeight * (1.3 * ($colNumber + 2) + 1) - 2,
+		x2    => $margin +  $refSequence[5] / $pixelUnit,
+		y2    => $barY + $barHeight * (1.3 * ($colNumber + 2) + 1) - 2
+	);
+
+
+    for my $currentClone (@besCloneList)
+    {
+		next if ($fpcCloneRightEnd->{$currentClone} eq '0');
+    	my $col = 0;
+    	my $goodCol = @colPostion;
+    	for(@colPostion)
+    	{
+    		if($_ < $besLeftPosition->{$currentClone})
+    		{
+    			$goodCol = $col;
+    			last;
+    		}
+    		$col++;
+    	}
+		$besClone->anchor(
+			id      => 'clone'.$currentClone.$colCount,
+			onclick => "closeDialog();openDialog('cloneView.cgi?cloneName=$currentClone')",
+			title   => $currentClone
+			)->rectangle(
+				x     => $margin + $besLeftPosition->{$currentClone} / $pixelUnit,
+				y     => $barY + $barHeight * (1.3 * ($goodCol + 2) + 1),
+				width => ($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone}) / $pixelUnit,
+				height=> $barHeight,
+				style => { stroke => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'red' :'grey',
+							fill => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'yellow': 'white'
 							},
 				id    => "besClone$currentClone$colCount$$"
 			);
