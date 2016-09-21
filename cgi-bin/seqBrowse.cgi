@@ -165,7 +165,7 @@ if ($seqId)
 	my $totalLength = 0;
 	my $besId = 0;
 	open (BES,">$commoncfg->{TMPDIR}/BES-$refSequence[2].txt") or die "can't open file: $commoncfg->{TMPDIR}/BES-$refSequence[2].txt";
-	my $besList=$dbh->prepare("SELECT * FROM alignment WHERE subject = ? AND program LIKE 'BES%' ORDER BY s_start");
+	my $besList=$dbh->prepare("SELECT * FROM alignment WHERE subject = ? AND program LIKE 'BES%' AND perc_indentity >= 95 ORDER BY s_start");
 	$besList->execute($seqId);
 	while (my @besList = $besList->fetchrow_array())
 	{
@@ -188,14 +188,16 @@ if ($seqId)
 		my @besSequence = $besSequence->fetchrow_array();
 
 		$fpcContig->{$besSequence[2]} = "None" unless (exists $fpcContig->{$besSequence[2]});
-		$fpcCloneLeftEnd->{$besSequence[2]} = 0 unless (exists $fpcCloneLeftEnd->{$besSequence[2]});
-		$fpcCloneRightEnd->{$besSequence[2]} = 0 unless (exists $fpcCloneRightEnd->{$besSequence[2]});
+		$fpcCloneLeftEnd->{$besSequence[2]} = -1 unless (exists $fpcCloneLeftEnd->{$besSequence[2]});
+		$fpcCloneRightEnd->{$besSequence[2]} = -1 unless (exists $fpcCloneRightEnd->{$besSequence[2]});
 		
 		my $getFpcClone = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpcClone' AND name LIKE ?");
 		$getFpcClone->execute($besSequence[2]);
 		while (my @getFpcClone = $getFpcClone->fetchrow_array())
 		{
 			$fpcContig->{$besSequence[2]} = 'Ctg0';
+			$fpcCloneLeftEnd->{$besSequence[2]} = 0;
+			$fpcCloneRightEnd->{$besSequence[2]} = 0;
 			if ($getFpcClone[8] =~ /Map "(.*)" Ends Left (\d*)/)
 			{
 				$fpcContig->{$besSequence[2]} = ucfirst ($1);
@@ -217,8 +219,14 @@ if ($seqId)
 			$besRightPosition->{$besSequence[2]} = ($besList[11] > $besList[10]) ? $besList[11] : $besList[10];
 			$besRightAlignment->{$besSequence[2]} = ($besList[11] > $besList[10]) ? "+" : "-";
 			$totalLength += $besDistance;
-
-			print BES "$besSequence[2]\t$refSequence[2]\t$besLeftPosition->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$besSequence[2]}\t$besRightAlignment->{$besSequence[2]}\t$fpcContig->{$besSequence[2]}\t$fpcCloneLeftEnd->{$besSequence[2]}\t$fpcCloneRightEnd->{$besSequence[2]}\n";
+			if($besLeftAlignment->{$besSequence[2]} eq $besRightAlignment->{$besSequence[2]})
+			{
+				print BES "$besSequence[2]\t$refSequence[2]\t$besLeftPosition->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$besSequence[2]}\t=\t$fpcContig->{$besSequence[2]}\t$fpcCloneLeftEnd->{$besSequence[2]}\t$fpcCloneRightEnd->{$besSequence[2]}\n";
+			}
+			else
+			{
+				print BES "$besSequence[2]\t$refSequence[2]\t$besLeftPosition->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$besSequence[2]}\t$besRightAlignment->{$besSequence[2]}\t$fpcContig->{$besSequence[2]}\t$fpcCloneLeftEnd->{$besSequence[2]}\t$fpcCloneRightEnd->{$besSequence[2]}\n";
+			}
 		}
 		else
 		{
@@ -238,11 +246,12 @@ if ($seqId)
         id    => 'besClone'
     );
 	my $colCount=0;
+	my $toBeFlipped = 0;
 	my @colPostion;
 	push @colPostion, -1;
     for my $currentClone (@besCloneList)
     {
-		next if ($fpcCloneRightEnd->{$currentClone} ne '0');
+		next if ($fpcCloneRightEnd->{$currentClone} ne '-1');
     	my $col = 0;
     	my $goodCol = @colPostion;
     	for(@colPostion)
@@ -268,8 +277,9 @@ if ($seqId)
 							},
 				id    => "besClone$currentClone$colCount$$"
 			);
+		$toBeFlipped++ if ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone});
 		my $besDistanceText =  commify($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone});
-		my $lable = ($fpcCloneRightEnd->{$currentClone} eq '0') ?  $currentClone." (~$besDistanceText bp)" : $currentClone." (~$besDistanceText bp) FPC: $fpcContig->{$currentClone}($fpcCloneLeftEnd->{$currentClone}-$fpcCloneRightEnd->{$currentClone})";
+		my $lable = ($fpcCloneRightEnd->{$currentClone} eq '-1') ?  $currentClone." (~$besDistanceText bp)" : $currentClone." (~$besDistanceText bp) FPC: $fpcContig->{$currentClone}($fpcCloneLeftEnd->{$currentClone}-$fpcCloneRightEnd->{$currentClone})";
 		my $lableLength = length $lable;
 		
     	my $textX = $margin + $barHeight + $besLeftPosition->{$currentClone} / $pixelUnit;
@@ -288,6 +298,10 @@ if ($seqId)
     	$colPostion[$goodCol] = ($textEnd > $besRightPosition->{$currentClone}) ? $textEnd : $besRightPosition->{$currentClone};
 		$colCount++;
     }
+
+	my $nonFpcCloneNumber = $colCount;
+	my $nonFpcCloneToBeFlippedNumber = $toBeFlipped; 
+
 	my $colNumber = 0;
     for(@colPostion)
 	{
@@ -297,7 +311,7 @@ if ($seqId)
 
 	#zone line
 	$ruler->line(
-		id    => "physicalCloneOrNot",
+		id    => "fpcCloneOrNot",
 		style => {
 			stroke => 'blue',
 			'stroke-dasharray' => '3,3'
@@ -307,11 +321,22 @@ if ($seqId)
 		x2    => $margin +  $refSequence[5] / $pixelUnit,
 		y2    => $barY + $barHeight * (1.3 * ($colNumber + 2) + 1) - 2
 	);
+	#nonFpcClone
+	$ruler->text(
+		id      => "nonFpcCloneNumber",
+		x       => $margin,
+		y       => $barY + $barHeight * (1.3 * ($colNumber + 2) + 1) - 2,
+		style   => {
+			'font-size'   =>  11,
+			'stroke'        => 'blue'
+		}
+	)->cdata("$nonFpcCloneNumber ($nonFpcCloneToBeFlippedNumber conflict) non-FPC clones");
+
 
 
     for my $currentClone (@besCloneList)
     {
-		next if ($fpcCloneRightEnd->{$currentClone} eq '0');
+		next if ($fpcCloneRightEnd->{$currentClone} eq '-1');
     	my $col = 0;
     	my $goodCol = @colPostion;
     	for(@colPostion)
@@ -337,6 +362,7 @@ if ($seqId)
 							},
 				id    => "besClone$currentClone$colCount$$"
 			);
+		$toBeFlipped++ if ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone});
 		my $besDistanceText =  commify($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone});
 		my $lable = ($fpcCloneRightEnd->{$currentClone} eq '0') ?  $currentClone." (~$besDistanceText bp)" : $currentClone." (~$besDistanceText bp) FPC: $fpcContig->{$currentClone}($fpcCloneLeftEnd->{$currentClone}-$fpcCloneRightEnd->{$currentClone})";
 		my $lableLength = length $lable;
@@ -351,12 +377,25 @@ if ($seqId)
 			y       => $textY,
 			style   => {
 				'font-size'   => $textFontSize,
-				'stroke'        => 'black'
+				'stroke'        => ($fpcCloneRightEnd->{$currentClone} eq '0') ? 'red' : 'black'
 			}
 		)->cdata($lable);
     	$colPostion[$goodCol] = ($textEnd > $besRightPosition->{$currentClone}) ? $textEnd : $besRightPosition->{$currentClone};
 		$colCount++;
     }
+	my $fpcCloneNumber = $colCount - $nonFpcCloneNumber;
+	my $fpcCloneToBeFlippedNumber = $toBeFlipped - $nonFpcCloneToBeFlippedNumber;
+
+	#fpcClone
+	$ruler->text(
+		id      => "fpcCloneNumber",
+		x       => $margin,
+		y       => $barY + $barHeight * (1.3 * (@colPostion + 2) + 1) - 2,
+		style   => {
+			'font-size'   =>  11,
+			'stroke'        => 'green'
+		}
+	)->cdata("$fpcCloneNumber ($fpcCloneToBeFlippedNumber conflict) FPC clones");
 
 
 	@lengthList = sort {$b <=> $a} @lengthList;

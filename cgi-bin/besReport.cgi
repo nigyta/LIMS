@@ -58,7 +58,7 @@ if(param ('libraryId'))
 			my $fpcView;
 			my $fpcCloneLeftEnd;
 			my $fpcCloneRightEnd;
-			my $besList=$dbh->prepare("SELECT * FROM alignment WHERE subject = ? AND program LIKE 'BES%' ORDER BY s_start");
+			my $besList=$dbh->prepare("SELECT * FROM alignment WHERE subject = ? AND program LIKE 'BES%' AND perc_indentity >= 98 ORDER BY s_start");
 			$besList->execute($refSequence[0]);
 			while (my @besList = $besList->fetchrow_array())
 			{
@@ -68,13 +68,15 @@ if(param ('libraryId'))
 				my @besSequence = $besSequence->fetchrow_array();
 
 				$fpcView->{$besSequence[2]} = "None" unless (exists $fpcView->{$besSequence[2]});
-				$fpcCloneLeftEnd->{$besSequence[2]} = 0 unless (exists $fpcCloneLeftEnd->{$besSequence[2]});
-				$fpcCloneRightEnd->{$besSequence[2]} = 0 unless (exists $fpcCloneRightEnd->{$besSequence[2]});
+				$fpcCloneLeftEnd->{$besSequence[2]} = -1 unless (exists $fpcCloneLeftEnd->{$besSequence[2]});
+				$fpcCloneRightEnd->{$besSequence[2]} = -1 unless (exists $fpcCloneRightEnd->{$besSequence[2]});
 				my $getFpcClone = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpcClone' AND name LIKE ?");
 				$getFpcClone->execute($besSequence[2]);
 				while (my @getFpcClone = $getFpcClone->fetchrow_array())
 				{
 					$fpcView->{$besSequence[2]} = 'Ctg0';
+					$fpcCloneLeftEnd->{$besSequence[2]} = 0;
+					$fpcCloneRightEnd->{$besSequence[2]} = 0;
 					if ($getFpcClone[8] =~ /Map "(.*)" Ends Left (\d*)/)
 					{
 						$fpcView->{$besSequence[2]} = ucfirst ($1);
@@ -94,7 +96,8 @@ if(param ('libraryId'))
 					$besRightDirection->{$refSequence[0]}->{$besSequence[2]} = $besSequence[6];
 					$besRightPosition->{$refSequence[0]}->{$besSequence[2]} = ($besList[11] > $besList[10]) ? $besList[11] : $besList[10];
 					$besRightAlignment->{$refSequence[0]}->{$besSequence[2]} = ($besList[11] > $besList[10]) ? "+" : "-";
-					$besToGenome->{$genomeList[0]}->{$besSequence[2]} = "$refSequence[2]\t$besLeftPosition->{$refSequence[0]}->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$refSequence[0]}->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$refSequence[0]}->{$besSequence[2]}\t$besRightAlignment->{$refSequence[0]}->{$besSequence[2]}\t$fpcView->{$besSequence[2]}\t$fpcCloneLeftEnd->{$besSequence[2]}\t$fpcCloneRightEnd->{$besSequence[2]}";
+					$besToGenome->{$genomeList[0]}->{$besSequence[2]} = ($besLeftAlignment->{$refSequence[0]}->{$besSequence[2]} eq $besRightAlignment->{$refSequence[0]}->{$besSequence[2]}) ? "$refSequence[2]\t$besLeftPosition->{$refSequence[0]}->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$refSequence[0]}->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$refSequence[0]}->{$besSequence[2]}\t=\t$fpcView->{$besSequence[2]}\t$fpcCloneLeftEnd->{$besSequence[2]}\t$fpcCloneRightEnd->{$besSequence[2]}" :
+						"$refSequence[2]\t$besLeftPosition->{$refSequence[0]}->{$besSequence[2]}\t$besDistance\t$seqDir{$besLeftDirection->{$refSequence[0]}->{$besSequence[2]}}\t$seqDir{$besSequence[6]}\t$besLeftAlignment->{$refSequence[0]}->{$besSequence[2]}\t$besRightAlignment->{$refSequence[0]}->{$besSequence[2]}\t$fpcView->{$besSequence[2]}\t$fpcCloneLeftEnd->{$besSequence[2]}\t$fpcCloneRightEnd->{$besSequence[2]}";
 				}
 				else
 				{
@@ -108,6 +111,7 @@ if(param ('libraryId'))
 
 	my $besClone;
 	my $paredBes;
+	my $singleEndCount;
 	my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 98 AND x = ? ORDER BY name,id");
 	$getSequences->execute($libraryId);
 	while(my @getSequences =  $getSequences->fetchrow_array())
@@ -121,18 +125,26 @@ if(param ('libraryId'))
 		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
 		$besClone->{$getSequences[2]} .= "$seqDir{$getSequences[6]}:$getSequences[5] ";
 		$paredBes->{$getSequences[2]} .= $seqDir{$getSequences[6]};
+		$singleEndCount->{$seqDir{$getSequences[6]}}++;
 	}
+	my $singleEnd;
+	for (sort keys %$singleEndCount)
+	{
+		$singleEnd .= ($singleEnd) ? " $_:$singleEndCount->{$_}" : "$_:$singleEndCount->{$_}";
+	}
+
+	my $totalClone = keys %$besClone;
 	my $totalBes = $getSequences->rows; 
-	$totalBes = "Total $totalBes BESs: ";
+	$totalBes = "$totalBes ($singleEnd) BESs";
 	my $besDetails = "<table id='bes$$' class='display' style='width: 100%;'>
 			<thead>
-				<tr>
-					<th style='text-align:left'><b>Clone Name</b></th>
-					<th style='text-align:left'><b>Direction:Length</b> (bp)</th>
-					<th style='text-align:left'><b>BAC Hits</b></th>";
+				<tr style='text-align:left'>
+					<th><b>Clone Name</b></th>
+					<th><b>Direction:Length</b> (bp)</th>
+					<th><b>BAC Hits</b></th>";
 	for(@targetGenome)
 	{
-			$besDetails .= "<th style='text-align:left'><b>$targetGenome->{$_}</b></th>";
+			$besDetails .= "<th><b>$targetGenome->{$_}</b></th>";
 	}
 	$besDetails .= "</tr>
 			</thead>
@@ -153,25 +165,27 @@ if(param ('libraryId'))
 	}	
 
 	my $mappedPairs = '';
-	$besDetails .= "<tr><td></td><td></td><td></td>"; 
+	$besDetails .= "</tbody><tfoot style='text-align:left'><tr><th>$totalClone clones</th><th>$totalBes, $paredBesNumber pairs</th><th></th>"; 
 	for(@targetGenome)
 	{
 		my $targetGenomeId = $_;
 		my $besIdToGenomeTotal = scalar (keys %{$besIdToGenome->{$targetGenomeId}});
-		$besDetails .= "<td>Mapped: $besIdToGenomeTotal ($paredBesMapped->{$targetGenomeId} paired)</td>";
 
+		my $besToBeFlipped;
 		open (BES,">$commoncfg->{TMPDIR}/BES-$targetGenome->{$targetGenomeId}.txt") or die "can't open file: $commoncfg->{TMPDIR}/BES-$targetGenome->{$targetGenomeId}.txt";
 		for (sort keys %{$besToGenome->{$targetGenomeId}})
 		{
 			print BES "$_\t$besToGenome->{$targetGenomeId}->{$_}\n";
+			$besToBeFlipped->{$targetGenomeId}++ if ($besToGenome->{$targetGenomeId}->{$_} =~ /=/);
 		}
 		close (BES);
 		`gzip -f $commoncfg->{TMPDIR}/BES-$targetGenome->{$targetGenomeId}.txt`;
-		$totalBes .= ($mappedPairs) ? " and $besIdToGenomeTotal<sup>$targetGenome->{$targetGenomeId}</sup>" : "$besIdToGenomeTotal<sup>$targetGenome->{$targetGenomeId}</sup>";
-		$mappedPairs .= ($mappedPairs) ? " and <a href='$commoncfg->{TMPURL}/BES-$targetGenome->{$targetGenomeId}.txt.gz' target='hiddenFrame'>$paredBesMapped->{$targetGenomeId}</a><sup>$targetGenome->{$targetGenomeId}</sup>" : "<a href='$commoncfg->{TMPURL}/BES-$targetGenome->{$targetGenomeId}.txt.gz' target='hiddenFrame'>$paredBesMapped->{$targetGenomeId}</a><sup>$targetGenome->{$targetGenomeId}</sup>";
+		$besDetails .= "<th>Mapped: $besIdToGenomeTotal ($paredBesMapped->{$targetGenomeId} paired, including $besToBeFlipped->{$targetGenomeId} conflict ones)</th>";
+		$totalBes .= ($mappedPairs) ? " and $besIdToGenomeTotal<sup>$targetGenome->{$targetGenomeId}</sup>" : ": $besIdToGenomeTotal<sup>$targetGenome->{$targetGenomeId}</sup>";
+		$mappedPairs .= ($mappedPairs) ? " and $paredBesMapped->{$targetGenomeId} ($besToBeFlipped->{$targetGenomeId} conflict)<a href='$commoncfg->{TMPURL}/BES-$targetGenome->{$targetGenomeId}.txt.gz' target='hiddenFrame'><sup>$targetGenome->{$targetGenomeId}</sup></a>" : "$paredBesMapped->{$targetGenomeId} ($besToBeFlipped->{$targetGenomeId} conflict)<a href='$commoncfg->{TMPURL}/BES-$targetGenome->{$targetGenomeId}.txt.gz' target='hiddenFrame'><sup>$targetGenome->{$targetGenomeId}</sup></a>";
 	}
 	$besDetails .= "</tr>"; 
-	$besDetails .= "</tbody></table>"; 
+	$besDetails .= "</tfoot></table>"; 
 
 	open (BESTEXT,">$commoncfg->{TMPDIR}/BES-report.$libraryId.html") or die "can't open file: $commoncfg->{TMPDIR}/BES-report.$libraryId.html";
 	print BESTEXT $besDetails;
@@ -179,6 +193,7 @@ if(param ('libraryId'))
 	`gzip -f $commoncfg->{TMPDIR}/BES-report.$libraryId.html`;
 	my $besReport = "<a href='$commoncfg->{TMPURL}/BES-report.$libraryId.html.gz' target='hiddenFrame'>Download Details</a>" if (-e "$commoncfg->{TMPDIR}/BES-report.$libraryId.html.gz");
 	$html =~ s/\$besReport/$besReport/g;
+	$html =~ s/\$totalClone/$totalClone/g;
 	$html =~ s/\$totalBes/$totalBes/g;
 	$html =~ s/\$paredBesNumber/$paredBesNumber/g;
 	$html =~ s/\$mappedPairs/$mappedPairs/g;
@@ -194,6 +209,7 @@ else
 
 __DATA__
 <div id="besReport$$"  name="besReport$$">
+$totalClone clones <br><br>
 $totalBes mapped. <br><br>
 $paredBesNumber pairs: $mappedPairs mapped. <br><br>
 
