@@ -58,7 +58,7 @@ if(param ('libraryId'))
 			my $fpcView;
 			my $fpcCloneLeftEnd;
 			my $fpcCloneRightEnd;
-			my $besList=$dbh->prepare("SELECT * FROM alignment WHERE subject = ? AND program LIKE 'BES%' AND perc_indentity >= 98 ORDER BY s_start");
+			my $besList=$dbh->prepare("SELECT * FROM alignment WHERE subject = ? AND program LIKE 'BES%' AND perc_indentity >= 95 ORDER BY s_start");
 			$besList->execute($refSequence[0]);
 			while (my @besList = $besList->fetchrow_array())
 			{

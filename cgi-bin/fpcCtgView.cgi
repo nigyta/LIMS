@@ -37,8 +37,8 @@ if ($fpcCtgId)
 	my $barY = 25;
 	my $rulerY = 20;
 	my $margin = 4;
-	my $barHeight = 8;
-	my $barSpacing = 15; #space between two bars
+	my $barHeight = 12;
+	my $barSpacing = 5; #space between two bars
 	my $unitLength = 10;
     my $textLength;
 	my $fpcClone;
@@ -148,20 +148,21 @@ if ($fpcCtgId)
 				style => ($fpcCloneMTP->{$currentClone}) ? 
 						{ stroke =>'red',
 							fill => ($fpcCloneSequenced->{$currentClone}) ? 'yellow' : 'lightgrey',
-							'stroke-dasharray' => ($currentClone eq $highlight) ? '1,1' :''
+							'stroke-dasharray' => ($currentClone eq $highlight) ? '3,3' :''
 							} :
 						{ stroke =>'grey',
 							fill => ($fpcCloneSequenced->{$currentClone}) ? 'yellow' : 'white',
-							'stroke-dasharray' => ($currentClone eq $highlight) ? '1,1' :''
+							'stroke-dasharray' => ($currentClone eq $highlight) ? '3,3' :''
 							},
 				id    => "$currentClone$$"
 			);
 		$scrollLeft = $fpcCloneLeftEnd->{$currentClone} * $pixelUnit if ($currentClone eq $highlight);
-    	my $textX = $margin + $fpcCloneLeftEnd->{$currentClone} * $pixelUnit;
-    	my $textY = $barY + ($barHeight + $barSpacing) * $goodCol + $barSpacing - 2;
+    	my $textX = $margin + $fpcCloneLeftEnd->{$currentClone} * $pixelUnit + 2;
+    	my $textY = $barY + ($barHeight + $barSpacing) * ($goodCol + 1) - 2;
     	my $textEnd = $fpcCloneLeftEnd->{$currentClone}  + $textLength->{$currentClone} * $textFontWidth / $pixelUnit;
 		$fpcCtgClone->text(
 			id      => 'cloneName'.$currentClone,
+			onclick => "closeDialog();openDialog('cloneView.cgi?cloneName=$currentClone')",
 			x       => $textX,
 			y       => $textY,
 			style   => {
@@ -189,8 +190,16 @@ if ($fpcCtgId)
 			<ul style='z-index: 1000;white-space: nowrap;'>
 				<li><a onclick='openDialog(\"fpcCtgList.cgi?fpcCtgId=$fpcCtgId\");'><span class='ui-icon ui-icon-document'></span>View Clone List</a></li>
 				<li><a onclick='printDiv(\"fpcCtgList$fpcCtgId$$\")'><span class='ui-icon ui-icon-print'></span>Print</a></li>
-				<li><a>Learn about $fpcCtgList[2]</a>
+				<li><a>Legends</a>
 					<ul>
+						<li>Red bolder: MTP Clones</li>
+						<li>Dashed bolder: Highlighted Clones</li>
+						<li>Yellow filling: Sequenced Clones</li>
+					</ul>
+				</li>
+				<li><a>Learn about</a>
+					<ul>
+						<li><b>$fpcCtgList[2]</b></li>
 						<li>Total Clones: $colCount ($sequenced sequenced)</li>
 						<li>$fpcCtgList[8]</li>
 					</ul>

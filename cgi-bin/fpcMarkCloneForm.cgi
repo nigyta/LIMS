@@ -44,7 +44,7 @@ print header;
 print $html;
 
 __DATA__
-<form id="markMTP" name="markMTP" action="fpcMarkMTP.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+<form id="markMTP" name="markMTP" action="fpcMarkClone.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 <h3>Mark MTP clones in '$fpcName v.$fpcVersion':</h3>
 	<input name="fpcId" id="fpcId" type="hidden" value="$fpcId" />
 	<table>
