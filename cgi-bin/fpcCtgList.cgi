@@ -51,27 +51,26 @@ if ($fpcCtgId)
 	my @fpcClone = sort { $fpcCloneLeftEnd->{$a} <=> $fpcCloneLeftEnd->{$b} } keys %$fpcCloneLeftEnd;
 
 	$fpcCtgDetails .= "<table width='100%'>";
-	my $col = 4;
+	my $col = 3;
 	my $colCount=0;
 	my $sequenced = 0;
     for (@fpcClone)
     {
-		my $sequencedClass = ($fpcCloneSequenced->{$_}) ? ($fpcCloneHighlighted->{$_}) ? " class='ui-state-error'" : " class='ui-state-highlight'" : ($fpcCloneHighlighted->{$_}) ? " class='ui-state-error'" : "";
+		my $sequencedFlag = ($fpcCloneSequenced->{$_}) ? "<span class='ui-icon ui-icon-flag' style='float: left; margin-right: 0;' title='Sequenced Clone'></span>" : "";
+		my $mtpCheck = ($fpcCloneMTP->{$_}) ? "<span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span>" : "<span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span>";
+		my $highlightedClass = ($fpcCloneHighlighted->{$_}) ? " class='ui-state-highlight'" : "";
 		$sequenced++ if ($fpcCloneSequenced->{$_});
 		if($colCount % $col == 0)
 		{
-			$fpcCtgDetails .= ($fpcCloneMTP->{$_}) ? "<tr><td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>" :
-								"<tr><td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
+			$fpcCtgDetails .= "<tr><td><div$highlightedClass style='float: left; margin-right: .7em;'>$mtpCheck$sequencedFlag<a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
 		}
 		elsif($colCount % $col == $col - 1)
 		{
-			$fpcCtgDetails .= ($fpcCloneMTP->{$_}) ?  "<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td></tr>" :
-								"<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td></tr>";
+			$fpcCtgDetails .= "<td><div$highlightedClass style='float: left; margin-right: .7em;'>$mtpCheck$sequencedFlag<a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td></tr>";
 		}
 		else
 		{
-			$fpcCtgDetails .= ($fpcCloneMTP->{$_}) ?  "<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>" :
-								"<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
+			$fpcCtgDetails .= "<td><div$highlightedClass style='float: left; margin-right: .7em;'>$mtpCheck$sequencedFlag<a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
 		}
 		$colCount++;
     }
@@ -93,6 +92,12 @@ if ($fpcCtgId)
 			</ul>
 		</li>
 	</ul>
+	<table width='100%'><tr>
+	<td><b>Note:</b></td>
+	<td><div style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-flag' style='float: left; margin-right: 0;' title='Sequenced Clone'></span>Sequenced</div></td>
+	<td><div style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span>MTP</div></td>
+	<td><div class='ui-state-highlight' style='float: left; margin-right: .7em;'>Highlighted</div></td>
+	</tr></table>
 	$fpcCtgDetails
 	</div>";
 	$html =~ s/\$fpcCtgDetails/$fpcCtgDetails/g;

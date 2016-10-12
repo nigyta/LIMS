@@ -147,14 +147,14 @@ if ($fpcCtgId)
 				y     => $barY + ($barHeight + $barSpacing) * $goodCol + $barSpacing,
 				width => ($fpcCloneRightEnd->{$currentClone} - $fpcCloneLeftEnd->{$currentClone}) * $pixelUnit,
 				height=> $barHeight,
-				style => ($fpcCloneMTP->{$currentClone}) ? 
+				style => ($fpcCloneHighlighted->{$currentClone}) ? 
 						{ stroke =>'red',
-							fill => ($fpcCloneSequenced->{$currentClone}) ? 'yellow' : 'lightgrey',
-							'stroke-dasharray' => ($fpcCloneHighlighted->{$currentClone}) ? '3,3' :''
+							fill => ($fpcCloneSequenced->{$currentClone}) ? 'yellow' : 'white',
+							'stroke-dasharray' => ($fpcCloneMTP->{$currentClone}) ? '' : '3,1'
 							} :
 						{ stroke =>'grey',
 							fill => ($fpcCloneSequenced->{$currentClone}) ? 'yellow' : 'white',
-							'stroke-dasharray' => ($fpcCloneHighlighted->{$currentClone}) ? '3,3' :''
+							'stroke-dasharray' => ($fpcCloneMTP->{$currentClone}) ? '' : '3,1'
 							},
 				id    => "$currentClone$$"
 			);
@@ -194,8 +194,8 @@ if ($fpcCtgId)
 				<li><a onclick='printDiv(\"fpcCtgList$fpcCtgId$$\")'><span class='ui-icon ui-icon-print'></span>Print</a></li>
 				<li><a>Legends</a>
 					<ul>
-						<li>Red bolder: MTP Clones</li>
-						<li>Dashed bolder: Highlighted Clones</li>
+						<li>Solid bolder: MTP Clones</li>
+						<li>Red bolder: Highlighted Clones</li>
 						<li>Yellow filling: Sequenced Clones</li>
 					</ul>
 				</li>
