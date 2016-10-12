@@ -44,24 +44,32 @@ print header;
 print $html;
 
 __DATA__
-<form id="markMTP" name="markMTP" action="fpcMarkClone.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
-<h3>Mark MTP clones in '$fpcName v.$fpcVersion':</h3>
+<form id="markClone" name="markClone" action="fpcMarkClone.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+<h3>Mark clones in '$fpcName v.$fpcVersion' as</h3>
 	<input name="fpcId" id="fpcId" type="hidden" value="$fpcId" />
 	<table>
-	<tr><td style='text-align:right'><label for="markMTPClones"><b>MTP Clones</b></label><br><sub id="markMTPClones_count" style="display:none"></sub></td><td><textarea class='ui-widget-content ui-corner-all word_count' name="MTPClones" id="markMTPClones" cols="50" rows="8"></textarea></td></tr>
-	<tr><td style='text-align:left' colspan='2'><label for="markMTPCloneReplace">Are you going to clear all marked MTP clones before marking the above clones?</label></td></tr>
 	<tr><td style='text-align:right'></td>
 		<td>
-		<div id="markMTPCloneReplace">
-			<input type="radio" id="markMTPCloneReplaceRadio2" name="replace" value="1"><label for="markMTPCloneReplaceRadio2">Yes</label>
-			<input type="radio" id="markMTPCloneReplaceRadio1" name="replace" value="0" checked="checked"><label for="markMTPCloneReplaceRadio1">No</label>
+		<div id="markCloneAs">
+			<input type="radio" id="markCloneAsRadio2" name="markAs" value="1" checked="checked"><label for="markCloneAsRadio2"><b>MTP Clones</b></label>
+			<input type="radio" id="markCloneAsRadio1" name="markAs" value="2"><label for="markCloneAsRadio1"><b>Highlighted Clones</b></label>
+		</div>
+	</td></tr>
+	<tr><td style='text-align:right'><sub id="markClones_count" style="display:none"></sub></td><td><textarea class='ui-widget-content ui-corner-all word_count' name="markClones" id="markClones" cols="50" rows="8"></textarea></td></tr>
+	<tr><td style='text-align:left' colspan='2'><label for="markCloneReplace">Are you going to clear all marked clones before marking the above clones?</label></td></tr>
+	<tr><td style='text-align:right'></td>
+		<td>
+		<div id="markCloneReplace">
+			<input type="radio" id="markCloneReplaceRadio2" name="replace" value="1"><label for="markCloneReplaceRadio2">Yes</label>
+			<input type="radio" id="markCloneReplaceRadio1" name="replace" value="0" checked="checked"><label for="markCloneReplaceRadio1">No</label>
 		</div>
 	</td></tr>
 	</table>
 </form>
 <script>
-$('#dialog').dialog("option", "title", "Mark MTP Clones");
-$( "#dialog" ).dialog( "option", "buttons", [{ text: "Submit", click: function() { submitForm('markMTP'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
-$( "#markMTPCloneReplace" ).buttonset();
+$('#dialog').dialog("option", "title", "Mark Clones");
+$( "#dialog" ).dialog( "option", "buttons", [{ text: "Submit", click: function() { submitForm('markClone'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
+$( "#markCloneAs" ).buttonset();
+$( "#markCloneReplace" ).buttonset();
 wordCount('clone');
 </script>

@@ -28,8 +28,9 @@ if ($fpcCtgId)
 	my @fpcCtgList = $fpcCtgList->fetchrow_array();
 	$fpcCtgList[8] =~ s/\n/<br>/g;
 	my $fpcClone;
-	my $fpcCloneMTP;
 	my $fpcCloneSequenced;
+	my $fpcCloneMTP;
+	my $fpcCloneHighlighted;
 	my $fpcCloneLeftEnd;
 	my $fpcCloneRightEnd;
 	my $fpcCloneMaxEnd = 0;
@@ -40,6 +41,7 @@ if ($fpcCtgId)
 		$fpcClone->{$fpcCloneList[2]} = $fpcCloneList[8];
 		$fpcCloneSequenced->{$fpcCloneList[2]} = $fpcCloneList[4];
 		$fpcCloneMTP->{$fpcCloneList[2]} = $fpcCloneList[5];
+		$fpcCloneHighlighted->{$fpcCloneList[2]} = $fpcCloneList[6];
 		$fpcCloneList[8] =~ /Ends Left (\d*)/;
 		$fpcCloneLeftEnd->{$fpcCloneList[2]} = $1;
 		$fpcCloneList[8] =~ /Ends Right (\d*)/;
@@ -54,22 +56,22 @@ if ($fpcCtgId)
 	my $sequenced = 0;
     for (@fpcClone)
     {
-		my $sequencedClass = ($fpcCloneSequenced->{$_}) ? ($_ eq $highlight) ? " class='ui-state-error'" : " class='ui-state-highlight'" : ($_ eq $highlight) ? " class='ui-state-error'" : "";
+		my $sequencedClass = ($fpcCloneSequenced->{$_}) ? ($fpcCloneHighlighted->{$_}) ? " class='ui-state-error'" : " class='ui-state-highlight'" : ($fpcCloneHighlighted->{$_}) ? " class='ui-state-error'" : "";
 		$sequenced++ if ($fpcCloneSequenced->{$_});
 		if($colCount % $col == 0)
 		{
 			$fpcCtgDetails .= ($fpcCloneMTP->{$_}) ? "<tr><td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>" :
-								"<tr><td><div$sequencedClass  style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
+								"<tr><td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
 		}
 		elsif($colCount % $col == $col - 1)
 		{
 			$fpcCtgDetails .= ($fpcCloneMTP->{$_}) ?  "<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td></tr>" :
-								"<td><div$sequencedClass  style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td></tr>";
+								"<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td></tr>";
 		}
 		else
 		{
 			$fpcCtgDetails .= ($fpcCloneMTP->{$_}) ?  "<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-check' style='float: left; margin-right: 0;' title='MTP Clone'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>" :
-								"<td><div$sequencedClass  style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
+								"<td><div$sequencedClass style='float: left; margin-right: .7em;'><span class='ui-icon ui-icon-bullet' style='float: left; margin-right: 0;'></span><a onclick='closeDialog();openDialog(\"cloneView.cgi?cloneName=$_\")' title='$fpcClone->{$_}'>$_</a></div></td>";
 		}
 		$colCount++;
     }

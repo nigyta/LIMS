@@ -30,7 +30,7 @@ if ($fpcId)
 					<ul style='z-index: 1000;white-space: nowrap;'>
 						<li><a href='download.cgi?fpcId=$fpc[0]' target='hiddenFrame'><span class='ui-icon ui-icon-disk'></span>Download Clone List</a></li>
 						<li><a href='fpcPickMTP.cgi?fpcId=$fpc[0]' target='hiddenFrame'><span class='ui-icon ui-icon-search'></span>Pick Up MTP Clone</a></li>
-						<li><a onclick='openDialog(\"fpcMarkCloneForm.cgi?fpcId=$fpc[0]\")'><span class='ui-icon ui-icon-flag'></span>Mark MTP Clones</a></li>
+						<li><a onclick='openDialog(\"fpcMarkCloneForm.cgi?fpcId=$fpc[0]\")'><span class='ui-icon ui-icon-flag'></span>Mark Clones</a></li>
 						<li><a onclick='deleteItem($fpc[0])'><span class='ui-icon ui-icon-trash'></span>Delete This FPC</a></li>
 					</ul>
 				</li>

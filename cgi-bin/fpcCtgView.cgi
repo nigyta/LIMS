@@ -42,8 +42,9 @@ if ($fpcCtgId)
 	my $unitLength = 10;
     my $textLength;
 	my $fpcClone;
-	my $fpcCloneMTP;
 	my $fpcCloneSequenced;
+	my $fpcCloneMTP;
+	my $fpcCloneHighlighted;
 	my $fpcCloneLeftEnd;
 	my $fpcCloneRightEnd;
 	my $fpcCloneMaxEnd = 0;
@@ -54,6 +55,7 @@ if ($fpcCtgId)
 		$fpcClone->{$fpcCloneList[2]} = $fpcCloneList[8];
 		$fpcCloneSequenced->{$fpcCloneList[2]} = $fpcCloneList[4];
 		$fpcCloneMTP->{$fpcCloneList[2]} = $fpcCloneList[5];
+		$fpcCloneHighlighted->{$fpcCloneList[2]} = $fpcCloneList[6];
 		$fpcCloneList[8] =~ /Ends Left (\d*)/;
 		$fpcCloneLeftEnd->{$fpcCloneList[2]} = $1;
 		$fpcCloneList[8] =~ /Ends Right (\d*)/;
@@ -148,11 +150,11 @@ if ($fpcCtgId)
 				style => ($fpcCloneMTP->{$currentClone}) ? 
 						{ stroke =>'red',
 							fill => ($fpcCloneSequenced->{$currentClone}) ? 'yellow' : 'lightgrey',
-							'stroke-dasharray' => ($currentClone eq $highlight) ? '3,3' :''
+							'stroke-dasharray' => ($fpcCloneHighlighted->{$currentClone}) ? '3,3' :''
 							} :
 						{ stroke =>'grey',
 							fill => ($fpcCloneSequenced->{$currentClone}) ? 'yellow' : 'white',
-							'stroke-dasharray' => ($currentClone eq $highlight) ? '3,3' :''
+							'stroke-dasharray' => ($fpcCloneHighlighted->{$currentClone}) ? '3,3' :''
 							},
 				id    => "$currentClone$$"
 			);
@@ -167,7 +169,7 @@ if ($fpcCtgId)
 			y       => $textY,
 			style   => {
 				'font-size'   => $textFontSize,
-				'stroke'        => 'grey'
+				'stroke'        => ($currentClone eq $highlight) ? 'red' : 'grey'
 			}
 		)->cdata($currentClone);
     	$colPostion[$goodCol] = ($textEnd > $fpcCloneRightEnd->{$currentClone}) ? $textEnd : $fpcCloneRightEnd->{$currentClone};
