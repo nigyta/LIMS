@@ -38,8 +38,8 @@ my $seqToGenome = param ('seqToGenome') || '0';
 my $identitySeqToGenome = param ('identitySeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
 my $minOverlapSeqToGenome = param ('minOverlapSeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
 
-my $alignEngine =  = param ('alignEngine') || 'blastn';
-my $task =  = param ('megablast') || 'blastn';
+my $alignEngine = param ('alignEngine') || 'blastn';
+my $task = param ('megablast') || 'blastn';
 my $softMasking = param ('softMasking') || '0';
 
 my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
@@ -54,6 +54,7 @@ my $orientSeqs = param ('orientSeqs') || '0';
 my $renumber = param ('renumber') || '0';
 
 my $blastn = 'blast+/bin/blastn';
+my $windowmasker = 'blast+/bin/windowmasker';
 my $makeblastdb = 'blast+/bin/makeblastdb';
 
 print header;
@@ -623,10 +624,10 @@ END
 			
 			if($alignEngine eq 'blastn')
 			{
-				if($softMask)
+				if($softMasking)
 				{
-					system( "$windowmasker -in /tmp/$refGenomeId.$$.genome  -infmt fasta -mk_counts -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.counts" )
-					system( "$windowmasker -in /tmp/$refGenomeId.$$.genome  -infmt fasta -ustat /tmp/$refGenomeId.$$.genome_mask.counts -outfmt maskinfo_asn1_bin -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.asnb" )
+					system( "$windowmasker -in /tmp/$refGenomeId.$$.genome -infmt fasta -mk_counts -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.counts" );
+					system( "$windowmasker -in /tmp/$refGenomeId.$$.genome -infmt fasta -ustat /tmp/$refGenomeId.$$.genome_mask.counts -outfmt maskinfo_asn1_bin -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.asnb" );
 					system( "$makeblastdb -in /tmp/$refGenomeId.$$.genome -inputtype fasta -dbtype nucl -parse_seqids -mask_data /tmp/$refGenomeId.$$.genome_mask.asnb" );
 				}
 				else
@@ -683,7 +684,7 @@ END
 				{
 					if($alignEngine eq 'blastn')
 					{
-						if($softMask)
+						if($softMasking)
 						{
 							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
@@ -701,7 +702,7 @@ END
 				{
 					if($alignEngine eq 'blastn')
 					{
-						if($softMask)
+						if($softMasking)
 						{
 							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}

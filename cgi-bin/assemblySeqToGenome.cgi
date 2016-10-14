@@ -36,6 +36,7 @@ my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
 my $markRepeatRegion = param ('markRepeatRegion') || '0';
 
 my $blastn = 'blast+/bin/blastn';
+my $windowmasker = 'blast+/bin/windowmasker';
 my $makeblastdb = 'blast+/bin/makeblastdb';
 
 
@@ -89,10 +90,10 @@ END
 		
 		if($alignEngine eq 'blastn')
 		{
-			if($softMask)
+			if($softMasking)
 			{
-				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome  -infmt fasta -mk_counts -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.counts" )
-				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome  -infmt fasta -ustat /tmp/$refGenomeId.$$.genome_mask.counts -outfmt maskinfo_asn1_bin -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.asnb" )
+				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome -infmt fasta -mk_counts -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.counts" );
+				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome -infmt fasta -ustat /tmp/$refGenomeId.$$.genome_mask.counts -outfmt maskinfo_asn1_bin -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.asnb" );
 				system( "$makeblastdb -in /tmp/$refGenomeId.$$.genome -inputtype fasta -dbtype nucl -parse_seqids -mask_data /tmp/$refGenomeId.$$.genome_mask.asnb" );
 			}
 			else
@@ -165,7 +166,7 @@ END
 		{
 			if($alignEngine eq 'blastn')
 			{
-				if($softMask)
+				if($softMasking)
 				{
 					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}

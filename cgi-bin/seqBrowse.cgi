@@ -273,6 +273,7 @@ if ($seqId)
 				width => ($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone}) / $pixelUnit,
 				height=> $barHeight,
 				style => { stroke => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'red' :'grey',
+							'stroke-dasharray' => '3,1',
 							fill => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'yellow': 'white'
 							},
 				id    => "besClone$currentClone$colCount$$"
@@ -358,6 +359,7 @@ if ($seqId)
 				width => ($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone}) / $pixelUnit,
 				height=> $barHeight,
 				style => { stroke => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'red' :'grey',
+							'stroke-dasharray' => '3,1',
 							fill => ($besLeftAlignment->{$currentClone} eq $besRightAlignment->{$currentClone}) ? 'yellow': 'white'
 							},
 				id    => "besClone$currentClone$colCount$$"
