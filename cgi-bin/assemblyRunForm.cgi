@@ -143,17 +143,17 @@ __DATA__
 	</table>
 	<hr>
 	<table>
-	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="2"><label for="newAssemblySeqToSeq"><b>Seq-to-Seq Alignment</b></label>
+	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="3"><label for="newAssemblySeqToSeq"><b>Seq-to-Seq Alignment</b></label>
 		<div id="newAssemblySeqToSeq">
 			<input type="radio" id="newAssemblySeqToSeqRadio2" name="seqToSeq" value="1"><label for="newAssemblySeqToSeqRadio2">Yes</label>
 			<input type="radio" id="newAssemblySeqToSeqRadio1" name="seqToSeq" value="0" checked="checked"><label for="newAssemblySeqToSeqRadio1">No</label>
 		</div>
 			<input type="checkbox" id="newAssemblyRedoAllSeqToSeqCheckbox" name="redoAllSeqToSeq" value="1"><label for="newAssemblyRedoAllSeqToSeqCheckbox">For All Sequences</label><br>
 			<input type="checkbox" id="newAssemblySeqToSeqCheckGood" name="checkGood" value="1" checked="checked"><label for="newAssemblySeqToSeqCheckGood">Check End Match</label>
-	</td>
-	<td style='text-align:right'><label for="newAssemblySeqToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToSeq" id="newAssemblySeqToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td>
-	</tr>
+	</td><td style='text-align:right'><label for="newAssemblySeqToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToSeq" id="newAssemblySeqToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
 	<tr><td style='text-align:right'><label for="newAssemblySeqToSeqIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToSeq" id="newAssemblySeqToSeqIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
+	<tr><td style='text-align:right'><input type="checkbox" id="newAssemblySeqToSeqMegablastCheckbox" name="seqToSeqMegablast" value="megablast"></td>
+	<td style='text-align:left'><label for="newAssemblySeqToSeqMegablastCheckbox">Megablast</label></td></tr>
 	</table>
 	<hr>
 	<table>

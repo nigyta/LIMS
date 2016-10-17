@@ -28,6 +28,7 @@ my $minOverlapSeqToSeq = param ('minOverlapSeqToSeq') || $userConfig->getFieldVa
 my $redoAllSeqToSeq = param ('redoAllSeqToSeq') || '0';
 my $checkGood = param ('checkGood') || '0';
 my $blastn = 'blast+/bin/blastn';
+my $task =  = param ('megablast') || 'blastn';
 my $makeblastdb = 'blast+/bin/makeblastdb';
 
 print header;
@@ -112,11 +113,11 @@ END
 		open (BLAST,">/tmp/$assembly[4].$$.blastn") or die "can't open file: /tmp/$assembly[4].$$.blastn";
 		if($redoAllSeqToSeq)
 		{
-			open (CMD,"$blastn -query /tmp/$assembly[4].$$.seq -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$blastn -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		}
 		else
 		{
-			open (CMD,"$blastn -query /tmp/$assembly[4].$$.new.seq -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$blastn -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		}
 		while(<CMD>)
 		{

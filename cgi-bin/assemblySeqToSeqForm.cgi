@@ -42,6 +42,7 @@ __DATA__
 	<tr><td><b>Alignment Settings:</b></td><td style='text-align:left' colspan='2'><input type="checkbox" id="newAssemblyRedoAllSeqToSeqCheckbox" name="redoAllSeqToSeq" value="1"><label for="newAssemblyRedoAllSeqToSeqCheckbox">For All Sequences</label></td><td><input type="checkbox" id="newAssemblySeqToSeqCheckGood" name="checkGood" value="1" checked="checked"><label for="newAssemblySeqToSeqCheckGood">Check End Match</label></td></tr>
 	<tr><td></td><td style='text-align:right'><label for="newAssemblySeqToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToSeq" id="newAssemblySeqToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
 	<tr><td></td><td style='text-align:right'><label for="newAssemblySeqToSeqIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToSeq" id="newAssemblySeqToSeqIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
+	<tr><td></td><td style='text-align:left'><input type="checkbox" id="newAssemblyMegablastCheckbox" name="megablast" value="megablast"><label for="newAssemblyMegablastCheckbox">Megablast</label></td></tr>
 	</table>
 </form>
 <script>

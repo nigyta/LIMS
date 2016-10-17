@@ -40,6 +40,7 @@ my $minOverlapSeqToGenome = param ('minOverlapSeqToGenome') || $userConfig->getF
 
 my $alignEngine = param ('alignEngine') || 'blastn';
 my $task = param ('megablast') || 'blastn';
+my $seqToSeqTask = param ('seqToSeqMegablast') || 'blastn';
 my $softMasking = param ('softMasking') || '0';
 
 my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
@@ -309,11 +310,11 @@ END
 			open (BLAST,">/tmp/$assembly[4].$$.blastn") or die "can't open file: /tmp/$assembly[4].$$.blastn";
 			if($redoAllSeqToSeq)
 			{
-				open (CMD,"$blastn -query /tmp/$assembly[4].$$.seq -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$blastn -query /tmp/$assembly[4].$$.seq -task $seqToSeqTask -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			else
 			{
-				open (CMD,"$blastn -query /tmp/$assembly[4].$$.new.seq -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$blastn -query /tmp/$assembly[4].$$.new.seq -task $seqToSeqTask -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			while(<CMD>)
 			{
