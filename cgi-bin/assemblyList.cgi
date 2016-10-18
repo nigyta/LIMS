@@ -412,14 +412,15 @@ END
 		$assemblySortableStyle .= $assemblySortableStyleByChr->{$_};
 		$assemblySortableJs .= $assemblySortableJsByChr->{$_};
     }
-	my $assembledCtg = ($totalAssembled > 0) ? "<div id='tabs-assembled$assemblyId$$'>Total length: " . commify($totalLength->{'all'}). " bp, N50 length: " . commify($n50Length). " bp, Median length: " . commify($medianLength). " bp.<br>Longest: " . commify($maxLength->{'all'}). " bp, Shortest: " . commify($minLength->{'all'}). " bp. (<a onclick='openDialog(\"assemblyCtgList.cgi?assemblyId=$assemblyId\")'>Length Details</a>)
-	<br>$graphic $assembledCtgDetails</div>" : "<div id='tabs-assembled$assemblyId$$'>No assembly! Please run assembly!</div>";
+	my $assembledCtg = ($totalAssembled > 0) ? "<div id='tabs-assembled$assemblyId$$'>Total length: " . commify($totalLength->{'all'}). " bp, N50 length: " . commify($n50Length). " bp, Median length: " . commify($medianLength). " bp.<br>Longest: " . commify($maxLength->{'all'}). " bp, Shortest: " . commify($minLength->{'all'}). " bp.<br>$graphic $assembledCtgDetails</div>"
+			: "<div id='tabs-assembled$assemblyId$$'>No assembly! Please run assembly!</div>";
 
 
 	my $totalInAssembly = keys %$assemblySeq;
 	$assemblyList .= "<div id='assemblyTab$assemblyId$$'><ul>";
 	$assemblyList .= ($totalAssembled > 1) ? "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled Contigs)" : "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled Contig)";
 	$assemblyList .= ($totalInAssembly > 1) ? " - $totalInAssembly Sequences</a></li>" : " - $totalInAssembly Sequence</a></li>";
+	$assemblyList .= ($totalAssembled > 0) ? "<li><a href='assemblyCtgList.cgi?assemblyId=$assemblyId'>Contig List</a></li>" : "";
 
 	if($assemblyDetails->{'autoCheckNewSeq'})
 	{

@@ -64,6 +64,8 @@ print header;
 print $html;
 
 __DATA__
+<button style="float: right; margin-top: .3em; margin-right: .3em;" onclick="submitForm('assemblyCtg$assemblyId$$')">Download</button>
+<button style="float: right; margin-top: .3em; margin-right: .3em;" onclick="printDiv('viewCtgLength$$')">Print</button>
 <form id="assemblyCtg$assemblyId$$" name="assemblyCtg$assemblyId$$" action="assemblyCtgDownload.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 <input name="assemblyId" id="assemblyId" type="hidden" value="$assemblyId" />
 <div id="viewCtgLength$$" name="viewCtgLength$$">
@@ -74,13 +76,11 @@ $ctgListDetails
 buttonInit();
 $( "#ctgLengthDetails$$" ).dataTable({
 	"dom": 'lfrtip',
-	"scrollY": "300px",
+	"scrollY": "500px",
 	"scrollCollapse": true,
 	"paging": false,
 	"searching": false,
 	"ordering": false,
 	"info": false
 });
-$('#dialog').dialog("option", "title", "Contig Length");
-$( "#dialog" ).dialog( "option", "buttons", [{ text: "Download", click: function() { submitForm('assemblyCtg$assemblyId$$'); } },{ text: "Print", click: function() { printDiv('viewCtgLength$$'); } },{ text: "OK", click: function() { closeDialog(); } } ] );
 </script>
