@@ -28,8 +28,8 @@ my $refGenomeId = param ('refGenomeId') || '';
 my $identitySeqToGenome = param ('identitySeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
 my $minOverlapSeqToGenome = param ('minOverlapSeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
 
-my $alignEngine =  = param ('alignEngine') || 'blastn';
-my $task =  = param ('megablast') || 'blastn';
+my $alignEngine = param ('alignEngine') || 'blastn';
+my $task = param ('megablast') || 'blastn';
 my $softMasking = param ('softMasking') || '0';
 
 my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
