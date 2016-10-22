@@ -42,16 +42,16 @@ if ($assemblyId)
 		{
 			$commentDetails = decode_json $comment[8];
 			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>".commify($assemblyCtg[7])." </td><td>$commentDetails->{'description'}</td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$assemblyCtg[4]</td><td>".commify($assemblyCtg[7])." </td><td>$commentDetails->{'description'}</td></tr>" ;
 		}
 		else
 		{
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>".commify($assemblyCtg[7])." </td><td></td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$assemblyCtg[4]</td><td>".commify($assemblyCtg[7])." </td><td></td></tr>" ;
 		}
 	}
 	
 	$ctgListDetails = "
-	<table id='ctgLengthDetails$$' class='display'><thead><tr><th><b>Contig</b></th><th><b>Seq Numbers</b></th><th><b>Length (bp)</b></th><th><b>Comment</b></th></tr></thead><tbody>$ctgListDetails</tbody></table>
+	<table id='ctgLengthDetails$$' class='display'><thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs</b></th><th><b>Assigned chromosome #</b></th><th><b>Length (bp)</b></th><th><b>Comment</b></th></tr></thead><tbody>$ctgListDetails</tbody></table>
 	";
 	
 }
@@ -66,8 +66,8 @@ print $html;
 __DATA__
 <button style="float: right; margin-top: .3em; margin-right: .3em;" onclick="submitForm('assemblyCtg$assemblyId$$')">Download</button>
 <button style="float: right; margin-top: .3em; margin-right: .3em;" onclick="printDiv('viewCtgLength$$')">Print</button>
-<form id="assemblyCtg$assemblyId$$" name="assemblyCtg$assemblyId$$" action="assemblyCtgDownload.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
-<input name="assemblyId" id="assemblyId" type="hidden" value="$assemblyId" />
+<form id="assemblyCtg$assemblyId$$" name="assemblyCtg$assemblyId$$" action="download.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+<input name="assemblyIdForCtgList" id="assemblyIdForCtgList" type="hidden" value="$assemblyId" />
 <div id="viewCtgLength$$" name="viewCtgLength$$">
 $ctgListDetails
 </div>

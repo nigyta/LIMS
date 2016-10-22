@@ -90,8 +90,10 @@ END
 		close(SEQB);
 		if($redo)
 		{
-			my $deleteAlignment = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");
-			$deleteAlignment->execute($getSequenceA[0],$getSequenceB[0]);
+			my $deleteAlignmentA = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");
+			$deleteAlignmentA->execute($getSequenceA[0],$getSequenceB[0]);
+			my $deleteAlignmentB = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");
+			$deleteAlignmentB->execute($getSequenceB[0],$getSequenceA[0]);
 		}
 		my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ?");
 		$getAlignment->execute($getSequenceA[0],$getSequenceB[0]);

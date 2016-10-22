@@ -393,7 +393,7 @@ END
 END
     }
     my $assembledCtgDetails = '';
-    for (sort {$a <=> $b} keys %$assembledCtgByChr)
+    for (sort {$b <=> $a} keys %$assembledCtgByChr)
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
 		$assembledCtgByChr->{$_} = ($totalAssembledSeqNumberByChr->{$_} > 1) ?
@@ -408,7 +408,7 @@ END
 			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>Chromosome $_</a> $assembledCtgByChr->{$_}"
 			: "<h3>Chromosome $_ $assembledCtgByChr->{$_}";
 
-		$assembledCtgDetails .= $assembledCtgByChr->{$_};		
+		$assembledCtgDetails = ($_ > 0) ? $assembledCtgByChr->{$_}.$assembledCtgDetails : $assembledCtgDetails.$assembledCtgByChr->{$_}; #list chromosome-assigned first.
 		$assemblySortableStyle .= $assemblySortableStyleByChr->{$_};
 		$assemblySortableJs .= $assemblySortableJsByChr->{$_};
     }

@@ -1258,6 +1258,36 @@ elsif(param ('assemblyIdForAgp'))
 		}
 	}
 }
+elsif (param ('assemblyIdForCtgList'))
+{
+	my $assemblyIdForCtgList = param ('assemblyIdForCtgList');
+	print header(-type=>'application/octet-stream',
+		-attachment=>"ctgList.$assemblyIdForCtgList.txt",
+		);
+	print "CTG\tNumber-of-assemblySeqs\tAssigned-chomosome#\tLength(bp)\tComment\n";
+	my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
+	$assemblyCtg->execute($assemblyIdForCtgList);
+	while (my @assemblyCtg = $assemblyCtg->fetchrow_array())
+	{
+		my @seq=split",",$assemblyCtg[8];
+		my $num=@seq;
+		my $commentDetails;
+		my $comment = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'comment' AND o = ?");
+		$comment->execute($assemblyCtg[0]);
+		my @comment = $comment->fetchrow_array();
+		if ($comment->rows > 0)
+		{
+			$commentDetails = decode_json $comment[8];
+			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
+			$commentDetails->{'description'} =~ s/[\n\r]/\\n/g;
+			print "Ctg$assemblyCtg[2]\t$num\t$assemblyCtg[4]\t".commify($assemblyCtg[7])."\t'$commentDetails->{'description'}'\n";
+		}
+		else
+		{
+			print "Ctg$assemblyCtg[2]\t$num\t$assemblyCtg[4]\t".commify($assemblyCtg[7])."\t\n";
+		}
+	}
+}
 else
 {
 	print header(-type=>'text/html',-status=>'402 Invalid operation');
