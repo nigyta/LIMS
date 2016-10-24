@@ -470,6 +470,7 @@ if ($seqId)
 	$dialogWidth = ($svgWidth > 1000 ) ? 1050 : ($svgWidth < 550) ? 600 : $svgWidth + 50;
 	$seqDetails =~ s/\$svgWidth/$svgWidth/g;
 	$seqDetails =~ s/\$svgHeight/$svgHeight/g;
+	$seqDetails =~ s/&/&amp;/g;
 
 	open (SVGFILE,">$commoncfg->{TMPDIR}/BES-$refSequence[2].svg") or die "can't open file: $commoncfg->{TMPDIR}/BES-$refSequence[2].svg";
 	print SVGFILE $seqDetails;

@@ -183,21 +183,21 @@ if ($fpcCtgId)
 	my $svgHeight = $barY + ($barHeight + $barSpacing) * @colPostion + $margin;
 	$graphic =~ s/\$svgWidth/$svgWidth/g;
 	$graphic =~ s/\$svgHeight/$svgHeight/g;
-
-	$dialogWidth = ($svgWidth > 1000 ) ? 1050 : ($svgWidth < 550) ? 600 : $svgWidth + 50;
+	$graphic =~ s/&/&amp;/g;
 
 	open (SVGFILE,">$commoncfg->{TMPDIR}/FPC-$fpcCtgList[2]-$fpcCtgList[0].svg") or die "can't open file: $commoncfg->{TMPDIR}/FPC-$fpcCtgList[2]-$fpcCtgList[0].svg";
 	print SVGFILE $graphic;
 	close (SVGFILE);
 	`gzip -f $commoncfg->{TMPDIR}/FPC-$fpcCtgList[2]-$fpcCtgList[0].svg`;
-	my $fpcSvg = "<a href='$commoncfg->{TMPURL}/FPC-$fpcCtgList[2]-$fpcCtgList[0].svg.gz' target='hiddenFrame'><span class='ui-icon ui-icon-disk'></span>Download SVG</a>" if (-e "$commoncfg->{TMPDIR}/FPC-$fpcCtgList[2]-$fpcCtgList[0].svg.gz");
+
+	$dialogWidth = ($svgWidth > 1000 ) ? 1050 : ($svgWidth < 550) ? 600 : $svgWidth + 50;
 
 	$fpcCtgDetails ="
 	<ul class='fpcCtgListMenu' style='width: 100px;float: left; margin-right: .3em; white-space: nowrap;'>
 		<li><a><span class='ui-icon ui-icon-wrench'></span>You Can</a>
 			<ul style='z-index: 1000;white-space: nowrap;'>
 				<li><a onclick='openDialog(\"fpcCtgList.cgi?fpcCtgId=$fpcCtgId\");'><span class='ui-icon ui-icon-document'></span>View Clone List</a></li>
-				<li>$fpcSvg</li>
+				<li><a href='$commoncfg->{TMPURL}/FPC-$fpcCtgList[2]-$fpcCtgList[0].svg.gz' target='hiddenFrame'><span class='ui-icon ui-icon-disk'></span>Download SVG</a></li>
 				<li><a>Legends</a>
 					<ul>
 						<li>Solid bolder: MTP Clones</li>

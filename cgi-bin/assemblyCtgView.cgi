@@ -533,6 +533,12 @@ if ($assemblyCtgId)
 	my $svgHeight = $barY + ($barHeight + $barSpacing) * 2 - $barSpacing + $barHeight + $margin;
 	$graphic =~ s/\$svgWidth/$svgWidth/g;
 	$graphic =~ s/\$svgHeight/$svgHeight/g;
+	$graphic =~ s/&/&amp;/g;
+
+	open (SVGFILE,">$commoncfg->{TMPDIR}/GPM-Ctg$assemblyCtg[2]-$assemblyCtgId.svg") or die "can't open file: $commoncfg->{TMPDIR}/GPM-Ctg$assemblyCtg[2]-$assemblyCtgId.svg";
+	print SVGFILE $graphic;
+	close (SVGFILE);
+	`gzip -f $commoncfg->{TMPDIR}/GPM-Ctg$assemblyCtg[2]-$assemblyCtgId.svg`;
 
 	$dialogWidth = ($svgWidth > 1000 ) ? 1050 : ($svgWidth < 550) ? 600 : $svgWidth + 50;
 	$assemblyCtgDetails ="
@@ -553,6 +559,7 @@ if ($assemblyCtgId)
 						<li><a href='download.cgi?assemblyCtgIdForAgp=$assemblyCtgId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>AGP</a></li>
 						<li><a href='download.cgi?assemblyCtgId=$assemblyCtgId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Raw Sequence</a></li>
 						<li><a href='download.cgi?assemblyCtgId=$assemblyCtgId&pseudo=1' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>PseudoMolecule</a></li>
+						<li><a href='$commoncfg->{TMPURL}/GPM-Ctg$assemblyCtg[2]-$assemblyCtgId.svg.gz' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>SVG</a></li>
 					</ul>
 				</li>
 				<li><a onclick='printDiv(\"assemblyCtgForAlignment$assemblyCtgId$$\")'><span class='ui-icon ui-icon-print'></span>Print</a></li>

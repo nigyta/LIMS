@@ -965,6 +965,12 @@ if ($assemblyId && $chr)
 	my $svgWidth = $longest / $pixelUnit + $margin * 2;
 	$dialogWidth = ($svgWidth > 1000 ) ? 1050 : ($svgWidth < 550) ? 600 : $svgWidth + 50;
 	$graphic =~ s/\$svgWidth/$svgWidth/g;
+	$graphic =~ s/&/&amp;/g;
+
+	open (SVGFILE,">$commoncfg->{TMPDIR}/GPM-$assembly[2]-$assembly[3]-Chr$chr.svg") or die "can't open file: $commoncfg->{TMPDIR}/GPM-$assembly[2]-$assembly[3]-Chr$chr.svg";
+	print SVGFILE $graphic;
+	close (SVGFILE);
+	`gzip -f $commoncfg->{TMPDIR}/GPM-$assembly[2]-$assembly[3]-Chr$chr.svg`;
 
 	$assemblyChrDetails ="
 	<ul class='assemblyChrListMenu' style='width: 120px;float: left; margin-right: .3em; white-space: nowrap;'>
@@ -974,6 +980,7 @@ if ($assemblyId && $chr)
 					<ul style='z-index: 1000;white-space: nowrap;'>
 						<li><a href='download.cgi?assemblyId=$assemblyId&chr=$chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Raw Sequence</a></li>
 						<li><a href='download.cgi?assemblyId=$assemblyId&chr=$chr&pseudo=1' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>PseudoMolecule</a></li>
+						<li><a href='$commoncfg->{TMPURL}/GPM-$assembly[2]-$assembly[3]-Chr$chr.svg.gz' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>SVG</a></li>
 					</ul>
 				</li>
 				<li><a onclick='printDiv(\"assemblyChrListForAlignment$assemblyId$$\")'><span class='ui-icon ui-icon-print'></span>Print</a></li>
