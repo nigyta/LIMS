@@ -23,6 +23,12 @@ my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 my $userConfig = new userConfig;
 
+my $alignEngineList;
+$alignEngineList->{'blastn'} = "blast+/bin/blastn";
+$alignEngineList->{'BLAT'} = "blat";
+my $windowmasker = 'blast+/bin/windowmasker';
+my $makeblastdb = 'blast+/bin/makeblastdb';
+
 my $assemblyId = param ('assemblyId') || '';
 my $replace = param ('replace') || '0';
 my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
@@ -37,12 +43,10 @@ my $checkGood = param ('checkGood') || '0';
 my $seqToGenome = param ('seqToGenome') || '0';
 my $identitySeqToGenome = param ('identitySeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
 my $minOverlapSeqToGenome = param ('minOverlapSeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
-
 my $alignEngine = param ('alignEngine') || 'blastn';
 my $task = param ('megablast') || 'blastn';
 my $seqToSeqTask = param ('seqToSeqMegablast') || 'blastn';
 my $softMasking = param ('softMasking') || '0';
-
 my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
 my $markRepeatRegion = param ('markRepeatRegion') || '0';
 my $endToEnd = param ('endToEnd') || '0';
@@ -53,10 +57,6 @@ my $redundancySeq = 0;
 my $redundancyFilterOverlap = param ('redundancyFilterOverlap') || '0';
 my $orientSeqs = param ('orientSeqs') || '0';
 my $renumber = param ('renumber') || '0';
-
-my $blastn = 'blast+/bin/blastn';
-my $windowmasker = 'blast+/bin/windowmasker';
-my $makeblastdb = 'blast+/bin/makeblastdb';
 
 print header;
 
@@ -310,11 +310,11 @@ END
 			open (BLAST,">/tmp/$assembly[4].$$.blastn") or die "can't open file: /tmp/$assembly[4].$$.blastn";
 			if($redoAllSeqToSeq)
 			{
-				open (CMD,"$blastn -query /tmp/$assembly[4].$$.seq -task $seqToSeqTask -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.seq -task $seqToSeqTask -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			else
 			{
-				open (CMD,"$blastn -query /tmp/$assembly[4].$$.new.seq -task $seqToSeqTask -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.new.seq -task $seqToSeqTask -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			while(<CMD>)
 			{
@@ -371,7 +371,7 @@ END
 					close(SEQB);
 					my @alignments;
 					my $goodOverlap = ($checkGood) ? 0 : 1;
-					open (CMD,"$blastn -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMD>)
 					{
 						/^#/ and next;
@@ -386,7 +386,7 @@ END
 						}									
 					}
 					close(CMD);
-					open (CMD,"$blastn -query /tmp/$getSequenceB[0].$$.seq -subject /tmp/$getSequenceA[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceB[0].$$.seq -subject /tmp/$getSequenceA[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMD>)
 					{
 						/^#/ and next;
@@ -687,16 +687,16 @@ END
 					{
 						if($softMasking)
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 						else
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 					}
 					else
 					{
-						open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
+						open (CMD,"$alignEngineList->{$alignEngine} /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
 					}
 				}
 				else
@@ -705,16 +705,16 @@ END
 					{
 						if($softMasking)
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 						else
 						{
-							open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 						}
 					}
 					else
 					{
-						open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.new.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
+						open (CMD,"$alignEngineList->{$alignEngine} /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.new.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
 					}
 			
 				}

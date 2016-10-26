@@ -23,22 +23,21 @@ my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 my $userConfig = new userConfig;
 
+my $alignEngineList;
+$alignEngineList->{'blastn'} = "blast+/bin/blastn";
+$alignEngineList->{'BLAT'} = "blat";
+my $windowmasker = 'blast+/bin/windowmasker';
+my $makeblastdb = 'blast+/bin/makeblastdb';
+
 my $assemblyId = param ('assemblyId') || '';
 my $refGenomeId = param ('refGenomeId') || '';
 my $identitySeqToGenome = param ('identitySeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
 my $minOverlapSeqToGenome = param ('minOverlapSeqToGenome') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
-
 my $alignEngine = param ('alignEngine') || 'blastn';
 my $task = param ('megablast') || 'blastn';
 my $softMasking = param ('softMasking') || '0';
-
 my $redoAllSeqToGenome = param ('redoAllSeqToGenome') || '0';
 my $markRepeatRegion = param ('markRepeatRegion') || '0';
-
-my $blastn = 'blast+/bin/blastn';
-my $windowmasker = 'blast+/bin/windowmasker';
-my $makeblastdb = 'blast+/bin/makeblastdb';
-
 
 print header;
 
@@ -149,16 +148,16 @@ END
 			{
 				if($softMasking)
 				{
-					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 				else
 				{
-					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 			}
 			else
 			{
-				open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
 			}
 		
 		}
@@ -168,16 +167,16 @@ END
 			{
 				if($softMasking)
 				{
-					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 				else
 				{
-					open (CMD,"$alignEngine -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 			}
 			else
 			{
-				open (CMD,"$alignEngine /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.new.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.new.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
 			}
 			
 	
@@ -187,7 +186,7 @@ END
 			/^#/ and next;
 			my @hit = split("\t",$_);
 			next if($hit[3] < $minOverlapSeqToGenome);
-			my $newSeqToGenome = "BAC$hit[0]GNM$hit[1]";
+			my $newSeqToGenome = "SEQ$hit[0]GNM$hit[1]";
 			if (!exists $newSeqToGenomeFound->{$newSeqToGenome})
 			{
 				my $deleteAlignment = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");

@@ -22,13 +22,17 @@ my $userName = $userDetail->{"userName"};
 my $commoncfg = readConfig("main.conf");
 my $userConfig = new userConfig;
 
+my $alignEngineList;
+$alignEngineList->{'blastn'} = "blast+/bin/blastn";
+$alignEngineList->{'BLAT'} = "blat";
+my $windowmasker = 'blast+/bin/windowmasker';
+my $makeblastdb = 'blast+/bin/makeblastdb';
+
 my $libraryId = param ('libraryId') || '';
 my $targetId = param ('targetId') || '';
 
 my $identityBesToSeq = param ('identityBesToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"BESTOSEQIDENTITY");
 my $minOverlapBesToSeq = param ('minOverlapBesToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"BESTOSEQMINOVERLAP");
-my $blastn = 'blast+/bin/blastn';
-my $makeblastdb = 'blast+/bin/makeblastdb';
 
 print header;
 
@@ -104,7 +108,7 @@ END
 
 		open (BLAST,">/tmp/$libraryId.$$.blastn") or die "can't open file: /tmp/$libraryId.$$.blastn";
 		system( "$makeblastdb -in /tmp/$targetId.$$.seq -dbtype nucl" );
-		open (CMD,"$blastn -query /tmp/$libraryId.$$.bes -db /tmp/$targetId.$$.seq -dust no -evalue 1e-200 -perc_identity $identityBesToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+		open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$libraryId.$$.bes -db /tmp/$targetId.$$.seq -dust no -evalue 1e-200 -perc_identity $identityBesToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		while(<CMD>)
 		{
 			/^#/ and next;

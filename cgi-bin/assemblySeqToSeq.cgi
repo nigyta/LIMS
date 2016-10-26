@@ -22,14 +22,18 @@ my $userName = $userDetail->{"userName"};
 my $commoncfg = readConfig("main.conf");
 my $userConfig = new userConfig;
 
+my $alignEngineList;
+$alignEngineList->{'blastn'} = "blast+/bin/blastn";
+$alignEngineList->{'BLAT'} = "blat";
+my $windowmasker = 'blast+/bin/windowmasker';
+my $makeblastdb = 'blast+/bin/makeblastdb';
+
 my $assemblyId = param ('assemblyId') || '';
 my $identitySeqToSeq = param ('identitySeqToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQIDENTITY");
 my $minOverlapSeqToSeq = param ('minOverlapSeqToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQMINOVERLAP");
 my $redoAllSeqToSeq = param ('redoAllSeqToSeq') || '0';
 my $checkGood = param ('checkGood') || '0';
-my $blastn = 'blast+/bin/blastn';
 my $task = param ('megablast') || 'blastn';
-my $makeblastdb = 'blast+/bin/makeblastdb';
 
 print header;
 
@@ -113,11 +117,11 @@ END
 		open (BLAST,">/tmp/$assembly[4].$$.blastn") or die "can't open file: /tmp/$assembly[4].$$.blastn";
 		if($redoAllSeqToSeq)
 		{
-			open (CMD,"$blastn -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		}
 		else
 		{
-			open (CMD,"$blastn -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		}
 		while(<CMD>)
 		{
@@ -174,7 +178,7 @@ END
 				close(SEQB);
 				my @alignments;
 				my $goodOverlap = ($checkGood) ? 0 : 1;
-				open (CMD,"$blastn -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
 				while(<CMD>)
 				{
 					/^#/ and next;
@@ -189,7 +193,7 @@ END
 					}									
 				}
 				close(CMD);
-				open (CMD,"$blastn -query /tmp/$getSequenceB[0].$$.seq -subject /tmp/$getSequenceA[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceB[0].$$.seq -subject /tmp/$getSequenceA[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
 				while(<CMD>)
 				{
 					/^#/ and next;
