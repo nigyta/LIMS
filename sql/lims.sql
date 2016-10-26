@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `matrix` (
   `y` int(10) unsigned NOT NULL DEFAULT '0',
   `z` int(10) unsigned NOT NULL DEFAULT '0',
   `barcode` int(10) NOT NULL,
-  `note` longtext COMMENT,
+  `note` longtext,
   `creator` varchar(45) NOT NULL,
   `creationDate` datetime NOT NULL,
   PRIMARY KEY (`id`),

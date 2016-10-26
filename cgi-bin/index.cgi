@@ -463,8 +463,8 @@ __DATA__
 		mywindow.document.write(HTMLdata);
 		mywindow.document.write('</body></html>');
 		mywindow.print();
-		mywindow.close();
-	    return true;
+		//mywindow.close();
+	    //return true;
 	}
 
 	function buttonInit()
