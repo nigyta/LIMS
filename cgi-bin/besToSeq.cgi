@@ -43,7 +43,7 @@ if($libraryId && $targetId)
 		print <<END;
 <script>
 	parent.closeDialog();
-	parent.informationPop("It's running! This processing might take several minutes.");
+	parent.informationPop("It's running! This processing might take a while.");
 </script>	
 END
 	}

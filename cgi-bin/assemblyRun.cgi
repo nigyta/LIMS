@@ -90,7 +90,7 @@ END
 		print <<END;
 <script>
 	parent.refresh("menu");
-	parent.errorPop("It's running! This processing might take several minutes.");
+	parent.errorPop("It's running! This processing might take a while.");
 </script>	
 END
 		}

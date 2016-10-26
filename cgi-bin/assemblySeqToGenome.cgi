@@ -48,7 +48,7 @@ if($assemblyId && $refGenomeId)
 		print <<END;
 <script>
 	parent.closeDialog();
-	parent.errorPop("It's running! This processing might take several minutes.");
+	parent.errorPop("It's running! This processing might take a while.");
 </script>	
 END
 	}

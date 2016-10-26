@@ -38,7 +38,7 @@ if ($pid) {
 <script>
 	parent.closeDialog();
 	parent.refresh("menu");
-	parent.informationPop("It's running! This processing might take several minutes.");
+	parent.informationPop("It's running! This processing might take a while.");
 </script>	
 END
 }
