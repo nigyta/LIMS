@@ -75,6 +75,9 @@ __DATA__
 	<tr>
 		<td colspan="2"><input type="checkbox" id="assemblyAlignFilterCheckbox" name="filter" value="1" checked="checked"><label for="assemblyAlignFilterCheckbox">Filter Sequence with the same name</label></td>
 	</tr>
+	<tr>
+		<td colspan="2"><input type="checkbox" id="assemblyAlignCheckRedo" name="redo" value="1"><label for="assemblyAlignCheckRedo">Delete Cached Files</label></td>
+	</tr>
 	</table>
 </form>
 <script>

@@ -79,13 +79,13 @@ print $html;
 
 __DATA__
 <form id="assemblyAssign" name="assemblyAssign" action="assemblyAssignSave.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
-<h3>Please check ctgs to chr:</h3>
+<h3>Please check ctgs for assigning chromosome number:</h3>
 $ctgList
 <table>
-<tr><td style='text-align:right'><label for="chr$$"><b>Chromosome Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="chrNumber" id="editchrNumber" size="15" type="text" maxlength="15" ></td></tr>
+<tr><td style='text-align:right'><label for="chr$$"><b>Chromosome #</b></label></td><td><input class='ui-widget-content ui-corner-all' name="chrNumber" id="editchrNumber" size="15" type="text" maxlength="15" ></td></tr>
 </table>
 </form>
 <script>
-$('#dialog').dialog("option", "title", "Assign Ctg To Chr");
+$('#dialog').dialog("option", "title", "Assign Ctg To Chromosome");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Assign", click: function() { submitForm('assemblyAssign'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 </script>

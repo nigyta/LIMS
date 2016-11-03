@@ -50,6 +50,10 @@ END
 		exit;
 	}
 
+	my $deleteEmptyAssemblyCtg = $dbh->prepare("DELETE FROM matrix WHERE container LIKE 'assemblyCtg' AND note = '' AND o = ?");
+	$deleteEmptyAssemblyCtg->execute($assemblyId);
+
+
 	my $validateAssemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY name");
 	$validateAssemblyCtg->execute($assemblyId);
 	while(my @validateAssemblyCtg = $validateAssemblyCtg->fetchrow_array())

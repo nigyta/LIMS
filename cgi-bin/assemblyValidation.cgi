@@ -34,9 +34,9 @@ my $repeatedAssemblySeqTab = '';
 my $assemblySeqWithoutCtgTab = '';
 my $nullAssemblySeqDetails= '';
 my $errorAssemblySeqDetails= '';
-my $noAssemblySeqDetails= '';
-my $repeatedAssemblySeqDetails= '';
-my $assemblySeqWithoutCtgDetails= '';
+my $noAssemblySeqDetails = '';
+my $repeatedAssemblySeqDetails = '';
+my $assemblySeqWithoutCtgDetails = '';
 my $noSequenceDetails = '';
 my %assemblySeqToCtg;
 my $newSeqIdList;
@@ -68,7 +68,17 @@ END
 	my $noAssemblySeqNum = 0;
 	my $repeatedAssemblySeqNum = 0;
 	my $assemblySeqWithoutCtgNum = 0;
-	my $validateSeqToCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY name");
+
+	my $emptyAssemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE '' AND o = ?");
+	$emptyAssemblyCtg->execute($assemblyId);
+#	$noAssemblySeqNum = $emptyAssemblyCtg->rows;
+	while (my @emptyAssemblyCtg = $emptyAssemblyCtg->fetchrow_array())
+	{
+		$noAssemblySeqDetails .= "<tr><td>$emptyAssemblyCtg[0]</td><td>Ctg$emptyAssemblyCtg[2]</td></tr>";
+		$noAssemblySeqNum++;
+	}
+
+	my $validateSeqToCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note NOT LIKE '' AND o = ? ORDER BY name");
 	$validateSeqToCtg->execute($assemblyId);
 	while(my @validateSeqToCtg = $validateSeqToCtg->fetchrow_array())
 	{
@@ -86,8 +96,6 @@ END
 			$assemblySeqToCtg{$_}{$validateSeqToCtg[2]}=1;
 			my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ? ");
 			$assemblySeq->execute($_);			
-			$noAssemblySeqDetails .= "<tr><td>$_ </td><td>Ctg$validateSeqToCtg[2]</td></tr>" unless ($assemblySeq->rows > 0);
-			$noAssemblySeqNum++ unless ($assemblySeq->rows > 0);
 			my @assemblySeq = $assemblySeq->fetchrow_array();
 			my $assemblySequence=$dbh->prepare("SELECT * FROM matrix WHERE id = ? ");
 			$assemblySequence->execute($assemblySeq[5]);
@@ -125,7 +133,7 @@ END
 	<tr><td style='text-align:right'><b>No sequence</b></td><td>$noSequenceNum</td></tr>
 	<tr><td style='text-align:right'><b>Null assemblySeq</b></td><td>$nullAssemblySeqNum</td></tr>
 	<tr><td style='text-align:right'><b>Error assemblySeq</b></td><td>$errorAssemblySeqNum</td></tr>
-	<tr><td style='text-align:right'><b>No assemblySeq</b></td><td>$noAssemblySeqNum</td></tr>
+	<tr><td style='text-align:right'><b>Empty assemblyCtg</b></td><td>$noAssemblySeqNum</td></tr>
 	<tr><td style='text-align:right'><b>Repeated assemblySeq</b></td><td>$repeatedAssemblySeqNum</td></tr>
 	<tr><td style='text-align:right'><b>AssemblySeq without Ctg</b></td><td>$assemblySeqWithoutCtgNum</td></tr>
 	</table>";
@@ -153,9 +161,9 @@ END
 	}
 	if ($noAssemblySeqNum > 0)
 	{
-		$noAssemblySeqTab = "<li><a href='#viewValidateTabs-noAssemblySeq'>No assemblySeq ($noAssemblySeqNum)</a></li>";
+		$noAssemblySeqTab = "<li><a href='#viewValidateTabs-noAssemblySeq'>Empty assemblyCtg ($noAssemblySeqNum)</a></li>";
 		$noAssemblySeqDetails = "<div id='viewValidateTabs-noAssemblySeq'>
-		<table class='validateDetails display'><thead><tr><th>AssemblySeq does not exsit</th><th>Ctg</th></tr></thead><tbody>$noAssemblySeqDetails</tbody></table>
+		<table class='validateDetails display'><thead><tr><th>Empty assemblyCtg (ids)</th><th>Ctg</th></tr></thead><tbody>$noAssemblySeqDetails</tbody></table>
 		</div>";
 	}
 	if ($repeatedAssemblySeqNum > 0)

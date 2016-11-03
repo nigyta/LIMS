@@ -35,11 +35,10 @@ for my $assemblyCtgId(@assemblyCtgId)
 	my @assembly = $assembly->fetchrow_array();
 	unless ($assembly[7] == 1 || $assembly[7] == 0) # exit if for frozen or running assembly
 	{
-		print header;
 		print <<END;
 <script>
-	closeDialog();
-	errorPop("This assembly is running or frozen.");
+	parent.closeDialog();
+	parent.errorPop("This assembly is running or frozen.");
 </script>	
 END
 		exit;
@@ -94,6 +93,13 @@ END
 		my $update=$dbh->do("UPDATE matrix SET x = $chrNumber WHERE id = $assemblyCtgId ");
 	}
 }
+		print <<END;
+<script>
+	parent.closeDialog();
+	parent.informationPop("This chromosome number assignment is done.");
+	parent.refresh("menu");
+</script>	
+END
 
 
 
