@@ -130,14 +130,14 @@ if($genomeName)
 						print <<END;
 <script>
 parent.closeDialog();
+parent.informationPop("It's loading! This processing might take a while.");
 parent.refresh("general");
 </script>	
 END
 					}
 					elsif($pid == 0){
-						close (STDOUT);
 						my $updateGenomeToRunning = $dbh->do("UPDATE matrix SET o = 0, barcode = -1 WHERE id = $genomeId");			
-						my $deleteGenomeSequence = $dbh->do("DELETE FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $genomeId") if ($replace);	
+
 						if($genomeFilePath)
 						{
 							$genomeInfile = $genomeFilePath;
@@ -150,6 +150,49 @@ END
 							}
 							close FILE;
 						}		
+
+						if ($replace) #delete old sequences
+						{
+							my $genomeAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND y = $genomeId");
+							$genomeAsReference->execute();
+							if($genomeAsReference->rows > 0)
+							{
+								print <<END;
+<script>
+parent.closeDialog();
+parent.errorPop("You can NOT replace this genome since it has already been used as a reference in an assembly!");
+</script>	
+END
+
+								unlink ($genomeInfile) if (!$genomeFilePath);
+								exit;
+							}
+
+							my $genomeForAssembly = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = $genomeId");
+							$genomeForAssembly->execute();
+							if ($genomeForAssembly->rows > 0)
+							{
+								print <<END;
+<script>
+parent.closeDialog();
+parent.errorPop("You can NOT replace this genome since it has already been used in an assembly!");
+</script>	
+END
+								unlink ($genomeInfile) if (!$genomeFilePath);
+
+								exit;
+							}
+
+							my $genomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $genomeId");
+							$genomeSequence->execute();
+							while(my @genomeSequence = $genomeSequence->fetchrow_array())
+							{
+								my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $genomeSequence[0] OR subject = $genomeSequence[0]");
+							}
+							my $deleteGenomeSequence = $dbh->do("DELETE FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $genomeId");
+						}
+
+						close (STDOUT);
 
 						#loading sequence
 						my $in = Bio::SeqIO->new(-file => $genomeInfile,
@@ -214,7 +257,7 @@ END
 						my $countGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $genomeId");
 						$countGenomeSequence->execute();
 						$seqNumber = $countGenomeSequence->rows;
-						my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1 WHERE id = $genomeId");			
+						my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1, creationDate = NOW() WHERE id = $genomeId");			
 						exit 0;
 					}
 					else{
@@ -365,7 +408,7 @@ END
 					}
 					unlink ($genomeInfile) if (!$genomeFilePath);
 					unlink ($agpInfile);
-					my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1 WHERE id = $genomeId");			
+					my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1, creationDate = NOW() WHERE id = $genomeId");			
 					exit 0;
 				}
 				else{

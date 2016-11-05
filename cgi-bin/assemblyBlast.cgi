@@ -55,7 +55,7 @@ END
 		print <<END;
 <script>
 	parent.closeDialog();
-	parent.informationPop("It's running! This processing might take several minutes.");
+	parent.informationPop("It's running! This processing might take a while.");
 	parent.openDialog('$assemblyAlignCheckFormUrl&seqOne=$seqOne&seqTwo=$seqTwo');
 </script>	
 END
@@ -90,10 +90,8 @@ END
 		close(SEQB);
 		if($redo)
 		{
-			my $deleteAlignmentA = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");
-			$deleteAlignmentA->execute($getSequenceA[0],$getSequenceB[0]);
-			my $deleteAlignmentB = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");
-			$deleteAlignmentB->execute($getSequenceB[0],$getSequenceA[0]);
+			my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceA[0] AND subject = $getSequenceB[0]");
+			my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceB[0] AND subject = $getSequenceA[0]");
 		}
 		my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ?");
 		$getAlignment->execute($getSequenceA[0],$getSequenceB[0]);

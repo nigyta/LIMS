@@ -281,14 +281,15 @@ END
 			}
 			else
 			{
-				my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteSequence=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $_ OR subject = $_");
+				
 				if ($item[3] eq '99' )
 				{
 					my $genome=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 					$genome->execute($item[4]);
 					my @genome = $genome->fetchrow_array();
 					$genome[3] = $genome[3]-1;
-
 					my $updateGenome=$dbh->do("UPDATE matrix SET o = '$genome[3]' WHERE id = $item[4]");
 				}
 				print <<END;
@@ -331,8 +332,13 @@ END
 				exit;
 			}
 
-			my $deleteSequence=$dbh->do("DELETE FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $_");
-			my $deleteSequencePiece=$dbh->do("DELETE FROM matrix WHERE container LIKE 'sequence' AND o = 97 AND x = $_");
+			my $genomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $_");
+			$genomeSequence->execute();
+			while(my @genomeSequence = $genomeSequence->fetchrow_array())
+			{
+				my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $genomeSequence[0] OR subject = $genomeSequence[0]");
+			}
+			my $deleteGenomeSequence = $dbh->do("DELETE FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $_"); # both sequence and piece
 			my $deleteAgp=$dbh->do("DELETE FROM matrix WHERE container LIKE 'agp' AND x = $_");
 			my $deleteGenome=$dbh->do("DELETE FROM matrix WHERE id = $_");
 			print <<END;

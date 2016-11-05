@@ -95,9 +95,9 @@ __DATA__
 	<input name="genomeId" id="editGenomeId" type="hidden" value="$genomeId" />
 	<table>
 	<tr><td style='text-align:right'><label for="editGenomeName"><b>Genome Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="editGenomeName" size="40" type="text" maxlength="32" value="$genomeName"/><br><sup class='ui-state-disabled'>$genomeStatus by $genomeCreator on $genomeCreationDate</sup></td></tr>
-	<tr><td style='text-align:right'><label for="editGenomeFile"><b>Sequence File</b></label></td><td><input name="genomeFile" id="editGenomeFile" type="file" />(in FASTA format)</td></tr>
-	<tr><td></td><td>or <input name="genomeFilePath" id="editGenomeFilePath" type="text" />(On-server file name with full path)</td></tr>
-	<tr><td style='text-align:right'></td>
+	<tr><td style='text-align:right' rowspan='3'><label for="editGenomeFile"><b>Sequence File</b></label></td><td><sup class="ui-state-error-text">Note: Sequence Id should contain no more than 32 characters.</sup><br><input name="genomeFile" id="editGenomeFile" type="file" />(in FASTA format)</td></tr>
+	<tr><td>or <input name="genomeFilePath" id="editGenomeFilePath" type="text" />(On-server file name with full path)</td></tr>
+	<tr>
 		<td><div class="ui-state-error-text">The New Sequence File will be applied to</div>
 			<div id="editGenomeReplace">
 			<input type="radio" id="editGenomeReplaceRadio1" name="replace" value="1"><label for="editGenomeReplaceRadio1">replace the existing data set</label>

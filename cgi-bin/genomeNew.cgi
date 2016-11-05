@@ -49,8 +49,8 @@ __DATA__
 <form id="newGenome" name="newGenome" action="genomeSave.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<table>
 	<tr><td style='text-align:right'><label for="newGenomeName"><b>Genome Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="newGenomeName" size="40" type="text" maxlength="32" /></td></tr>
-	<tr><td style='text-align:right'><label for="newGenomeFile"><b>Sequence File</b></label></td><td><input name="genomeFile" id="newGenomeFile" type="file" />(in FASTA format)</td></tr>
-	<tr><td></td><td>or <input name="genomeFilePath" id="newGenomeFilePath" type="text" />(On-server file name with full path)</td></tr>
+	<tr><td style='text-align:right' rowspan='2'><label for="newGenomeFile"><b>Sequence File</b></label></td><td><sup class="ui-state-error-text">Note: Sequence Id should contain no more than 32 characters.</sup><br><input name="genomeFile" id="newGenomeFile" type="file" />(in FASTA format)</td></tr>
+	<tr><td>or <input name="genomeFilePath" id="newGenomeFilePath" type="text" />(On-server file name with full path)</td></tr>
 	<tr><td style='text-align:right'><label for="newGenomeLibraryId"><b>Link to</b></label></td><td><select class='ui-widget-content ui-corner-all' name='libraryId' id='newGenomeLibraryId'>$libraryId</select></td></tr>
 	<tr><td style='text-align:right'><b>Import Options</b></td>
 		<td>

@@ -123,7 +123,7 @@ if ($assemblyId)
 	$assemblyList .= ($assembly[7] < 1) ? "<button style='float: right;' onclick='refresh(\"menu\")' title='Click to Refresh'>Status: $assemblyStatus->{$assembly[7]}</button>" : 
 							($assembly[7] == 1) ? "<button style='float: right;' onclick='loaddiv(\"hiddenDiv\", \"assemblyFreeze.cgi?assemblyId=$assemblyId\")' title='Click to Freeze'>Status: $assemblyStatus->{$assembly[7]}</button>" :
 							"<button style='float: right;' onclick='loaddiv(\"hiddenDiv\", \"assemblyFreeze.cgi?assemblyId=$assemblyId\")' title='Click to Unfreeze'>Status: $assemblyStatus->{$assembly[7]}</button>";
-	$assemblyList .= "<input style='float: right;'  class='ui-widget-content ui-corner-all' name='seqName' id='assemblySearchSeqName$$' size='16' type='text' maxlength='16' VALUE='' placeholder='Search Seq' />
+	$assemblyList .= "<input style='float: right;'  class='ui-widget-content ui-corner-all' name='seqName' id='assemblySearchSeqName$$' size='16' type='text' maxlength='32' VALUE='' placeholder='Search Seq' />
 			<hr>";
 	my $assemblySeq;
 	my $assemblyCtg;

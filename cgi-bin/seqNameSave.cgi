@@ -54,6 +54,8 @@ if($seqId)
 	{
 		my $updateSequence=$dbh->prepare("UPDATE matrix SET name = ?, creator = ? WHERE id = ?");
 		$updateSequence->execute($seqName,$userName,$seqId);
+		my $updateAssemblySeq=$dbh->prepare("UPDATE matrix SET name = ? WHERE container LIKE 'assemblySeq' AND y = ?");
+		$updateAssemblySeq->execute($seqName,$seqId);
 		$seqName = 'no name' unless ($seqName);
 		print <<END;
 <a id='seqName$seqId$$' onmouseover='editIconShow("seqName$seqId$$")' onmouseout='editIconHide("seqName$seqId$$")' onclick="loaddiv('seqName$seqId','seqNameEdit.cgi?seqId=$seqId')" title="Edit this name">$seqName</a>
