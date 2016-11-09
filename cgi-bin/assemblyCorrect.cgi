@@ -22,14 +22,6 @@ my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
 my $assemblyId = param ('assemblyId')|| '';
-my $newSeqIdList;
-my %assemblySeqToCtg;
-my %seqCount;
-my %hideSeqCtg;
-my %hideCount;
-my $ctgNumber=1;
-my $newSeqId;
-my @ctgNum;
 
 print header;
 
@@ -54,18 +46,23 @@ END
 	$deleteEmptyAssemblyCtg->execute($assemblyId);
 
 
+	my %assemblySeqToCtg;
+	my %seqCount;
+	my %hideSeqCtg;
+	my %hideCount;
+	my $ctgNumber=1;
 	my $validateAssemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY name");
 	$validateAssemblyCtg->execute($assemblyId);
 	while(my @validateAssemblyCtg = $validateAssemblyCtg->fetchrow_array())
 	{
-		push @ctgNum,$validateAssemblyCtg[2];
-		$newSeqIdList=0;
+		$ctgNumber = $validateAssemblyCtg[2] if ($validateAssemblyCtg[2] > $ctgNumber);
+		my $newSeqIdList='';
 		foreach (split ",", $validateAssemblyCtg[8])
 		{
 			# Generate newSeqIdList
 			next unless ($_=~/\S/);
 			$_  =~ s/^(\-{2,})/-/g;
-			$newSeqId=$_;
+			my $newSeqId=$_;
 			$_ =~ s/[^a-zA-Z0-9]//g;
 			my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ? ");
 			$assemblySeq->execute($_);			
@@ -92,19 +89,16 @@ END
 				}
 			}
 
-			$hideCount{$_} += 1 if ($newSeqId =~/^(\-{1,})/ );
+			$hideCount{$_}++ if ($newSeqId =~/^(\-{1,})/ );
 			$hideSeqCtg{$_}{$validateAssemblyCtg[2]} = 1 if ($newSeqId =~/^(\-{1,})/ );
-			$seqCount{$_} += 1;
+			$seqCount{$_}++;
 			$assemblySeqToCtg{$_}{$validateAssemblyCtg[2]} = $newSeqId;
 		}
 		my $updateNewAssemblyCtg=$dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
 		$updateNewAssemblyCtg->execute($newSeqIdList,$validateAssemblyCtg[0]);
 	}
-	@ctgNum = sort {$a <=> $b} @ctgNum;
-	$ctgNumber = pop(@ctgNum);
 	$ctgNumber++;
-	my @seqInCtg=keys %seqCount;
-	for my $seqInCtg(@seqInCtg)
+	for my $seqInCtg(keys %seqCount)
 	{
 		if ($seqCount{$seqInCtg}>1)
 		{
@@ -140,7 +134,6 @@ END
 					{
 						my $deleteAssemblyCtg = $dbh->prepare("DELETE FROM matrix WHERE container LIKE 'assemblyCtg' AND name = ? AND o = ?");
 						$deleteAssemblyCtg->execute($ctgName,$assemblyId);
-
 					}
 				}
 			}

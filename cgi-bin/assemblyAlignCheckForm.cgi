@@ -65,8 +65,8 @@ __DATA__
 	<input name="assemblyId" id="assemblyAlignCheckAssemblyId" type="hidden" value="$assemblyId" />
 	<table>
 	<tr>
-		<td colspan="2"><label for="assemblyAlignCheckSeqOneLabel"><b>Sequence-1.</b></label><input name="seqOneLabel" id="assemblyAlignCheckSeqOneLabel" size="16" type="text" maxlength="16" VALUE="$seqOneLabel" placeholder="First Seq" onblur="checkBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqOne" id="assemblyAlignCheckSeqOne" type="text" placeholder="First SeqId" title="First SeqId" VALUE="$seqOne" readonly="readonly"/><br>
-		<label for="assemblyAlignCheckSeqTwoLabel"><b>Sequence-2.</b></label><input name="seqTwoLabel" id="assemblyAlignCheckSeqTwoLabel" size="16" type="text" maxlength="16" VALUE="$seqTwoLabel" placeholder="Second Seq" onblur="checkBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqTwo" id="assemblyAlignCheckSeqTwo" type="text" placeholder="Second SeqId" title="Second SeqId" VALUE="$seqTwo" readonly="readonly" />
+		<td colspan="2"><label for="assemblyAlignCheckSeqOneLabel"><b>Sequence-1.</b></label><input name="seqOneLabel" id="assemblyAlignCheckSeqOneLabel" size="16" type="text" maxlength="32" VALUE="$seqOneLabel" placeholder="First Seq" onblur="checkBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqOne" id="assemblyAlignCheckSeqOne" type="text" placeholder="First SeqId" title="First SeqId" VALUE="$seqOne" readonly="readonly"/><br>
+		<label for="assemblyAlignCheckSeqTwoLabel"><b>Sequence-2.</b></label><input name="seqTwoLabel" id="assemblyAlignCheckSeqTwoLabel" size="16" type="text" maxlength="32" VALUE="$seqTwoLabel" placeholder="Second Seq" onblur="checkBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqTwo" id="assemblyAlignCheckSeqTwo" type="text" placeholder="Second SeqId" title="Second SeqId" VALUE="$seqTwo" readonly="readonly" />
 		</td>
 	</tr>
 	<tr>

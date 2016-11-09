@@ -44,6 +44,7 @@ __DATA__
 		<li><a href="serviceAll.cgi">Services</a></li>
 		<li><a href="smrtrun.cgi">SMRT Runs</a></li>
 		<li><a href="genome.cgi">Genomes</a></li>
+		<li><a href="system.cgi">System</a></li>
 	</ul>
 </div>
 <script>

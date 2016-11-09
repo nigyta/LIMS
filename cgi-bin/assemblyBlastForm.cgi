@@ -71,8 +71,8 @@ __DATA__
 	<input name="assemblyId" id="assemblyBlastAssemblyId" type="hidden" value="$assemblyId" />
 	<table>
 	<tr>
-		<td colspan="3"><label for="assemblyBlastSeqOneLabel"><b>Sequence-1.</b></label><input name="seqOneLabel" id="assemblyBlastSeqOneLabel" size="16" type="text" maxlength="16" VALUE="$seqOneLabel" placeholder="First Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqOne" id="assemblyBlastSeqOne" type="text" placeholder="First SeqId" title="First SeqId" VALUE="$seqOne" readonly="readonly"/><br>
-		<label for="assemblyBlastSeqTwoLabel"><b>Sequence-2.</b></label><input name="seqTwoLabel" id="assemblyBlastSeqTwoLabel" size="16" type="text" maxlength="16" VALUE="$seqTwoLabel" placeholder="Second Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqTwo" id="assemblyBlastSeqTwo" type="text" placeholder="Second SeqId" title="Second SeqId" VALUE="$seqTwo" readonly="readonly" />
+		<td colspan="3"><label for="assemblyBlastSeqOneLabel"><b>Sequence-1.</b></label><input name="seqOneLabel" id="assemblyBlastSeqOneLabel" size="16" type="text" maxlength="32" VALUE="$seqOneLabel" placeholder="First Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqOne" id="assemblyBlastSeqOne" type="text" placeholder="First SeqId" title="First SeqId" VALUE="$seqOne" readonly="readonly"/><br>
+		<label for="assemblyBlastSeqTwoLabel"><b>Sequence-2.</b></label><input name="seqTwoLabel" id="assemblyBlastSeqTwoLabel" size="16" type="text" maxlength="32" VALUE="$seqTwoLabel" placeholder="Second Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqTwo" id="assemblyBlastSeqTwo" type="text" placeholder="Second SeqId" title="Second SeqId" VALUE="$seqTwo" readonly="readonly" />
 		</td>
 	</tr>
 	<tr><td><b>Alignment Settings:</b></td><td><input type="checkbox" id="assemblyCheckGood" name="checkGood" value="1"><label for="assemblyCheckGood">Check End Match</label></td><td><input type="checkbox" id="assemblyRedo" name="redo" value="1" checked="checked"><label for="assemblyRedo">Delete Cache</label></td></tr>

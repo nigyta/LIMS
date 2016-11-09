@@ -48,10 +48,91 @@ while (my @userInGroup = $userInGroup->fetchrow_array())
 }
 print header;
 
-my $pid = fork();
-if ($pid) {
-	my $libraryId = 0;
-	for(@items)
+my $libraryId = 0;
+for(@items)
+{
+	if ($_ eq 0)
+	{
+		my $pid = fork();
+		if ($pid) {
+			print <<END;
+	<script>
+		parent.closeDialog();
+		parent.errorPop("It's running! This processing might take a while.");
+	</script>	
+END
+			
+		}
+		elsif($pid == 0){
+			close (STDOUT);
+			if ($option eq 'delTempFiles')
+			{
+				#delete temp files
+				opendir(DIR, $commoncfg->{TMPDIR}) or die "can't opendir $commoncfg->{TMPDIR}: $!";
+				my @files = readdir(DIR);
+				closedir DIR;
+				foreach my $file (sort @files)
+				{
+					next if ($file =~ /^\./);
+					unlink "$commoncfg->{TMPDIR}/$file" if (-f "$commoncfg->{TMPDIR}/$file"); #delete files
+				}
+			}
+			else
+			{
+				#connect to the mysql server
+				my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
+				
+				#background check for orphan stuffs to be deleted.
+				# orphan alignments
+				my $sequenceIds;
+				my $query = $dbh->prepare("SELECT query FROM alignment GROUP BY query");
+				$query->execute();
+				while (my @query =  $query->fetchrow_array())
+				{
+					$sequenceIds->{$query[0]} = 1;
+				}
+
+				my $subject = $dbh->prepare("SELECT subject FROM alignment GROUP BY subject");
+				$subject->execute();
+				while (my @subject =  $subject->fetchrow_array())
+				{
+					$sequenceIds->{$subject[0]} = 1;
+				}
+				for (keys %{$sequenceIds})
+				{
+					my $sequence = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$sequence->execute($_);
+					unless ($sequence->rows > 0)
+					{
+						my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $_ OR subject = $_");
+					}
+				}
+				#
+				#delete comment
+				my $commentIds;
+				my $commentParents = $dbh->prepare("SELECT o FROM matrix WHERE container LIKE 'comment' GROUP BY o");
+				$commentParents->execute();
+				while (my @commentParents =  $commentParents->fetchrow_array())
+				{
+					$commentIds->{$commentParents[0]} = 1;
+				}
+				for (keys %{$commentIds})
+				{
+					my $commentParent = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$commentParent->execute($_);
+					unless ($commentParent->rows > 0)
+					{
+						my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $_");
+					}
+				}
+			}
+
+		}
+		else{
+			die "couldn't fork: $!\n";
+		} 
+	}
+	else
 	{
 		my $item = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$item->execute($_);
@@ -763,57 +844,3 @@ END
 		}
 	}
 }
-elsif($pid == 0){
-	close (STDOUT);
-	#connect to the mysql server
-	my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
-	
-# 	#background check for orphan stuffs to be deleted.
-# 	# orphan alignments
-# 	my $sequenceIds;
-# 	my $query = $dbh->prepare("SELECT query FROM alignment GROUP BY query");
-# 	$query->execute();
-# 	while (my @query =  $query->fetchrow_array())
-# 	{
-# 		$sequenceIds->{$query[0]} = 1;
-# 	}
-# 
-# 	my $subject = $dbh->prepare("SELECT subject FROM alignment GROUP BY subject");
-# 	$subject->execute();
-# 	while (my @subject =  $subject->fetchrow_array())
-# 	{
-# 		$sequenceIds->{$subject[0]} = 1;
-# 	}
-# 	for (keys %{$sequenceIds})
-# 	{
-# 		my $sequence = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-# 		$sequence->execute($_);
-# 		unless ($sequence->rows > 0)
-# 		{
-# 			my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $_ OR subject = $_");
-# 		}
-# 	}
-# 	#
-# 	#delete comment
-# 	my $commentIds;
-# 	my $commentParents = $dbh->prepare("SELECT o FROM matrix WHERE container LIKE 'comment' GROUP BY o");
-# 	$commentParents->execute();
-# 	while (my @commentParents =  $commentParents->fetchrow_array())
-# 	{
-# 		$commentIds->{$commentParents[0]} = 1;
-# 	}
-# 	for (keys %{$commentIds})
-# 	{
-# 		my $commentParent = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-# 		$commentParent->execute($_);
-# 		unless ($commentParent->rows > 0)
-# 		{
-# 			my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $_");
-# 		}
-# 	}	
-}
-else{
-	die "couldn't fork: $!\n";
-} 
-
-

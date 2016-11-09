@@ -92,6 +92,7 @@ END
 		{
 			my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceA[0] AND subject = $getSequenceB[0]");
 			my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceB[0] AND subject = $getSequenceA[0]");
+			unlink ("$commoncfg->{TMPDIR}/$seqOne-$seqTwo.aln.html");
 		}
 		my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ?");
 		$getAlignment->execute($getSequenceA[0],$getSequenceB[0]);
