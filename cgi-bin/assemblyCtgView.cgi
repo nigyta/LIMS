@@ -455,6 +455,7 @@ if ($assemblyCtgId)
 				$assemblyCtgSeqAlignment->polygon(
 					%$points,
 					id=>$alignments[0],
+					onclick => "closeDialog();openDialog('assemblyAlignmentView.cgi?alignmentId=$alignments[0]')",
 					class=>'hasmenuForAlignment',
 					style=>{ stroke => 'red',
 						fill => 'yellow',
@@ -462,6 +463,7 @@ if ($assemblyCtgId)
 						},
 					'overlap-url' => "assemblyCtgOverlap.cgi?assemblyCtgId=$assemblyCtgId&alignmentId=$alignments[0]&scrollLeft=$preXOne",
 					'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyCtgId=$assemblyCtgId&scrollLeft=$preXOne",
+					'view-url' => "assemblyAlignmentView.cgi?alignmentId=$alignments[0]",
 					'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$preXOne"
 				);
 			}
@@ -620,6 +622,7 @@ $assemblyCtgDetails
 <ul id="optionsForAlignment" class="ui-helper-hidden" style='z-index: 1000;white-space: nowrap;'>
     <li data-command="overlap"><a href="#"><span class="ui-icon ui-icon-gripsmall-diagonal-se"></span>Smart Redundancy Filter</a></li>
     <li data-command="hide"><a href="#"><span class="ui-icon ui-icon-cancel"></span>Hide Alignment</a></li>
+    <li data-command="view"><a href="#"><span class="ui-icon ui-icon-clipboard"></span>View Alignment</a></li>
     <li data-command="move"><a href="#"><span class="ui-icon ui-icon-arrow-2-e-w"></span>Move Seq</a></li>
 </ul>
 <ul id="optionsForAll" class="ui-helper-hidden" style='z-index: 1000;white-space: nowrap;'>
@@ -716,6 +719,10 @@ $("#assemblyCtgForAlignment$assemblyCtgId$$").contextmenu({
 			{
 				loaddiv('hiddenDiv',ui.target.attr('hide-url'));
 			}
+		}
+		if (ui.cmd == 'view')
+		{
+			openDialog(ui.target.attr('view-url'));
 		}
 		if (ui.cmd == 'move')
 		{

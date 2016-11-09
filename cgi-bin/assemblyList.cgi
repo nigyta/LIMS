@@ -91,9 +91,9 @@ if ($assemblyId)
 						<li><a href='download.cgi?besLibraryId=$assembly[4]' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>BAC End Sequence</a></li>"
 						: "";
 
-	$assemblyList .= "<li><a href='download.cgi?assemblyId=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>PseudoMolecule (Ctg)</a></li>
+	$assemblyList .= "<li><a href='download.cgi?assemblyId=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg PseudoMolecule</a></li>
+						<li><a href='download.cgi?assemblyId=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr PseudoMolecule</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li>
-						<li><a href='download.cgi?assemblyId=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>PseudoMolecule (Chr)</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li>
 							</ul>
@@ -121,8 +121,10 @@ if ($assemblyId)
 			</ul>";
 			
 	$assemblyList .= ($assembly[7] < 1) ? "<button style='float: right;' onclick='refresh(\"menu\")' title='Click to Refresh'>Status: $assemblyStatus->{$assembly[7]}</button>" : 
-							($assembly[7] == 1) ? "<button style='float: right;' onclick='loaddiv(\"hiddenDiv\", \"assemblyFreeze.cgi?assemblyId=$assemblyId\")' title='Click to Freeze'>Status: $assemblyStatus->{$assembly[7]}</button>" :
-							"<button style='float: right;' onclick='loaddiv(\"hiddenDiv\", \"assemblyFreeze.cgi?assemblyId=$assemblyId\")' title='Click to Unfreeze'>Status: $assemblyStatus->{$assembly[7]}</button>";
+							($assembly[7] == 1) ? "<button style='float: right;' onclick='loaddiv(\"hiddenDiv\", \"assemblyFreeze.cgi?assemblyId=$assemblyId\")' title='Click to Freeze'>$assemblyStatus->{$assembly[7]}</button>
+							<button style='float: right;' onclick='refresh(\"menu\")'>Refresh</button>" :
+							"<button style='float: right;' onclick='loaddiv(\"hiddenDiv\", \"assemblyFreeze.cgi?assemblyId=$assemblyId\")' title='Click to Unfreeze'>$assemblyStatus->{$assembly[7]}</button>
+							<button style='float: right;' onclick='refresh(\"menu\")'>Refresh</button>";
 	$assemblyList .= "<input style='float: right;'  class='ui-widget-content ui-corner-all' name='seqName' id='assemblySearchSeqName$$' size='16' type='text' maxlength='32' VALUE='' placeholder='Search Seq' />
 			<hr>";
 	my $assemblySeq;
@@ -396,9 +398,14 @@ END
     for (sort {$b <=> $a} keys %$assembledCtgByChr)
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
+
+		$assembledCtgByChr->{$_} = ($_ > 0) ?
+			" (<a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg Pseudomolecules</a> | <a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='Click to Download'>Chr Pseudomolecules</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg-Seq AGP</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame' title='Click to Download'>Chr-Ctg AGP</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='Click to Download'>Chr-Seq AGP</a>)</sup></h3>$assembledCtgByChr->{$_}"
+			: " (<a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg Pseudomolecule</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg-Seq AGP</a>)</sup><button class='ui-state-error-text' onclick='deleteItem($assemblyId,\"chrZeroOnly\")' title='Delete Chr0 Contigs'>Delete Chr0 Contigs</button></h3>$assembledCtgByChr->{$_}";
+
 		$assembledCtgByChr->{$_} = ($totalAssembledSeqNumberByChr->{$_} > 1) ?
-			" - $totalAssembledSeqNumberByChr->{$_} Seqs <sup>" . commify($totalLength->{$_}). " bp (<a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg Pseudomolecules</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg-Seq AGP</a>)</sup></h3>$assembledCtgByChr->{$_}"
-			: " - $totalAssembledSeqNumberByChr->{$_} Seq <sup>" . commify($totalLength->{$_}). " bp (<a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg Pseudomolecule</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg-Seq AGP</a>)</sup></h3>$assembledCtgByChr->{$_}";
+			" - $totalAssembledSeqNumberByChr->{$_} Seqs <sup>" . commify($totalLength->{$_}). " bp$assembledCtgByChr->{$_}"
+			: " - $totalAssembledSeqNumberByChr->{$_} Seq <sup>" . commify($totalLength->{$_}). " bp$assembledCtgByChr->{$_}";
 
 		$assembledCtgByChr->{$_} = ($totalAssembledContigByChr->{$_} > 1) ?
 			"($totalAssembledContigByChr->{$_} Contigs)$assembledCtgByChr->{$_}"

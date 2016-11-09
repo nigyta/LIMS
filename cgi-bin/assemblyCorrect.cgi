@@ -190,7 +190,7 @@ END
 			}
 			$validateCtgLength += $validateAssemblySeqEnd - $validateAssemblySeqStart + 1 - $filterLength;
 			my $insertAssemblyCtg=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblyCtg', ?, ?, 0, 0, 0, ?, ?, ?, NOW())");
-			$insertAssemblyCtg->execute($ctgNumber,$assemblyId,$validateCtgLength,'($validateAssemblySeq[0])',$userName);
+			$insertAssemblyCtg->execute($ctgNumber,$assemblyId,$validateCtgLength,"($validateAssemblySeq[0])",$userName);
 			$ctgNumber++;
 		}
 	}

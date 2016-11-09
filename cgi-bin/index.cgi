@@ -435,12 +435,12 @@ __DATA__
 		$('#'+iconName).removeClass('ui-state-hover');
 	}
 
-	function deleteItem(itemId)
+	function deleteItem(itemId,option)
 	{
 		var r=confirm("Are you sure to delete this?");
 		if (r==true)
 		{
-			loaddiv("hiddenDiv" , "itemDelete.cgi?items=" + itemId );
+			loaddiv("hiddenDiv" , "itemDelete.cgi?items=" + itemId + "&option=" + option);
 		}
 		return false;
 	}

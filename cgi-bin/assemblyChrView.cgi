@@ -533,12 +533,14 @@ if ($assemblyId && $chr)
 						$companionAssemblyChrSeqAlignment->polygon(
 							%$points,
 							id=>'aln'.$alignments[0],
+							onclick => "closeDialog();openDialog('assemblyAlignmentView.cgi?alignmentId=$alignments[0]')",
 							class=>'hasmenuForAlignment',
 							style=>{ stroke => 'red',
 								fill => 'yellow',
 								opacity => 0.5
 								},
-							'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyId=$companionAssemblyId&openAssemblyId=$assemblyId&chr=$chr&scrollLeft=$seqXOne"
+							'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyId=$companionAssemblyId&openAssemblyId=$assemblyId&chr=$chr&scrollLeft=$seqXOne",
+							'view-url' => "assemblyAlignmentView.cgi?alignmentId=$alignments[0]"
 						);
 				}
 				$preSeq = $currentSeq;
@@ -892,12 +894,14 @@ if ($assemblyId && $chr)
 					$assemblyChrSeqAlignment->polygon(
 						%$points,
 						id=>'aln'.$alignments[0],
+						onclick => "closeDialog();openDialog('assemblyAlignmentView.cgi?alignmentId=$alignments[0]')",
 						class=>'hasmenuForAlignment',
 						style=>{ stroke => 'red',
 							fill => 'yellow',
 							opacity => 0.5
 							},
-						'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyId=$assemblyId&chr=$chr&scrollLeft=$seqXOne"
+						'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyId=$assemblyId&chr=$chr&scrollLeft=$seqXOne",
+						'view-url' => "assemblyAlignmentView.cgi?alignmentId=$alignments[0]"
 					);
 			}
  			$preSeq = $currentSeq;
@@ -978,8 +982,11 @@ if ($assemblyId && $chr)
 			<ul style='z-index: 1000;white-space: nowrap;'>
 				<li><a><span class='ui-icon ui-icon-disk'></span>Download</a>
 					<ul style='z-index: 1000;white-space: nowrap;'>
-						<li><a href='download.cgi?assemblyId=$assemblyId&chr=$chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Raw Sequence</a></li>
-						<li><a href='download.cgi?assemblyId=$assemblyId&chr=$chr&pseudo=1' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>PseudoMolecule</a></li>
+						<li><a href='download.cgi?assemblyId=$assemblyId&chr=$chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg PseudoMolecule</a></li>
+						<li><a href='download.cgi?assemblyId=$assemblyId&chr=$chr&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr PseudoMolecule</a></li>
+						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li>
+						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$chr&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li>
+						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$chr&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li>
 						<li><a href='$commoncfg->{TMPURL}/GPM-$assembly[2]-$assembly[3]-Chr$chr.svg.gz' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>SVG</a></li>
 					</ul>
 				</li>
@@ -1043,6 +1050,7 @@ $assemblyChrDetails
 </ul>
 <ul id="optionsForAlignment" class="ui-helper-hidden" style='z-index: 1000;white-space: nowrap;'>
     <li data-command="hide"><a href="#"><span class="ui-icon ui-icon-cancel"></span>Hide Alignment</a></li>
+    <li data-command="view"><a href="#"><span class="ui-icon ui-icon-clipboard"></span>View Alignment</a></li>
 </ul>
 <ul id="optionsForAll" class="ui-helper-hidden" style='z-index: 1000;white-space: nowrap;'>
     <li><a><span class="ui-icon ui-icon-transfer-e-w"></span>Alignment</a>
@@ -1129,6 +1137,10 @@ $("#assemblyChrListForAlignment$assemblyId$$").contextmenu({
 			{
 				loaddiv('hiddenDiv',ui.target.attr('hide-url'));
 			}
+		}
+		if (ui.cmd == 'view')
+		{
+			openDialog(ui.target.attr('view-url'));
 		}
     }
 });
