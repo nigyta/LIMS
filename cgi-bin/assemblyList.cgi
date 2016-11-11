@@ -91,8 +91,8 @@ if ($assemblyId)
 						<li><a href='download.cgi?besLibraryId=$assembly[4]' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>BAC End Sequence</a></li>"
 						: "";
 
-	$assemblyList .= "<li><a href='download.cgi?assemblyId=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg PseudoMolecule</a></li>
-						<li><a href='download.cgi?assemblyId=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr PseudoMolecule</a></li>
+	$assemblyList .= "<li><a href='download.cgi?assemblyId=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg PseudoMolecules</a></li>
+						<li><a href='download.cgi?assemblyId=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr PseudoMolecules</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li>
@@ -398,24 +398,28 @@ END
     for (sort {$b <=> $a} keys %$assembledCtgByChr)
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
+		my $headerByChr;
+		$headerByChr->{$_} = ($_ > 0 && $assembly[5] > 0) ?
+			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>Chromosome $_</a>"
+			: "<h3>Chromosome $_";
 
-		$assembledCtgByChr->{$_} = ($_ > 0) ?
-			" (<a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg Pseudomolecules</a> | <a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='Click to Download'>Chr Pseudomolecules</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg-Seq AGP</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame' title='Click to Download'>Chr-Ctg AGP</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='Click to Download'>Chr-Seq AGP</a>)</sup></h3>$assembledCtgByChr->{$_}"
-			: " (<a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg Pseudomolecule</a> | <a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'>Ctg-Seq AGP</a>)</sup><button class='ui-state-error-text' onclick='deleteItem($assemblyId,\"chrZeroOnly\")' title='Delete Chr0 Contigs'>Delete Chr0 Contigs</button></h3>$assembledCtgByChr->{$_}";
+		$headerByChr->{$_} .= ($totalAssembledContigByChr->{$_} > 1) ?
+			" ($totalAssembledContigByChr->{$_} Contigs)"
+			: " ($totalAssembledContigByChr->{$_} Contig)";
 
-		$assembledCtgByChr->{$_} = ($totalAssembledSeqNumberByChr->{$_} > 1) ?
-			" - $totalAssembledSeqNumberByChr->{$_} Seqs <sup>" . commify($totalLength->{$_}). " bp$assembledCtgByChr->{$_}"
-			: " - $totalAssembledSeqNumberByChr->{$_} Seq <sup>" . commify($totalLength->{$_}). " bp$assembledCtgByChr->{$_}";
+		$headerByChr->{$_} .= ($totalAssembledSeqNumberByChr->{$_} > 1) ?
+			" - $totalAssembledSeqNumberByChr->{$_} Seqs"
+			: " - $totalAssembledSeqNumberByChr->{$_} Seq";
 
-		$assembledCtgByChr->{$_} = ($totalAssembledContigByChr->{$_} > 1) ?
-			"($totalAssembledContigByChr->{$_} Contigs)$assembledCtgByChr->{$_}"
-			: "($totalAssembledContigByChr->{$_} Contig)$assembledCtgByChr->{$_}";
+		$headerByChr->{$_} .= ($totalAssembledContigByChr->{$_} > 1) ?
+			" <sup>" . commify($totalLength->{$_}). " bp <ul class='assemblyMenu' style='width: 150px;display:inline-block; white-space: nowrap;'><li><a><span class='ui-icon ui-icon-disk'></span>Download</a><ul style='z-index: 1000;white-space: nowrap;'><li><a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg Pseudomolecules</a></li>"
+			: " <sup>" . commify($totalLength->{$_}). " bp <ul class='assemblyMenu' style='width: 150px;display:inline-block; white-space: nowrap;'><li><a><span class='ui-icon ui-icon-disk'></span>Download</a><ul style='z-index: 1000;white-space: nowrap;'><li><a href='download.cgi?assemblyId=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg Pseudomolecule</a></li>";
 
-		$assembledCtgByChr->{$_} = ($_ > 0 && $assembly[5] > 0) ?
-			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>Chromosome $_</a> $assembledCtgByChr->{$_}"
-			: "<h3>Chromosome $_ $assembledCtgByChr->{$_}";
+		$headerByChr->{$_} .= ($_ > 0) ?
+			"<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li></ul></li></ul></sup></h3>"
+			: "<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li></ul></li><li><a class='ui-state-error-text' onclick='deleteItem($assemblyId,\"chrZeroOnly\")' title='Delete Chr0 Contigs'><span class='ui-icon ui-icon-bullet'></span>Delete Chr0 Ctgs</a></li></ul></sup></h3>";
 
-		$assembledCtgDetails = ($_ > 0) ? $assembledCtgByChr->{$_}.$assembledCtgDetails : $assembledCtgDetails.$assembledCtgByChr->{$_}; #list chromosome-assigned first.
+		$assembledCtgDetails = ($_ > 0) ? $headerByChr->{$_}.$assembledCtgByChr->{$_}.$assembledCtgDetails : $assembledCtgDetails.$headerByChr->{$_}.$assembledCtgByChr->{$_}; #list chromosome-assigned first.
 		$assemblySortableStyle .= $assemblySortableStyleByChr->{$_};
 		$assemblySortableJs .= $assemblySortableJsByChr->{$_};
     }

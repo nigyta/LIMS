@@ -64,14 +64,8 @@ END
 		$target->execute($assembly[4]);
 		my @target = $target->fetchrow_array();
 
-		my $inAssemblySequenceId;
-		my $assemblySeqs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ?");
-		$assemblySeqs->execute($assemblyId);
-		while(my @assemblySeqs = $assemblySeqs->fetchrow_array())
-		{
-			$inAssemblySequenceId->{$assemblySeqs[5]} = 1;
-		}
 
+		my $hasAlignmentSequenceId;
 		my $updateAssemblyToRunningSeqToGenome=$dbh->do("UPDATE matrix SET barcode = '-4' WHERE id = $assemblyId");
 		open (GENOME,">/tmp/$refGenomeId.$$.genome") or die "can't open file: /tmp/$refGenomeId.$$.genome";
 		my $getGenome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
@@ -84,6 +78,12 @@ END
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			print GENOME ">$getGenome[0]\n$sequenceDetails->{'sequence'}\n";
+			my $alignmentChecker = $dbh->prepare("SELECT query FROM alignment WHERE subject = ? GROUP BY query");
+			$alignmentChecker->execute($getGenome[0]);
+			while(my @alignmentChecker = $alignmentChecker->fetchrow_array())
+			{
+				$hasAlignmentSequenceId->{$alignmentChecker[0]} = 1;
+			}
 		}
 		close(GENOME);
 		
@@ -120,7 +120,7 @@ END
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
-					print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $inAssemblySequenceId->{$getSequences[0]});
+					print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $hasAlignmentSequenceId->{$getSequences[0]});
 				}
 			}
 		}
@@ -136,7 +136,7 @@ END
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
-				print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $inAssemblySequenceId->{$getSequences[0]});
+				print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $hasAlignmentSequenceId->{$getSequences[0]});
 			}
 		}
 		close(SEQALL);

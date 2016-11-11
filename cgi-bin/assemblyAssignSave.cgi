@@ -96,7 +96,7 @@ END
 		print <<END;
 <script>
 	parent.closeDialog();
-	parent.informationPop("This chromosome number assignment is done.");
+	parent.informationPop("Chromosome number assignment is done.");
 	parent.refresh("menu");
 </script>	
 END
