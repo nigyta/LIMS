@@ -76,7 +76,7 @@ __DATA__
 		</td>
 	</tr>
 	<tr><td><b>Alignment Settings:</b></td><td><input type="checkbox" id="assemblyCheckGood" name="checkGood" value="1"><label for="assemblyCheckGood">Check End Match</label></td><td><input type="checkbox" id="assemblyRedo" name="redo" value="1" checked="checked"><label for="assemblyRedo">Delete Cache</label></td></tr>
-	<tr><td></td><td style='text-align:right'><label for="assemblyBlastMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapBlast" id="assemblyBlastMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
+	<tr><td style='text-align:right'><input type="checkbox" id="megablastCheckbox" name="megablast" value="megablast" checked="checked"><label for="megablastCheckbox">Megablast</label></td><td style='text-align:right'><label for="assemblyBlastMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapBlast" id="assemblyBlastMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
 	<tr><td></td><td style='text-align:right'><label for="assemblyBlastIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityBlast" id="assemblyBlastIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
 	</table>
 </form>

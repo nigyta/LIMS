@@ -152,7 +152,7 @@ __DATA__
 			<input type="checkbox" id="newAssemblySeqToSeqCheckGood" name="checkGood" value="1" checked="checked"><label for="newAssemblySeqToSeqCheckGood">Check End Match</label>
 	</td><td style='text-align:right'><label for="newAssemblySeqToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToSeq" id="newAssemblySeqToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
 	<tr><td style='text-align:right'><label for="newAssemblySeqToSeqIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToSeq" id="newAssemblySeqToSeqIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
-	<tr><td style='text-align:right'><input type="checkbox" id="newAssemblySeqToSeqMegablastCheckbox" name="seqToSeqMegablast" value="megablast"></td>
+	<tr><td style='text-align:right'><input type="checkbox" id="newAssemblySeqToSeqMegablastCheckbox" name="seqToSeqMegablast" value="megablast" checked="checked"></td>
 	<td style='text-align:left'><label for="newAssemblySeqToSeqMegablastCheckbox">Megablast</label></td></tr>
 	</table>
 	<hr>
@@ -170,7 +170,7 @@ __DATA__
 	</tr>
 	<tr><td style='text-align:right'><label for="newAssemblySeqToGenomeMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToGenome" id="newAssemblySeqToGenomeMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" /></td></tr>
 	<tr><td style='text-align:right'><label for="newAssemblySeqToGenomeIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToGenome" id="newAssemblySeqToGenomeIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOGNMIDENTITY" /></td></tr>
-	<tr><td style='text-align:left'><input type="checkbox" id="newAssemblyMegablastCheckbox" name="megablast" value="megablast"><label for="newAssemblyMegablastCheckbox">Megablast</label></td>
+	<tr><td style='text-align:left'><input type="checkbox" id="newAssemblyMegablastCheckbox" name="megablast" value="megablast" checked="checked"><label for="newAssemblyMegablastCheckbox">Megablast</label></td>
 	<td style='text-align:left'><input type="checkbox" id="newAssemblySoftMaskingCheckbox" name="softMasking" value="1"><label for="newAssemblySoftMaskingCheckbox">Soft Masking (blastn only)</label></td></tr>
 	</table>
 	<hr>

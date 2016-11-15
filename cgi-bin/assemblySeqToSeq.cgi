@@ -130,11 +130,8 @@ END
 			my @hit = split("\t",$_);
 			next if($hit[0] eq $hit[1]);
 			next if($hit[3] < $minOverlapSeqToSeq);
-			if($hit[6] == 1 || $hit[7] == $assemblySequenceLength->{$hit[0]})
-			{
-				$goodSequenceId->{$hit[0]}->{$hit[1]} = 1;
-				$goodSequenceId->{$hit[1]}->{$hit[0]} = 1;
-			}
+			$goodSequenceId->{$hit[0]}->{$hit[1]} = 1;
+			$goodSequenceId->{$hit[1]}->{$hit[0]} = 1;
 		}
 		close(CMD);
 		close(BLAST);
@@ -148,11 +145,6 @@ END
 		{
 			foreach my $subjectId (keys %{$goodSequenceId->{$queryId}})
 			{
-				my $deleteAlignmentA = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");
-				$deleteAlignmentA->execute($queryId,$subjectId);
-				my $deleteAlignmentB = $dbh->prepare("DELETE FROM alignment WHERE query = ? AND subject = ?");
-				$deleteAlignmentB->execute($subjectId,$queryId);
-
 				my $getSequenceA = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 				$getSequenceA->execute($queryId);
 				my @getSequenceA =  $getSequenceA->fetchrow_array();
@@ -176,6 +168,12 @@ END
 				$sequenceDetailsB->{'gapList'} = '' unless (exists $sequenceDetailsB->{'gapList'});
 				print SEQB ">$getSequenceB[0]\n$sequenceDetailsB->{'sequence'}\n";
 				close(SEQB);
+
+				my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceA[0] AND subject = $getSequenceB[0]");
+				my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceB[0] AND subject = $getSequenceA[0]");
+				unlink ("$commoncfg->{TMPDIR}/$getSequenceA[0]-$getSequenceB[0].aln.html");
+				unlink ("$commoncfg->{TMPDIR}/$getSequenceB[0]-$getSequenceA[0].aln.html");
+
 				my @alignments;
 				my $goodOverlap = ($checkGood) ? 0 : 1;
 				open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
