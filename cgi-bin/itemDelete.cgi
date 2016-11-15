@@ -272,22 +272,30 @@ END
 					$assemblyCtg->execute();
 					while (my @assemblyCtg=$assemblyCtg->fetchrow_array())
 					{
-						my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtg[0]");
 						foreach (split ",", $assemblyCtg[8])
 						{
 							$_ =~ s/[^a-zA-Z0-9]//g;
 							my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $_");
 						}
+						my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtg[0]");
 						my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $assemblyCtg[0]");
 					}
 				}
 				else
 				{
+					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $_");
+					$assemblyCtg->execute();
+					while (my @assemblyCtg=$assemblyCtg->fetchrow_array())
+					{
+						foreach (split ",", $assemblyCtg[8])
+						{
+							$_ =~ s/[^a-zA-Z0-9]//g;
+							my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $_");
+						}
+						my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtg[0]");
+						my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $assemblyCtg[0]");
+					}
 					my $deleteAssembly=$dbh->do("DELETE FROM matrix WHERE id = $_");
-					my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $_");
-					my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE container LIKE 'assemblySeq' AND o = $_");
-					#delete comment
-					#to be added
 				}
 				print <<END;
 	<script>
