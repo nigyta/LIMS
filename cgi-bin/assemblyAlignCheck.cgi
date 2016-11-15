@@ -88,12 +88,13 @@ if($seqOne || $seqTwo)
 			$getSequenceB[5] = commify($getSequenceB[5]);
 			open (ALN,">$commoncfg->{TMPDIR}/$seqOne-$seqTwo.aln.html") or die "can't open file: $commoncfg->{TMPDIR}/$seqOne-$seqTwo.aln.html";
 			print ALN <<END;
-	<table id='alignment$$' class='display'><thead><tr><th>$getSequenceA[2]</th><th>Query Length</th><th>$getSequenceB[2]</th><th>Subject Length</th><th>Identity %</th><th>Alignment Length</th><th>Query Start</th><th>Query End</th><th>Subject Start</th><th>Subject End</th></tr></thead><tbody>
+	<table id='alignment$$' class='display'><thead><tr><th>$getSequenceA[2]</th><th>Query Length</th><th>$getSequenceB[2]</th><th>Subject Length</th><th>Identity %</th><th>Alignment Length</th><th>Query Start</th><th>Query End</th><th></th><th>Subject Start</th><th>Subject End</th></tr></thead><tbody>
 END
 			my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? AND hidden < ?");
 			$getAlignment->execute($getSequenceA[0],$getSequenceB[0],$hidden);
 			while(my @getAlignment = $getAlignment->fetchrow_array())
 			{
+				my $direction = ($getAlignment[10] < $getAlignment[11]) ? "+":"-";
 				$getAlignment[5] = commify($getAlignment[5]);				
 				$getAlignment[8] = commify($getAlignment[8]);
 				$getAlignment[9] = commify($getAlignment[9]);
@@ -112,10 +113,12 @@ END
 					<td>$getAlignment[5]</td>
 					<td>$getAlignment[8]</td>
 					<td>$getAlignment[9]</td>
+					<td>$direction</td>
 					<td>$getAlignment[10]</td>
 					<td>$getAlignment[11]</td>
 					</tr>";
 			}
+			$assemblyAlignCheckFormUrl .= "&seqOne=$seqOne&seqTwo=$seqTwo";
 			$assemblyBlastFormUrl .= "&seqOne=$seqOne&seqTwo=$seqTwo";
 			print ALN <<END;
 </tbody></table>
@@ -153,12 +156,13 @@ END
 			$getSequenceA[5] = commify($getSequenceA[5]);
 			open (ALN,">$commoncfg->{TMPDIR}/$querySeq.aln.html") or die "can't open file: $commoncfg->{TMPDIR}/$querySeq.aln.html";
 			print ALN <<END;
-<table id='alignment$$' class='display'><thead><tr><th>Query</th><th>Query Length</th><th>Subject</th><th>Subject Length</th><th>Identity %</th><th>Alignment Length</th><th>Query Start</th><th>Query End</th><th>Subject Start</th><th>Subject End</th></tr></thead><tbody>
+<table id='alignment$$' class='display'><thead><tr><th>Query</th><th>Query Length</th><th>Subject</th><th>Subject Length</th><th>Identity %</th><th>Alignment Length</th><th>Query Start</th><th>Query End</th><th></th><th>Subject Start</th><th>Subject End</th></tr></thead><tbody>
 END
 			my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND hidden < ?");
 			$getAlignment->execute($getSequenceA[0],$hidden);
 			while(my @getAlignment = $getAlignment->fetchrow_array())
 			{
+				my $direction = ($getAlignment[10] < $getAlignment[11]) ? "+":"-";
 				$getAlignment[5] = commify($getAlignment[5]);
 				my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 				$getSequenceB->execute($getAlignment[3]);
@@ -182,10 +186,12 @@ END
 					<td>$getAlignment[5]</td>
 					<td>$getAlignment[8]</td>
 					<td>$getAlignment[9]</td>
+					<td>$direction</td>
 					<td>$getAlignment[10]</td>
 					<td>$getAlignment[11]</td>
 					</tr>";
 			}
+			$assemblyAlignCheckFormUrl .= "&seqOne=$querySeq";
 			$assemblyBlastFormUrl .= "&seqOne=$querySeq";
 			print ALN <<END;
 </tbody></table>

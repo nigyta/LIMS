@@ -64,7 +64,6 @@ END
 		$target->execute($assembly[4]);
 		my @target = $target->fetchrow_array();
 
-
 		my $hasAlignmentSequenceId;
 		my $updateAssemblyToRunningSeqToGenome=$dbh->do("UPDATE matrix SET barcode = '-4' WHERE id = $assemblyId");
 		open (GENOME,">/tmp/$refGenomeId.$$.genome") or die "can't open file: /tmp/$refGenomeId.$$.genome";
@@ -206,6 +205,7 @@ END
 		unlink("/tmp/$refGenomeId.$$.genome.nhr");
 		unlink("/tmp/$refGenomeId.$$.genome.nin");
 		unlink("/tmp/$refGenomeId.$$.genome.nsq");
+		`rm $commoncfg->{TMPDIR}/*.aln.html`; #delete cached files
 		if ($markRepeatRegion)
 		{
 			my $converageCutoff = 0.95;

@@ -334,6 +334,7 @@ END
 			unlink("/tmp/$assembly[4].$$.seq.nin");
 			unlink("/tmp/$assembly[4].$$.seq.nsq");
 			unlink("/tmp/$assembly[4].$$.blastn");
+			`rm $commoncfg->{TMPDIR}/*.aln.html`; #delete cached files
 			foreach my $queryId (keys %$goodSequenceId)
 			{
 				foreach my $subjectId (keys %{$goodSequenceId->{$queryId}})
@@ -364,8 +365,6 @@ END
 
 					my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceA[0] AND subject = $getSequenceB[0]");
 					my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceB[0] AND subject = $getSequenceA[0]");
-					unlink ("$commoncfg->{TMPDIR}/$getSequenceA[0]-$getSequenceB[0].aln.html");
-					unlink ("$commoncfg->{TMPDIR}/$getSequenceB[0]-$getSequenceA[0].aln.html");
 
 					my @alignments;
 					my $goodOverlap = ($checkGood) ? 0 : 1;
@@ -788,6 +787,7 @@ END
 			unlink("/tmp/$refGenomeId.$$.genome.nhr");
 			unlink("/tmp/$refGenomeId.$$.genome.nin");
 			unlink("/tmp/$refGenomeId.$$.genome.nsq");
+			`rm $commoncfg->{TMPDIR}/*.aln.html`; #delete cached files
 			
 			if($assignChr)
 			{
