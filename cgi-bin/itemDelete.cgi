@@ -269,8 +269,8 @@ END
 				if ($option eq 'chrZeroOnly')
 				{
 					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $_ AND x = 0");
-					$assemblyCtg->execute($_);
-					while (my @assemblyCtg=$item->fetchrow_array())
+					$assemblyCtg->execute();
+					while (my @assemblyCtg=$assemblyCtg->fetchrow_array())
 					{
 						my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtg[0]");
 						foreach (split ",", $assemblyCtg[8])
