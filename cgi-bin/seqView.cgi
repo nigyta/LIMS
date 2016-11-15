@@ -80,9 +80,15 @@ if ($seqId)
 		my @gaps = split (",",$sequenceDetails->{'gapList'});
 		my $longSeq = 1200;
 		my $sequence = $sequenceDetails->{'sequence'};
-		$sequence = substr($sequence,0,$longSeq) if ($getSeq[5] > $longSeq);
-		$sequence = multiLineSeq($sequence,60);
-		$sequence .= "...(<a href='download.cgi?seqId=$getSeq[0]' title='Download this sequence' target='hiddenFrame'>".commify($getSeq[5])." bp<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-disk'></span></a>)" if ($getSeq[5] > $longSeq);
+		my $sequenceLeft = ($getSeq[5] > $longSeq) ? substr($sequence,0,$longSeq/2) : $sequence;
+		my $sequenceRight =  ($getSeq[5] > $longSeq) ? substr($sequence,-$longSeq/2) : '';
+		$sequence = multiLineSeq($sequenceLeft,60);
+		if ($sequenceRight)
+		{
+			$sequence .= "...\n";
+			$sequence .= multiLineSeq($sequenceRight,60);
+		}
+		$sequence .= "(<a href='download.cgi?seqId=$getSeq[0]' title='Download this sequence' target='hiddenFrame'>".commify($getSeq[5])." bp<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-disk'></span></a>)" if ($getSeq[5] > $longSeq);
 
 		if($getSeq[3] < 50) #all pacBio Sequences
 		{
@@ -132,8 +138,9 @@ if ($seqId)
 				my $assemblySeqMember = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 				$assemblySeqMember->execute($_);
 				my @assemblySeqMember = $assemblySeqMember->fetchrow_array();
-				$assemblySeqList .= ($_ eq $assemblySeq[0]) ? "$i.<a class='ui-state-error-text' onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$assemblySeqMember[5]\")' title='SeqId:$assemblySeqMember[5]'>$assemblySeqMember[2]</a> "
-					: ($hidden) ? "$i.<a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$assemblySeqMember[5]\")' title='SeqId:$assemblySeqMember[5]' class='ui-state-disabled'>$assemblySeqMember[2]</a> " : "$i.<a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$assemblySeqMember[5]\")' title='SeqId:$assemblySeqMember[5]'>$assemblySeqMember[2]</a> ";
+				my $assemblySeqOrientation = ($assemblySeqMember[7] < 0) ? "<sup title='Orientation: -'>-</sup>" : "<sup title='Orientation: +'>+</sup>";
+				$assemblySeqList .= ($_ eq $assemblySeq[0]) ? ($hidden) ? "$i.<a class='ui-state-error-text' onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$assemblySeqMember[5]\")' title='SeqId:$assemblySeqMember[5]'>$assemblySeqMember[2]</a> " : "$i.<a class='ui-state-error-text' onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$assemblySeqMember[5]\")' title='SeqId:$assemblySeqMember[5]'>$assemblySeqMember[2]</a>$assemblySeqOrientation "
+					: ($hidden) ? "$i.<a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$assemblySeqMember[5]\")' title='SeqId:$assemblySeqMember[5]' class='ui-state-disabled'>$assemblySeqMember[2]</a> " : "$i.<a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$assemblySeqMember[5]\")' title='SeqId:$assemblySeqMember[5]'>$assemblySeqMember[2]</a>$assemblySeqOrientation ";
 				$i++;
 			}
 			
