@@ -568,7 +568,7 @@ elsif(param ('assemblyCtgIdForAgp'))
 elsif(param ('assemblyId'))
 {
 	my $assemblyId = param ('assemblyId');
-	my $chr = param('chr') || 'all'; 
+	my $chr = param('chr') || '0'; 
 	my $unit = param('unit') || 'ctg'; 
 	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$assembly->execute($assemblyId);
@@ -911,7 +911,7 @@ elsif(param ('assemblyId'))
 elsif(param ('assemblyIdForAgp'))
 {
 	my $assemblyIdForAgp = param ('assemblyIdForAgp');
-	my $chr = param('chr') || 'all'; 
+	my $chr = param('chr') || '0'; 
 	my $unit = param('unit') || 'ctg'; 
 	my $element = param('element') || 'seq'; 
 	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");

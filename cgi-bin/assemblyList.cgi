@@ -91,11 +91,11 @@ if ($assemblyId)
 						<li><a href='download.cgi?besLibraryId=$assembly[4]' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>BAC End Sequence</a></li>"
 						: "";
 
-	$assemblyList .= "<li><a href='download.cgi?assemblyId=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg PseudoMolecules</a></li>
-						<li><a href='download.cgi?assemblyId=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr PseudoMolecules</a></li>
-						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li>
-						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li>
-						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li>
+	$assemblyList .= "<li><a href='download.cgi?assemblyId=$assemblyId&chr=all' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg PseudoMolecules</a></li>
+						<li><a href='download.cgi?assemblyId=$assemblyId&chr=all&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr PseudoMolecules</a></li>
+						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=all' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li>
+						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=all&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li>
+						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=all&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li>
 							</ul>
 						</li>
 						<li><a><span class='ui-icon ui-icon-transfer-e-w'></span>Alignment</a>
