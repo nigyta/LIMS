@@ -795,6 +795,8 @@ elsif(param ('assemblyId'))
 					$chrSequence->{$preChr} = multiLineSeq($chrSequence->{$preChr},80);
 					print ")\n$chrSequence->{$preChr}" if ($preChr ne 'na');
 					print ">Chr$chrNumber (";
+					$chrSequence->{$assemblyCtg[4]} = '';
+					$lastComponentTypeOnChr->{$assemblyCtg[4]} = '';
 					$preChr = $assemblyCtg[4];
 				}
 				else
