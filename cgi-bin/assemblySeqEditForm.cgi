@@ -49,6 +49,18 @@ my %seqDir = (
 	2=>'r'
 	);
 
+my %gapType = (
+	0=>'None',
+	1=>'5\' Gap',
+	2=>'3\' Gap',
+	3=>'5\' and 3\' Gaps',
+	4=>'5\' Telomere',
+	5=>'3\' Telomere',
+	6=>'5\' and 3\' Telomeres',
+	7=>'5\' Telomere and 3\' Gap',
+	8=>'5\' Gap and 3\' Telomere'
+	);
+
 if ($assemblySeqId)
 {
 	print header;
@@ -89,14 +101,21 @@ END
 		$seqEnd = $assemblySeq[6];
 		my $updateAssemblySeq=$dbh->do("UPDATE matrix SET note = '$seqStart,$seqEnd' WHERE id = $assemblySeq[0]");
 	}
-	my $sequenceIdSelector .= ($target[1] eq 'library') ? "<tr><td style='text-align:right'><input type='radio' id='maskAssemblySeqRadio$assemblySequence[0]' name='seqId' value='$assemblySequence[0]' checked='checked' onchange='setSeqLength($assemblySequence[5])'></td><td><label for='maskAssemblySeqRadio$assemblySequence[0]'>$seqType{$assemblySequence[3]} ($bacAssignType{$assemblySequence[7]}:$assemblySequence[6])</label> <a href='download.cgi?seqId=$assemblySequence[0]' title='Download this sequence' target='hiddenFrame'>" .commify($assemblySequence[5]). " bp</a> <sup><a onclick='closeDialog();openDialog(\"jobView.cgi?jobId=$assemblySequence[4]\")'>JobId: $assemblySequence[4]</a></sup></td></tr>"
-		: "<tr><td style='text-align:right'><input type='radio' id='maskAssemblySeqRadio$assemblySequence[0]' name='seqId' value='$assemblySequence[0]' checked='checked' onchange='setSeqLength($assemblySequence[5])'></td><td><label for='maskAssemblySeqRadio$assemblySequence[0]'>$assemblySequence[2] (<a href='download.cgi?seqId=$assemblySequence[0]' title='Download this sequence' target='hiddenFrame'>" .commify($assemblySequence[5]). " bp</a>) in Genome <a onclick='closeDialog();openDialog(\"genomeView.cgi?genomeId=$assemblySequence[4]\")'>$target[2]</a></label></td></tr>";
+	my $sequenceIdSelector .= ($target[1] eq 'library') ? "<tr><td style='text-align:right'><input type='radio' id='editAssemblySeqRadio$assemblySequence[0]' name='seqId' value='$assemblySequence[0]' checked='checked' onchange='setSeqLength($assemblySequence[5])'></td><td><label for='editAssemblySeqRadio$assemblySequence[0]'>$seqType{$assemblySequence[3]} ($bacAssignType{$assemblySequence[7]}:$assemblySequence[6])</label> <a href='download.cgi?seqId=$assemblySequence[0]' title='Download this sequence' target='hiddenFrame'>" .commify($assemblySequence[5]). " bp</a> <sup><a onclick='closeDialog();openDialog(\"jobView.cgi?jobId=$assemblySequence[4]\")'>JobId: $assemblySequence[4]</a></sup></td></tr>"
+		: "<tr><td style='text-align:right'><input type='radio' id='editAssemblySeqRadio$assemblySequence[0]' name='seqId' value='$assemblySequence[0]' checked='checked' onchange='setSeqLength($assemblySequence[5])'></td><td><label for='editAssemblySeqRadio$assemblySequence[0]'>$assemblySequence[2] (<a href='download.cgi?seqId=$assemblySequence[0]' title='Download this sequence' target='hiddenFrame'>" .commify($assemblySequence[5]). " bp</a>) in Genome <a onclick='closeDialog();openDialog(\"genomeView.cgi?genomeId=$assemblySequence[4]\")'>$target[2]</a></label></td></tr>";
+
+
+	my $gapType;
+	for (sort keys %gapType)
+	{
+		$gapType .= ($_ == $assemblySeq[4]) ? "<option value='$_' selected>$gapType{$_}</option>" : "<option value='$_'>$gapType{$_}</option>";
+	}
 
 	$html =~ s/\$scrollLeft/$scrollLeft/g;
 	$html =~ s/\$assemblySeqId/$assemblySeqId/g;
 	$html =~ s/\$assemblySeqName/$assemblySeq[2]/g;
 	$html =~ s/\$seqLength/$assemblySeq[6]/g;
-	$html =~ s/\$gapSize/$assemblySeq[4]/g;
+	$html =~ s/\$gapType/$gapType/g;
 	$html =~ s/\$seqStart/$seqStart/g;
 	$html =~ s/\$seqEnd/$seqEnd/g;
 	$html =~ s/\$sequenceIdSelector/$sequenceIdSelector/g;
@@ -111,17 +130,17 @@ else
 
 
 __DATA__
-	<form id="maskAssemblySeq$assemblySeqId" name="maskAssemblySeq$assemblySeqId" action="assemblySeqMask.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
-	<input name="assemblySeqId" id="maskAssemblySeqId$$" type="hidden" value="$assemblySeqId" />
-	<input name="seqLength" id="maskAssemblySeqLength$$" type="hidden" value="$seqLength" />
-	<input name="scrollLeft" id="maskAssemblyScrollLeft$$" type="hidden" value="$scrollLeft" />
+	<form id="editAssemblySeq$assemblySeqId" name="editAssemblySeq$assemblySeqId" action="assemblySeqEdit.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+	<input name="assemblySeqId" id="editAssemblySeqId$$" type="hidden" value="$assemblySeqId" />
+	<input name="seqLength" id="editAssemblySeqLength$$" type="hidden" value="$seqLength" />
+	<input name="scrollLeft" id="editAssemblySeqScrollLeft$$" type="hidden" value="$scrollLeft" />
 	<table>
 	<tr><td style='text-align:right;white-space: nowrap;'><b>Sequence</b></td>
 	<td></td>
 	</tr>
 	$sequenceIdSelector
-	<tr><td style='text-align:right;white-space: nowrap;'><b>Gap Size:</b></td>
-	<td><input type="text" name="gapSize" id="gapSize$$" value="$gapSize" readonly="readonly"></td>
+	<tr><td style='text-align:right;white-space: nowrap;'><b>Gap Type:</b></td>
+	<td><select class='ui-widget-content ui-corner-all' name='gapType' id='gapType$$'>$gapType</select></td>
 	</tr>
 	<tr><td style='text-align:right;white-space: nowrap;'><b>Sequence Region:</b></td>
 	<td><input type="text" name="seqStart" id="seqStart$$" value="$seqStart" onblur="changeSeqRegion();"> to <input type="text" name="seqEnd" id="seqEnd$$" value="$seqEnd" onblur="changeSeqRegion();"></td>
@@ -146,7 +165,7 @@ $( "#slider-range$$" ).slider({
 	  }
 });
 $('#dialog').dialog("option", "title", "Set Sequence of $assemblySeqName");
-$( "#dialog" ).dialog( "option", "buttons", [ { text: "Set", click: function() { submitForm('maskAssemblySeq$assemblySeqId'); } }, { text: "Cancel", click: function() {closeDialog();} } ] );
+$( "#dialog" ).dialog( "option", "buttons", [ { text: "Set", click: function() { submitForm('editAssemblySeq$assemblySeqId'); } }, { text: "Cancel", click: function() {closeDialog();} } ] );
 function changeSeqRegion()
 {
 	var seqStart = $( "#seqStart$$" ).val();
@@ -184,7 +203,7 @@ function setSeqLength(seqLength)
 {
 	$( "#slider-range$$" ).slider( "option", "max", seqLength );
 	$( "#slider-range$$" ).slider( "values", [1, seqLength]);
-	$( "#maskAssemblySeqLength$$" ).val(seqLength);
+	$( "#editAssemblySeqLength$$" ).val(seqLength);
 	$( "#seqStart$$" ).val(1);
 	$( "#seqEnd$$" ).val(seqLength);
 }

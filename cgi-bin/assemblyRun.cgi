@@ -57,7 +57,7 @@ my $redundancySeq = 0;
 my $redundancyFilterOverlap = param ('redundancyFilterOverlap') || '0';
 my $orientSeqs = param ('orientSeqs') || '0';
 my $renumber = param ('renumber') || '0';
-
+my $gapLength = 100;
 print header;
 
 if($assemblyId)
@@ -1922,26 +1922,54 @@ END
 		{
 			my $assemblyCtgLength = 0;
 			my $assemblySeqList = '';
-			for (split ",", $assemblyAllCtgList[8])
+
+			my @assemblySeqListAll;
+			my $firstAssemblySeq = "";
+			my $lastAssemblySeq = "";
+			
+			foreach (split ",", $assemblyAllCtgList[8])
 			{
 				next unless ($_);
 				$assemblySeqList .= ($assemblySeqList ne '') ? ",$_": $_;
 				/^-/ and next;
 				$_ =~ s/[^a-zA-Z0-9]//g;
+				push @assemblySeqListAll, $_;
+				$firstAssemblySeq = $_ unless ($firstAssemblySeq);
+				$lastAssemblySeq = $_;
+			}
+
+			for (@assemblySeqListAll)
+			{
 				my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 				$assemblySeq->execute($_);
 				my @assemblySeq = $assemblySeq->fetchrow_array();
-				my $assemblySeqSeqStart;
-				my $assemblySeqSeqEnd;
+
+				if($_ ne $firstAssemblySeq)
+				{
+					if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+					{
+						$assemblyCtgLength += $gapLength;
+					}
+				}
+				if($_ ne $lastAssemblySeq)
+				{
+					if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+					{
+						$assemblyCtgLength += $gapLength;				
+					}
+				}
+
+				my $assemblySeqStart;
+				my $assemblySeqEnd;
 				if($assemblySeq[8])
 				{
-					($assemblySeqSeqStart,$assemblySeqSeqEnd) = split ",",$assemblySeq[8];
+					($assemblySeqStart,$assemblySeqEnd) = split ",",$assemblySeq[8];
 				}
 				else
 				{
-					$assemblySeqSeqStart = 1;
-					$assemblySeqSeqEnd = $assemblySeq[6];
-					my $updateAssemblySeq=$dbh->do("UPDATE matrix SET note = '$assemblySeqSeqStart,$assemblySeqSeqEnd' WHERE id = $assemblySeq[0]");
+					$assemblySeqStart = 1;
+					$assemblySeqEnd = $assemblySeq[6];
+					my $updateAssemblySeq=$dbh->do("UPDATE matrix SET note = '$assemblySeqStart,$assemblySeqEnd' WHERE id = $assemblySeq[0]");
 				}
 				my $filterLength = 0;
 				my $sequence = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
@@ -1954,19 +1982,19 @@ END
 					foreach (split ",", $sequenceDetails->{'filter'} )
 					{
 						my ($filterStart,$filterEnd) = split "-", $_;
-						next if ($assemblySeqSeqStart > $filterEnd);
-						next if ($assemblySeqSeqEnd < $filterStart);
-						if ($assemblySeqSeqStart >= $filterStart && $assemblySeqSeqEnd <= $filterEnd)
+						next if ($assemblySeqStart > $filterEnd);
+						next if ($assemblySeqEnd < $filterStart);
+						if ($assemblySeqStart >= $filterStart && $assemblySeqEnd <= $filterEnd)
 						{
-							$filterLength += $assemblySeqSeqEnd - $assemblySeqSeqStart + 1;
+							$filterLength += $assemblySeqEnd - $assemblySeqStart + 1;
 						}
-						elsif ($assemblySeqSeqStart >= $filterStart && $assemblySeqSeqStart <= $filterEnd)
+						elsif ($assemblySeqStart >= $filterStart && $assemblySeqStart <= $filterEnd)
 						{
-							$filterLength += $filterEnd - $assemblySeqSeqStart + 1;
+							$filterLength += $filterEnd - $assemblySeqStart + 1;
 						}
-						elsif ($assemblySeqSeqEnd >= $filterStart && $assemblySeqSeqEnd <= $filterEnd)
+						elsif ($assemblySeqEnd >= $filterStart && $assemblySeqEnd <= $filterEnd)
 						{
-							$filterLength += $assemblySeqSeqEnd - $filterStart + 1;
+							$filterLength += $assemblySeqEnd - $filterStart + 1;
 						}
 						else
 						{
@@ -1974,7 +2002,7 @@ END
 						}
 					}
 				}
- 			  	$assemblyCtgLength += $assemblySeqSeqEnd - $assemblySeqSeqStart + 1 - $filterLength;
+ 			  	$assemblyCtgLength += $assemblySeqEnd - $assemblySeqStart + 1 - $filterLength;
 			}
 			if($renumber)
 			{

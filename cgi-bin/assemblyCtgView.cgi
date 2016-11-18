@@ -37,6 +37,7 @@ my $hiddenSeqPosition = 50;
 my $barSpacing = 300; #space between two bars
 my $unitLength = 10000;
 my $maxCol = 0;
+my $gapLength = 100;
 if ($assemblyCtgId)
 {
 	my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
@@ -79,6 +80,7 @@ if ($assemblyCtgId)
 	$assembly->execute($assemblyCtg[3]);
 	my @assembly = $assembly->fetchrow_array();
 	my $assemblySequenceName;
+	my $assemblySequenceGapType;
 	my $assemblySequenceId;
 	my $assemblySequenceData;
 	my $assemblySequenceType;
@@ -87,6 +89,8 @@ if ($assemblyCtgId)
 	my $assemblySeqStart;
 	my $assemblySeqEnd;
 	my $assemblySeqOrder;
+	my $firstAssemblySeq = "";
+	my $lastAssemblySeq = "";	
 	my $assemblySeqHide;
 	my $assemblySeqFpcCtg;
 	my $order = 0;
@@ -96,12 +100,15 @@ if ($assemblyCtgId)
 		my $hide = ($_ =~ /^-/) ? 1 : 0;
 		$_ =~ s/[^a-zA-Z0-9]//g;
 		$assemblySeqHide->{$_} = $hide;
+		$firstAssemblySeq = $_ if ($hide eq 0 && $firstAssemblySeq eq "");
+		$lastAssemblySeq = $_ if ($hide eq 0);
 		$order++;
 		$assemblySeqOrder->{$_} = $order;
 		my $assemblySeqList=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$assemblySeqList->execute($_);
 		my @assemblySeqList = $assemblySeqList->fetchrow_array();
 		$assemblySequenceName->{$assemblySeqList[0]} = $assemblySeqList[2];
+		$assemblySequenceGapType->{$assemblySeqList[0]} = $assemblySeqList[4];		
 		$assemblySequenceId->{$assemblySeqList[0]} = $assemblySeqList[5];
 		$assemblySeqLength->{$assemblySeqList[0]} = $assemblySeqList[6];
 		$assemblySeqOrient->{$assemblySeqList[0]} = ($assemblySeqList[7] < 0) ? "-" : "+";
@@ -219,7 +226,7 @@ if ($assemblyCtgId)
 								},
 					'flip-url' => "assemblySeqFlip.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 					'hide-url' => "assemblySeqHide.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
-					'mask-url' => "assemblySeqMaskForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
+					'edit-url' => "assemblySeqEditForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 					'break-url'=> "assemblyCtgBreakForm.cgi?assemblyCtgId=$assemblyCtgId&assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 					'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$hiddenSeqBarX",
 					'delete-url' => "assemblySeqDelete.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
@@ -242,7 +249,7 @@ if ($assemblyCtgId)
 				},
 				'flip-url' => "assemblySeqFlip.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 				'hide-url' => "assemblySeqHide.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
-				'mask-url' => "assemblySeqMaskForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
+				'edit-url' => "assemblySeqEditForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 				'break-url'=> "assemblyCtgBreakForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 				'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$hiddenSeqBarX",
 				'delete-url' => "assemblySeqDelete.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
@@ -368,7 +375,7 @@ if ($assemblyCtgId)
 							},
 				'flip-url' => "assemblySeqFlip.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 				'hide-url' => "assemblySeqHide.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
-				'mask-url' => "assemblySeqMaskForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
+				'edit-url' => "assemblySeqEditForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 				'break-url'=> "assemblyCtgBreakForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 				'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$seqBarX",
 				'delete-url' => "assemblySeqDelete.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
@@ -391,7 +398,7 @@ if ($assemblyCtgId)
 			class   => 'hasmenuForSeq',
 			'flip-url' => "assemblySeqFlip.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 			'hide-url' => "assemblySeqHide.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
-			'mask-url' => "assemblySeqMaskForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
+			'edit-url' => "assemblySeqEditForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 			'break-url'=> "assemblyCtgBreakForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 			'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$seqBarX",
 			'delete-url' => "assemblySeqDelete.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
@@ -470,10 +477,28 @@ if ($assemblyCtgId)
 		}
     	$assemblySeqMaxEnd = $assemblySeqRightEnd->{$currentSeq} if($assemblySeqMaxEnd < $assemblySeqRightEnd->{$currentSeq});
     	$assemblyCtgLength += $assemblySeqEnd->{$currentSeq} - $assemblySeqStart->{$currentSeq} + 1;
+		if($currentSeq ne $firstAssemblySeq)
+		{
+			if ($assemblySequenceGapType->{$currentSeq} eq 1 || $assemblySequenceGapType->{$currentSeq} eq 3 || $assemblySequenceGapType->{$currentSeq} eq 4 || $assemblySequenceGapType->{$currentSeq} eq 6 || $assemblySequenceGapType->{$currentSeq} eq 7 || $assemblySequenceGapType->{$currentSeq} eq 8) # add 5' 100 Ns
+			{
+				$assemblyCtgLength += $gapLength;
+				#graphic to be added
+				
+			}
+		}
+		if($currentSeq ne $lastAssemblySeq)
+		{
+			if ($assemblySequenceGapType->{$currentSeq} eq 2 || $assemblySequenceGapType->{$currentSeq} eq 3 || $assemblySequenceGapType->{$currentSeq} eq 5 || $assemblySequenceGapType->{$currentSeq} eq 6 || $assemblySequenceGapType->{$currentSeq} eq 7 || $assemblySequenceGapType->{$currentSeq} eq 8) # add 5' 100 Ns
+			{
+				$assemblyCtgLength += $gapLength;
+				#graphic to be added
+				
+			}
+		}
     	$preSeq = $currentSeq;
     	$hiddenSeqCount = 0;
     	$seqCount++;
-    }
+	}
 
 	for (my $rulerNumber = 0;$rulerNumber <= $assemblySeqMaxEnd;$rulerNumber += $unitLength)
 	{
@@ -607,7 +632,7 @@ $assemblyCtgDetails
 <ul id="optionsForSeq" class="ui-helper-hidden" style='z-index: 1000;white-space: nowrap;'>
     <li data-command="flip"><a href="#"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span>Flip Sequence</a></li>
     <li data-command="hide"><a href="#"><span class="ui-icon ui-icon-lightbulb"></span>Hide/Show</a></li>
-    <li data-command="mask"><a href="#"><span class="ui-icon ui-icon-carat-2-e-w"></span>Mask Sequence</a></li>
+    <li data-command="edit"><a href="#"><span class="ui-icon ui-icon-carat-2-e-w"></span>Edit Sequence</a></li>
     <li data-command="break"><a href="#"><span class="ui-icon ui-icon-scissors"></span>Break Contig</a></li>
     <li data-command="move"><a href="#"><span class="ui-icon ui-icon-arrow-2-e-w"></span>Move Seq</a></li>
     <li data-command="delete"><a href="#"><span class="ui-icon ui-icon-trash"></span>Delete Seq</a></li>
@@ -670,9 +695,9 @@ $("#assemblyCtgForSeq$assemblyCtgId$$").contextmenu({
 		{
 			loaddiv('hiddenDiv',ui.target.attr('hide-url'));
 		}
-		if (ui.cmd == 'mask')
+		if (ui.cmd == 'edit')
 		{
-			openDialog(ui.target.attr('mask-url'));
+			openDialog(ui.target.attr('edit-url'));
 		}
 		if (ui.cmd == 'break')
 		{

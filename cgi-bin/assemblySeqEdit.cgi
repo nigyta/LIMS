@@ -22,7 +22,7 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 
 my $assemblySeqId = param ('assemblySeqId') || '';
 my $seqId = param ('seqId') || '';
-my $gapSize = param ('gapSize') || 0;
+my $gapType = param ('gapType') || 0;
 my $seqLength = param ('seqLength') || '';
 my $seqStart = param ('seqStart') || '';
 my $seqEnd = param ('seqEnd') || '';
@@ -32,7 +32,7 @@ print header;
 
 if($assemblySeqId && $seqId && $seqLength && $seqStart && $seqEnd)
 {
-	my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = $gapSize, y = $seqId, z = $seqLength, note = '$seqStart,$seqEnd' WHERE id = $assemblySeqId");
+	my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = $gapType, y = $seqId, z = $seqLength, note = '$seqStart,$seqEnd' WHERE id = $assemblySeqId");
 	my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
 	$assemblyCtgOfSeq->execute("($assemblySeqId)");
 	my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
