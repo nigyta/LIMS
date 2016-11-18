@@ -1938,27 +1938,12 @@ END
 				$lastAssemblySeq = $_;
 			}
 
+			my $lastComponentType = '';
 			for (@assemblySeqListAll)
 			{
 				my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 				$assemblySeq->execute($_);
 				my @assemblySeq = $assemblySeq->fetchrow_array();
-
-				if($_ ne $firstAssemblySeq)
-				{
-					if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
-					{
-						$assemblyCtgLength += $gapLength;
-					}
-				}
-				if($_ ne $lastAssemblySeq)
-				{
-					if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
-					{
-						$assemblyCtgLength += $gapLength;				
-					}
-				}
-
 				my $assemblySeqStart;
 				my $assemblySeqEnd;
 				if($assemblySeq[8])
@@ -2002,7 +1987,25 @@ END
 						}
 					}
 				}
+				#add non-end gaps to assemblyCtg length
+				if($_ ne $firstAssemblySeq && $lastComponentType ne 'U')
+				{
+					if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+					{
+						$assemblyCtgLength += $gapLength;
+						$lastComponentType = 'U';
+					}
+				}
  			  	$assemblyCtgLength += $assemblySeqEnd - $assemblySeqStart + 1 - $filterLength;
+				$lastComponentType = 'D';
+				if($_ ne $lastAssemblySeq && $lastComponentType ne 'U')
+				{
+					if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+					{
+						$assemblyCtgLength += $gapLength;				
+						$lastComponentType = 'U';
+					}
+				}
 			}
 			if($renumber)
 			{

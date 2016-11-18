@@ -189,6 +189,8 @@ if ($assemblyCtgId)
 	my @hiddenSeqPosition;
 	my $assemblySeqCol;
     my $seqCount = 0;
+	my $lastComponentType = '';
+
     for my $currentSeq (@assemblySeq)
     {
 		my $sequenceDetails = decode_json $assemblySequenceData->{$currentSeq};
@@ -476,25 +478,36 @@ if ($assemblyCtgId)
 			}
 		}
     	$assemblySeqMaxEnd = $assemblySeqRightEnd->{$currentSeq} if($assemblySeqMaxEnd < $assemblySeqRightEnd->{$currentSeq});
+ 
+     	if($lastComponentType ne 'U')
+    	{
+			if($currentSeq ne $firstAssemblySeq)
+			{
+				if ($assemblySequenceGapType->{$currentSeq} eq 1 || $assemblySequenceGapType->{$currentSeq} eq 3 || $assemblySequenceGapType->{$currentSeq} eq 4 || $assemblySequenceGapType->{$currentSeq} eq 6 || $assemblySequenceGapType->{$currentSeq} eq 7 || $assemblySequenceGapType->{$currentSeq} eq 8) # add 5' 100 Ns
+				{
+					$assemblyCtgLength += $gapLength;
+					$lastComponentType = 'U';
+					#graphic to be added
+				
+				}
+			}
+    	}
+
     	$assemblyCtgLength += $assemblySeqEnd->{$currentSeq} - $assemblySeqStart->{$currentSeq} + 1;
-		if($currentSeq ne $firstAssemblySeq)
-		{
-			if ($assemblySequenceGapType->{$currentSeq} eq 1 || $assemblySequenceGapType->{$currentSeq} eq 3 || $assemblySequenceGapType->{$currentSeq} eq 4 || $assemblySequenceGapType->{$currentSeq} eq 6 || $assemblySequenceGapType->{$currentSeq} eq 7 || $assemblySequenceGapType->{$currentSeq} eq 8) # add 5' 100 Ns
+    	$lastComponentType = 'D';
+
+    	if($lastComponentType ne 'U')
+    	{
+			if($currentSeq ne $lastAssemblySeq)
 			{
-				$assemblyCtgLength += $gapLength;
-				#graphic to be added
-				
+				if ($assemblySequenceGapType->{$currentSeq} eq 2 || $assemblySequenceGapType->{$currentSeq} eq 3 || $assemblySequenceGapType->{$currentSeq} eq 5 || $assemblySequenceGapType->{$currentSeq} eq 6 || $assemblySequenceGapType->{$currentSeq} eq 7 || $assemblySequenceGapType->{$currentSeq} eq 8) # add 5' 100 Ns
+				{
+					$assemblyCtgLength += $gapLength;
+					$lastComponentType = 'U';
+					#graphic to be added
+				}
 			}
-		}
-		if($currentSeq ne $lastAssemblySeq)
-		{
-			if ($assemblySequenceGapType->{$currentSeq} eq 2 || $assemblySequenceGapType->{$currentSeq} eq 3 || $assemblySequenceGapType->{$currentSeq} eq 5 || $assemblySequenceGapType->{$currentSeq} eq 6 || $assemblySequenceGapType->{$currentSeq} eq 7 || $assemblySequenceGapType->{$currentSeq} eq 8) # add 5' 100 Ns
-			{
-				$assemblyCtgLength += $gapLength;
-				#graphic to be added
-				
-			}
-		}
+    	}
     	$preSeq = $currentSeq;
     	$hiddenSeqCount = 0;
     	$seqCount++;

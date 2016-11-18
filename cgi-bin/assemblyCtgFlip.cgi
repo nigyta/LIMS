@@ -47,7 +47,38 @@ END
 		{
 			next unless ($_);
 			$_ =~ s/[^a-zA-Z0-9]//g;
-			my $updateAssemblySeq=$dbh->do("UPDATE matrix SET barcode = barcode * (-1) WHERE id = $_");
+			
+			my $assemblySeq = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblySeq->execute($_);
+			my @assemblySeq = $assemblySeq->fetchrow_array();
+			if($assemblySeq[4] eq 1)
+			{
+				my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = 2, barcode = barcode * (-1) WHERE id = $_");
+			}
+			elsif($assemblySeq[4] eq 2)
+			{
+				my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = 1, barcode = barcode * (-1) WHERE id = $_");
+			}
+			elsif($assemblySeq[4] eq 4)
+			{
+				my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = 5, barcode = barcode * (-1) WHERE id = $_");
+			}
+			elsif($assemblySeq[4] eq 5)
+			{
+				my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = 4, barcode = barcode * (-1) WHERE id = $_");
+			}
+			elsif($assemblySeq[4] eq 7)
+			{
+				my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = 8, barcode = barcode * (-1) WHERE id = $_");
+			}
+			elsif($assemblySeq[4] eq 8)
+			{
+				my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = 7, barcode = barcode * (-1) WHERE id = $_");
+			}
+			else
+			{
+				my $updateAssemblySeq=$dbh->do("UPDATE matrix SET barcode = barcode * (-1) WHERE id = $_");
+			}
 		}
 
 		my $updateAssemblyCtg=$dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
