@@ -3,9 +3,6 @@
 
 We developed a web-based LIMS to manage and analyze genomic data at different levels from both wet and dry lab experiments.
 
-## Demo
-http://www.genome.arizona.edu/lims-demo (coming soon)
-
 ## Installation 
 https://github.com/Jianwei-Zhang/LIMS/wiki
 
