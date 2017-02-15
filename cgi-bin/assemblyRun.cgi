@@ -307,7 +307,6 @@ END
 			close(SEQNEW);
 			system( "$makeblastdb -in /tmp/$assembly[4].$$.seq -dbtype nucl" );
 			my $goodSequenceId;
-			open (BLAST,">/tmp/$assembly[4].$$.blastn") or die "can't open file: /tmp/$assembly[4].$$.blastn";
 			if($redoAllSeqToSeq)
 			{
 				open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.seq -task $seqToSeqTask -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
@@ -319,57 +318,64 @@ END
 			while(<CMD>)
 			{
 				/^#/ and next;
-				print BLAST $_;
 				my @hit = split("\t",$_);
 				next if($hit[0] eq $hit[1]);
 				next if($hit[3] < $minOverlapSeqToSeq);
-				$goodSequenceId->{$hit[0]}->{$hit[1]} = 1;
-				$goodSequenceId->{$hit[1]}->{$hit[0]} = 1;
-			}
-			close(CMD);
-			close(BLAST);
-			unlink("/tmp/$assembly[4].$$.seq");
-			unlink("/tmp/$assembly[4].$$.new.seq");
-			unlink("/tmp/$assembly[4].$$.seq.nhr");
-			unlink("/tmp/$assembly[4].$$.seq.nin");
-			unlink("/tmp/$assembly[4].$$.seq.nsq");
-			unlink("/tmp/$assembly[4].$$.blastn");
-			`rm $commoncfg->{TMPDIR}/*.aln.html`; #delete cached files
-			foreach my $queryId (keys %$goodSequenceId)
-			{
-				foreach my $subjectId (keys %{$goodSequenceId->{$queryId}})
+				my $rerunBlastTwo = 0;
+				if($hit[0] < $hit[1])
 				{
-					my $getSequenceA = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-					$getSequenceA->execute($queryId);
-					my @getSequenceA =  $getSequenceA->fetchrow_array();
-					open (SEQA,">/tmp/$getSequenceA[0].$$.seq") or die "can't open file: /tmp/$getSequenceA[0].$$.seq";
-					my $sequenceDetailsA = decode_json $getSequenceA[8];
-					$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
-					$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
-					$sequenceDetailsA->{'sequence'} = '' unless (exists $sequenceDetailsA->{'sequence'});
-					$sequenceDetailsA->{'gapList'} = '' unless (exists $sequenceDetailsA->{'gapList'});
-					print SEQA ">$getSequenceA[0]\n$sequenceDetailsA->{'sequence'}\n";
-					close(SEQA);
+					unless(exists $goodSequenceId->{$hit[0]}->{$hit[1]})
+					{
+						$goodSequenceId->{$hit[0]}->{$hit[1]} = 1;
+						$rerunBlastTwo = 1;
+					}
+				}
+				else
+				{
+					unless(exists $goodSequenceId->{$hit[1]}->{$hit[0]})
+					{
+						$goodSequenceId->{$hit[1]}->{$hit[0]} = 1;
+						$rerunBlastTwo = 1;
+					}
+				}
+				if($rerunBlastTwo)
+				{
+					my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $hit[0] AND subject = $hit[1]");
+					my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $hit[1] AND subject = $hit[0]");
 
-					my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-					$getSequenceB->execute($subjectId);
-					my @getSequenceB =  $getSequenceB->fetchrow_array();
-					open (SEQB,">/tmp/$getSequenceB[0].$$.seq") or die "can't open file: /tmp/$getSequenceB[0].$$.seq";
-					my $sequenceDetailsB = decode_json $getSequenceB[8];
-					$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
-					$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
-					$sequenceDetailsB->{'sequence'} = '' unless (exists $sequenceDetailsB->{'sequence'});
-					$sequenceDetailsB->{'gapList'} = '' unless (exists $sequenceDetailsB->{'gapList'});
-					print SEQB ">$getSequenceB[0]\n$sequenceDetailsB->{'sequence'}\n";
-					close(SEQB);
-
-					my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceA[0] AND subject = $getSequenceB[0]");
-					my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $getSequenceB[0] AND subject = $getSequenceA[0]");
+					unless(-e "/tmp/$hit[0].$$.seq")
+					{
+						my $getSequenceA = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+						$getSequenceA->execute($hit[0]);
+						my @getSequenceA =  $getSequenceA->fetchrow_array();
+						open (SEQA,">/tmp/$getSequenceA[0].$$.seq") or die "can't open file: /tmp/$getSequenceA[0].$$.seq";
+						my $sequenceDetailsA = decode_json $getSequenceA[8];
+						$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
+						$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
+						$sequenceDetailsA->{'sequence'} = '' unless (exists $sequenceDetailsA->{'sequence'});
+						$sequenceDetailsA->{'gapList'} = '' unless (exists $sequenceDetailsA->{'gapList'});
+						print SEQA ">$getSequenceA[0]\n$sequenceDetailsA->{'sequence'}\n";
+						close(SEQA);
+					}
+					unless(-e "/tmp/$hit[1].$$.seq")
+					{
+						my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+						$getSequenceB->execute($hit[1]);
+						my @getSequenceB =  $getSequenceB->fetchrow_array();
+						open (SEQB,">/tmp/$getSequenceB[0].$$.seq") or die "can't open file: /tmp/$getSequenceB[0].$$.seq";
+						my $sequenceDetailsB = decode_json $getSequenceB[8];
+						$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
+						$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
+						$sequenceDetailsB->{'sequence'} = '' unless (exists $sequenceDetailsB->{'sequence'});
+						$sequenceDetailsB->{'gapList'} = '' unless (exists $sequenceDetailsB->{'gapList'});
+						print SEQB ">$getSequenceB[0]\n$sequenceDetailsB->{'sequence'}\n";
+						close(SEQB);
+					}
 
 					my @alignments;
 					my $goodOverlap = ($checkGood) ? 0 : 1;
-					open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
-					while(<CMD>)
+					open (CMDA,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
+					while(<CMDA>)
 					{
 						/^#/ and next;
 						my @hit = split("\t",$_);
@@ -382,9 +388,9 @@ END
 							}
 						}									
 					}
-					close(CMD);
-					open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceB[0].$$.seq -subject /tmp/$getSequenceA[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
-					while(<CMD>)
+					close(CMDA);
+					open (CMDB,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceB[0].$$.seq -subject /tmp/$getSequenceA[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
+					while(<CMDB>)
 					{
 						/^#/ and next;
 						my @hit = split("\t",$_);
@@ -397,9 +403,7 @@ END
 							}
 						}									
 					}
-					close(CMD);						
-					unlink("/tmp/$getSequenceA[0].$$.seq");
-					unlink("/tmp/$getSequenceB[0].$$.seq");
+					close(CMDB);						
 					if($goodOverlap)
 					{
 						foreach (@alignments)
@@ -412,6 +416,22 @@ END
 					}
 				}
 			}
+			close(CMD);
+			unlink("/tmp/$assembly[4].$$.seq");
+			unlink("/tmp/$assembly[4].$$.new.seq");
+			unlink("/tmp/$assembly[4].$$.seq.nhr");
+			unlink("/tmp/$assembly[4].$$.seq.nin");
+			unlink("/tmp/$assembly[4].$$.seq.nsq");
+			`rm $commoncfg->{TMPDIR}/*.aln.html`; #delete cached files
+			foreach my $queryId (keys %$goodSequenceId)
+			{
+				unlink("/tmp/$queryId.$$.seq");
+				foreach my $subjectId (keys %{$goodSequenceId->{$queryId}})
+				{
+					unlink("/tmp/$subjectId.$$.seq");
+				}
+			}
+
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		}
 

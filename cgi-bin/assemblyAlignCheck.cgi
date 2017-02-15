@@ -158,30 +158,34 @@ END
 			print ALN <<END;
 <table id='alignment$$' class='display'><thead><tr><th>Query</th><th>Query Length</th><th>Subject</th><th>Subject Length</th><th>Identity %</th><th>Alignment Length</th><th>Query Start</th><th>Query End</th><th></th><th>Subject Start</th><th>Subject End</th></tr></thead><tbody>
 END
+			my $getSequenceBline;
 			my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND hidden < ?");
 			$getAlignment->execute($getSequenceA[0],$hidden);
 			while(my @getAlignment = $getAlignment->fetchrow_array())
 			{
 				my $direction = ($getAlignment[10] < $getAlignment[11]) ? "+":"-";
 				$getAlignment[5] = commify($getAlignment[5]);
-				my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-				$getSequenceB->execute($getAlignment[3]);
-				my @getSequenceB = $getSequenceB->fetchrow_array();
-				$getSequenceB[5] = commify($getSequenceB[5]);
-				next if ($filter && ($getSequenceA[2] eq $getSequenceB[2]));
+				unless (exists $getSequenceBline->{$getAlignment[3]})
+				{
+					my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$getSequenceB->execute($getAlignment[3]);
+					@{$getSequenceBline->{$getAlignment[3]}} = $getSequenceB->fetchrow_array();
+					$getSequenceBline->{$getAlignment[3]}[5] = commify($getSequenceBline->{$getAlignment[3]}[5]);
+				}
+				next if ($filter && ($getSequenceA[2] eq $getSequenceBline->{$getAlignment[3]}[2]));
 				$getAlignment[8] = commify($getAlignment[8]);
 				$getAlignment[9] = commify($getAlignment[9]);
 				$getAlignment[10] = commify($getAlignment[10]);
 				$getAlignment[11] = commify($getAlignment[11]);				
 				$getAlignment[8] = "<a class='ui-state-error-text' title='Seq End'>$getAlignment[8]</a>" if($getAlignment[8] eq 1 || $getAlignment[8] eq $getSequenceA[5]);
 				$getAlignment[9] = "<a class='ui-state-error-text' title='Seq End'>$getAlignment[9]</a>" if($getAlignment[9] eq 1 || $getAlignment[9] eq $getSequenceA[5]);
-				$getAlignment[10] = "<a class='ui-state-error-text' title='Seq End'>$getAlignment[10]</a>" if($getAlignment[10] eq 1 || $getAlignment[10] eq $getSequenceB[5]);
-				$getAlignment[11] = "<a class='ui-state-error-text' title='Seq End'>$getAlignment[11]</a>" if($getAlignment[11] eq 1 || $getAlignment[11] eq $getSequenceB[5]);
+				$getAlignment[10] = "<a class='ui-state-error-text' title='Seq End'>$getAlignment[10]</a>" if($getAlignment[10] eq 1 || $getAlignment[10] eq $getSequenceBline->{$getAlignment[3]}[5]);
+				$getAlignment[11] = "<a class='ui-state-error-text' title='Seq End'>$getAlignment[11]</a>" if($getAlignment[11] eq 1 || $getAlignment[11] eq $getSequenceBline->{$getAlignment[3]}[5]);
 				print ALN "<tr>
 					<td><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequenceA[0]\")' title='View this sequence'>$seqType{$getSequenceA[3]}</a> ($getSequenceA[4]) $bacAssignType{$getSequenceA[7]}</td>
 					<td>$getSequenceA[5]</td>
-					<td><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequenceB[0]\")' title='View this sequence'>$getSequenceB[2]</a> $seqType{$getSequenceB[3]} ($getSequenceB[4]) $bacAssignType{$getSequenceB[7]}</td>
-					<td>$getSequenceB[5]</td>
+					<td><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequenceBline->{$getAlignment[3]}[0]\")' title='View this sequence'>$getSequenceBline->{$getAlignment[3]}[2]</a> $seqType{$getSequenceBline->{$getAlignment[3]}[3]} ($getSequenceBline->{$getAlignment[3]}[4]) $bacAssignType{$getSequenceBline->{$getAlignment[3]}[7]}</td>
+					<td>$getSequenceBline->{$getAlignment[3]}[5]</td>
 					<td><a title='E-value:$getAlignment[12] \nBit-score:$getAlignment[13]'>$getAlignment[4]</a></td>
 					<td>$getAlignment[5]</td>
 					<td>$getAlignment[8]</td>

@@ -207,22 +207,6 @@ if ($assemblyId && $chr)
 				$j++;
 			}
 			$ctgPosition[$ctgRow] = $margin + ($companionAssemblyCtgList[6] + $companionAssemblyCtgList[7]) / $pixelUnit;
-			my $ctgBarX = $margin + $companionAssemblyCtgList[6] / $pixelUnit;
-			my $ctgBarY = $barY + $barHeight * ($ctgRow + 1) * 3;
-			$companionAssemblyChrCtg->text(
-				id      => 'ctgName'.$companionAssemblyCtgList[0],
-				class   => 'hasmenuForCtg',
-				x       => $ctgBarX,
-				y       => $ctgBarY + $barHeight - 2,
-				style   => {
-					'font-size'   => $textFontSize,
-					'stroke'        =>  'black'
-				},
-				'edit-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$companionAssemblyCtgList[0]&assemblyId=$assembly[0]&chr=$chr&scrollLeft=$ctgBarX",
-				'flip-url' => "assemblyCtgFlip.cgi?assemblyCtgId=$companionAssemblyCtgList[0]&assemblyId=$assembly[0]&chr=$chr&scrollLeft=$ctgBarX",
-				'comment-url' => "comment.cgi?itemId=$companionAssemblyCtgList[0]",
-				'fill-url' => "assemblyGapFillForm.cgi?assemblyCtgId=$companionAssemblyCtgList[0]"
-			)->cdata($companionAssembly[2].'.'.$companionAssembly[3].'-Ctg'.$companionAssemblyCtgList[2]);
 
 			my $companionAssemblySequenceName;
 			my $companionAssemblySequenceId;
@@ -303,6 +287,34 @@ if ($assemblyId && $chr)
 					}
 				}
 			}
+			my $ctgBarX = $margin + $companionAssemblyCtgList[6] / $pixelUnit;
+			my $ctgBarY = $barY + $barHeight * ($ctgRow + 1) * 3;
+			my $companionCtgLabel = $companionAssembly[2].'.'.$companionAssembly[3].'-Ctg'.$companionAssemblyCtgList[2];
+			my $companionCtgLabelLength = length $companionCtgLabel;
+			if (($companionAssemblyCtgList[7] + $filterLength) / $pixelUnit < $companionCtgLabelLength * $textFontWidth) #no assembly name
+			{
+				$companionCtgLabel = 'Ctg'.$companionAssemblyCtgList[2];
+				$companionCtgLabelLength = length $companionCtgLabel;
+			}
+			if (($companionAssemblyCtgList[7] + $filterLength) / $pixelUnit < $companionCtgLabelLength * $textFontWidth) # no prefix
+			{
+				$companionCtgLabel = $companionAssemblyCtgList[2];
+				$companionCtgLabelLength = length $companionCtgLabel;
+			}
+			$companionAssemblyChrCtg->text(
+				id      => 'ctgName'.$companionAssemblyCtgList[0],
+				class   => 'hasmenuForCtg',
+				x       => $ctgBarX,
+				y       => $ctgBarY + $barHeight - 2,
+				style   => {
+					'font-size'   => $textFontSize,
+					'stroke'        =>  'black'
+				},
+				'edit-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$companionAssemblyCtgList[0]&assemblyId=$assembly[0]&chr=$chr&scrollLeft=$ctgBarX",
+				'flip-url' => "assemblyCtgFlip.cgi?assemblyCtgId=$companionAssemblyCtgList[0]&assemblyId=$assembly[0]&chr=$chr&scrollLeft=$ctgBarX",
+				'comment-url' => "comment.cgi?itemId=$companionAssemblyCtgList[0]",
+				'fill-url' => "assemblyGapFillForm.cgi?assemblyCtgId=$companionAssemblyCtgList[0]"
+			)->cdata($companionCtgLabel) if (($companionAssemblyCtgList[7] + $filterLength) / $pixelUnit > $companionCtgLabelLength * $textFontWidth);
 			
 			$companionAssemblyChrCtg->rectangle(
 				id    => $companionAssemblyCtgList[0],
@@ -373,6 +385,24 @@ if ($assemblyId && $chr)
 							'view-url' => "seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}"
 						);
 					$scrollLeft = $companionAssemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
+					my $hiddenCompanionSeqLabel = 'Ctg'. $companionAssemblyCtgList[2] ."-". $companionAssemblySeqOrder->{$currentSeq}. "." .$companionAssemblySequenceName->{$currentSeq}."  FPC:".$companionAssemblySeqFpcCtg->{$currentSeq};
+					my $hiddenCompanionSeqLabelLength = length $hiddenCompanionSeqLabel;
+					if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit < $hiddenCompanionSeqLabelLength * $textFontWidth) #no FPC
+					{
+						$hiddenCompanionSeqLabel = 'Ctg'. $companionAssemblyCtgList[2] ."-". $companionAssemblySeqOrder->{$currentSeq}. "." .$companionAssemblySequenceName->{$currentSeq};
+						$hiddenCompanionSeqLabelLength = length $hiddenCompanionSeqLabel;
+					}
+					if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit < $hiddenCompanionSeqLabelLength * $textFontWidth) #no Ctg
+					{
+						$hiddenCompanionSeqLabel = $companionAssemblySeqOrder->{$currentSeq}. "." .$companionAssemblySequenceName->{$currentSeq};
+						$hiddenCompanionSeqLabelLength = length $hiddenCompanionSeqLabel;
+					}
+					if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit < $hiddenCompanionSeqLabelLength * $textFontWidth) #no order
+					{
+						$hiddenCompanionSeqLabel = $companionAssemblySequenceName->{$currentSeq};
+						$hiddenCompanionSeqLabelLength = length $hiddenCompanionSeqLabel;
+					}
+
 					my $hiddenTextY = $barY + $barSpacing - $hiddenSeqPosition - $barHeight * $hiddenRow * 2 + $barHeight - 2;
 					$companionAssemblyChrSeqHidden->text(
 						id      => 'seqName'.$currentSeq,
@@ -387,7 +417,7 @@ if ($assemblyId && $chr)
 						'blast-url' => "assemblyBlastForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 						'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 						'view-url' => "seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}"
-					)->cdata('Ctg'. $companionAssemblyCtgList[2] ."-". $companionAssemblySeqOrder->{$currentSeq}. "." .$companionAssemblySequenceName->{$currentSeq}."  FPC:".$companionAssemblySeqFpcCtg->{$currentSeq});
+					)->cdata($hiddenCompanionSeqLabel) if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit > $hiddenCompanionSeqLabelLength * $textFontWidth);
 					$hiddenSeqPosition[$hiddenRow] = $companionAssemblySeqLeftEnd->{$currentSeq} + $companionAssemblySeqLength->{$currentSeq} - 1;
 					$hiddenSeqCount++;
 					next;
@@ -489,6 +519,24 @@ if ($assemblyId && $chr)
 						'view-url' => "seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}"
 					);
 				$scrollLeft = $companionAssemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
+				my $companionSeqLabel = $companionAssemblySeqOrder->{$currentSeq}. "." . $companionAssemblySequenceName->{$currentSeq} . "(" .$companionAssemblySeqOrient->{$currentSeq}.")  FPC:".$companionAssemblySeqFpcCtg->{$currentSeq};
+				my $companionSeqLabelLength = length $companionSeqLabel;
+				if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit < $companionSeqLabelLength * $textFontWidth) # no FPC
+				{
+					$companionSeqLabel = $companionAssemblySeqOrder->{$currentSeq}. "." . $companionAssemblySequenceName->{$currentSeq} . "(" .$companionAssemblySeqOrient->{$currentSeq}.")";
+					$companionSeqLabelLength = length $companionSeqLabel;
+				}
+				if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit < $companionSeqLabelLength * $textFontWidth) # no orientation
+				{
+					$companionSeqLabel = $companionAssemblySeqOrder->{$currentSeq}. "." . $companionAssemblySequenceName->{$currentSeq};
+					$companionSeqLabelLength = length $companionSeqLabel;
+				}
+				if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit < $companionSeqLabelLength * $textFontWidth) # no order
+				{
+					$companionSeqLabel = $companionAssemblySequenceName->{$currentSeq};
+					$companionSeqLabelLength = length $companionSeqLabel;
+				}
+
 				$companionAssemblyChrSeq->text(
 					id      => 'seqName'.$currentSeq,
 					x       => $seqBarX,
@@ -502,7 +550,7 @@ if ($assemblyId && $chr)
 					'blast-url' => "assemblyBlastForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 					'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 					'view-url' => "seqView.cgi?seqName=$currentSeq"
-				)->cdata($companionAssemblySeqOrder->{$currentSeq}. "." . $companionAssemblySequenceName->{$currentSeq} . "(" .$companionAssemblySeqOrient->{$currentSeq}.")  FPC:".$companionAssemblySeqFpcCtg->{$currentSeq});
+				)->cdata($companionSeqLabel) if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit > $companionSeqLabelLength * $textFontWidth);
 
 				my $alignments = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? AND hidden < 1");
 				$alignments->execute($companionAssemblySequenceId->{$currentSeq},$refGenomeSequence[0]);
@@ -569,22 +617,6 @@ if ($assemblyId && $chr)
 			$j++;
 		}
 		$ctgPosition[$ctgRow] = $margin + ($assemblyCtgList[6] + $assemblyCtgList[7]) / $pixelUnit;
-		my $ctgBarX = $margin + $assemblyCtgList[6] / $pixelUnit;
-		my $ctgBarY = $barY + $barSpacing - $barHeight * $ctgRow * 3 + $spaceForCompanion;
-		$assemblyChrCtg->text(
-			id      => 'ctgName'.$assemblyCtgList[0],
-			class   => 'hasmenuForCtg',
-			x       => $ctgBarX,
-			y       => $ctgBarY + $barHeight - 2,
-			style   => {
-				'font-size'   => $textFontSize,
-				'stroke'        =>  'black'
-			},
-			'edit-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgList[0]&chr=$chr&scrollLeft=$ctgBarX",
-			'flip-url' => "assemblyCtgFlip.cgi?assemblyCtgId=$assemblyCtgList[0]&chr=$chr&scrollLeft=$ctgBarX",
-			'comment-url' => "comment.cgi?itemId=$assemblyCtgList[0]",
-			'fill-url' => "assemblyGapFillForm.cgi?assemblyCtgId=$assemblyCtgList[0]"
-		)->cdata($assembly[2].'.'.$assembly[3].'-Ctg'.$assemblyCtgList[2]);
 
 		my $assemblySequenceName;
 		my $assemblySequenceId;
@@ -665,6 +697,35 @@ if ($assemblyId && $chr)
 				}
 			}
 		}
+		my $ctgBarX = $margin + $assemblyCtgList[6] / $pixelUnit;
+		my $ctgBarY = $barY + $barSpacing - $barHeight * $ctgRow * 3 + $spaceForCompanion;
+
+		my $ctgLabel = $assembly[2].'.'.$assembly[3].'-Ctg'.$assemblyCtgList[2];
+		my $ctgLabelLength = length $ctgLabel;
+		if (($assemblyCtgList[7] + $filterLength) / $pixelUnit < $ctgLabelLength * $textFontWidth) #no assembly name
+		{
+			$ctgLabel = 'Ctg'.$assemblyCtgList[2];
+			$ctgLabelLength = length $ctgLabel;
+		}
+		if (($assemblyCtgList[7] + $filterLength) / $pixelUnit < $ctgLabelLength * $textFontWidth) #no prefix
+		{
+			$ctgLabel = $assemblyCtgList[2];
+			$ctgLabelLength = length $ctgLabel;
+		}
+		$assemblyChrCtg->text(
+			id      => 'ctgName'.$assemblyCtgList[0],
+			class   => 'hasmenuForCtg',
+			x       => $ctgBarX,
+			y       => $ctgBarY + $barHeight - 2,
+			style   => {
+				'font-size'   => $textFontSize,
+				'stroke'        =>  'black'
+			},
+			'edit-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgList[0]&chr=$chr&scrollLeft=$ctgBarX",
+			'flip-url' => "assemblyCtgFlip.cgi?assemblyCtgId=$assemblyCtgList[0]&chr=$chr&scrollLeft=$ctgBarX",
+			'comment-url' => "comment.cgi?itemId=$assemblyCtgList[0]",
+			'fill-url' => "assemblyGapFillForm.cgi?assemblyCtgId=$assemblyCtgList[0]"
+		)->cdata($ctgLabel) if (($assemblyCtgList[7] + $filterLength) / $pixelUnit > $ctgLabelLength * $textFontWidth);
 		
 		$assemblyChrCtg->rectangle(
 			id    => $assemblyCtgList[0],
@@ -734,6 +795,24 @@ if ($assemblyId && $chr)
 						'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
 					);
 				$scrollLeft = $assemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
+				my $hiddenSeqLabel = 'Ctg'. $assemblyCtgList[2] ."-". $assemblySeqOrder->{$currentSeq}. "." .$assemblySequenceName->{$currentSeq}."  FPC:".$assemblySeqFpcCtg->{$currentSeq};
+				my $hiddenSeqLabelLength = length $hiddenSeqLabel;
+				if ($assemblySeqLength->{$currentSeq} / $pixelUnit < $hiddenSeqLabelLength * $textFontWidth) #no FPC
+				{
+					$hiddenSeqLabel = 'Ctg'. $assemblyCtgList[2] ."-". $assemblySeqOrder->{$currentSeq}. "." .$assemblySequenceName->{$currentSeq};
+					$hiddenSeqLabelLength = length $hiddenSeqLabel;
+				}
+				if ($assemblySeqLength->{$currentSeq} / $pixelUnit < $hiddenSeqLabelLength * $textFontWidth) #no Ctg
+				{
+					$hiddenSeqLabel = $assemblySeqOrder->{$currentSeq}. "." .$assemblySequenceName->{$currentSeq};
+					$hiddenSeqLabelLength = length $hiddenSeqLabel;
+				}
+				if ($assemblySeqLength->{$currentSeq} / $pixelUnit < $hiddenSeqLabelLength * $textFontWidth) #no order
+				{
+					$hiddenSeqLabel = $assemblySequenceName->{$currentSeq};
+					$hiddenSeqLabelLength = length $hiddenSeqLabel;
+				}
+
 				my $hiddenTextY = $barY + $hiddenSeqPosition + $barHeight * $hiddenRow * 2 + $barHeight - 2 + $spaceForCompanion;
 				$assemblyChrSeqHidden->text(
 					id      => 'seqName'.$currentSeq,
@@ -748,7 +827,7 @@ if ($assemblyId && $chr)
 					'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 					'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 					'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
-				)->cdata('Ctg'. $assemblyCtgList[2] ."-". $assemblySeqOrder->{$currentSeq}. "." .$assemblySequenceName->{$currentSeq}."  FPC:".$assemblySeqFpcCtg->{$currentSeq});
+				)->cdata($hiddenSeqLabel) if ($assemblySeqLength->{$currentSeq} / $pixelUnit > $hiddenSeqLabelLength * $textFontWidth);
 				$hiddenSeqPosition[$hiddenRow] = $assemblySeqLeftEnd->{$currentSeq} + $assemblySeqLength->{$currentSeq} - 1;
 				$hiddenSeqCount++;
 				next;
@@ -850,6 +929,23 @@ if ($assemblyId && $chr)
 					'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
 				);
 			$scrollLeft = $assemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
+			my $seqLabel = $assemblySeqOrder->{$currentSeq}. "." . $assemblySequenceName->{$currentSeq} . "(" .$assemblySeqOrient->{$currentSeq}.")  FPC:".$assemblySeqFpcCtg->{$currentSeq};
+			my $seqLabelLength = length $seqLabel;
+			if ($assemblySeqLength->{$currentSeq} / $pixelUnit < $seqLabelLength * $textFontWidth) #no FPC
+			{
+				$seqLabel = $assemblySeqOrder->{$currentSeq}. "." . $assemblySequenceName->{$currentSeq} . "(" .$assemblySeqOrient->{$currentSeq}.")";
+				$seqLabelLength = length $seqLabel;
+			}
+			if ($assemblySeqLength->{$currentSeq} / $pixelUnit < $seqLabelLength * $textFontWidth) #no orientation
+			{
+				$seqLabel = $assemblySeqOrder->{$currentSeq}. "." . $assemblySequenceName->{$currentSeq};
+				$seqLabelLength = length $seqLabel;
+			}
+			if ($assemblySeqLength->{$currentSeq} / $pixelUnit < $seqLabelLength * $textFontWidth) #no order
+			{
+				$seqLabel = $assemblySequenceName->{$currentSeq};
+				$seqLabelLength = length $seqLabel;
+			}
 			$assemblyChrSeq->text(
 				id      => 'seqName'.$currentSeq,
 				x       => $seqBarX,
@@ -863,7 +959,7 @@ if ($assemblyId && $chr)
 				'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 				'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 				'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
-			)->cdata($assemblySeqOrder->{$currentSeq}. "." . $assemblySequenceName->{$currentSeq} . "(" .$assemblySeqOrient->{$currentSeq}.")  FPC:".$assemblySeqFpcCtg->{$currentSeq});
+			)->cdata($seqLabel) if ($assemblySeqLength->{$currentSeq} / $pixelUnit > $seqLabelLength * $textFontWidth);
 
 			my $alignments = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? AND hidden < 1");
 			$alignments->execute($assemblySequenceId->{$currentSeq},$refGenomeSequence[0]);
