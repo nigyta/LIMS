@@ -386,24 +386,42 @@ END
 							{
 								$goodOverlap = 1;
 							}
-						}									
-					}
-					close(CMDA);
-					open (CMDB,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceB[0].$$.seq -subject /tmp/$getSequenceA[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
-					while(<CMDB>)
-					{
-						/^#/ and next;
-						my @hit = split("\t",$_);
-						if($hit[3] >= $minOverlapSeqToSeq)
-						{
-							push @alignments, $_;
+							
+							#switch query and subject
+							if($hit[8] < $hit[9])
+							{
+								my $exchange = $hit[8];
+								$hit[8] = $hit[6];
+								$hit[6] = $exchange;
+								$exchange = $hit[9];
+								$hit[9] = $hit[7];
+								$hit[7] = $exchange;
+								$exchange = $hit[1];
+								$hit[1] = $hit[0];
+								$hit[0] = $exchange;
+							}
+							else
+							{
+								my $exchange = $hit[8];
+								$hit[8] = $hit[7];
+								$hit[7] = $exchange;
+								$exchange = $hit[9];
+								$hit[9] = $hit[6];
+								$hit[6] = $exchange;
+								$exchange = $hit[1];
+								$hit[1] = $hit[0];
+								$hit[0] = $exchange;
+							}
+
 							if($hit[6] == 1 || $hit[7] == $getSequenceB[5])
 							{
 								$goodOverlap = 1;
 							}
-						}									
+							my $reverseBlast = join "\t",@hit;
+							push @alignments, $reverseBlast;							
+						}
 					}
-					close(CMDB);						
+					close(CMDA);
 					if($goodOverlap)
 					{
 						foreach (@alignments)

@@ -192,26 +192,41 @@ END
 						{
 							$goodOverlap = 1;
 						}
-					}									
-				}
-				close(CMDA);
-				open (CMDB,"$alignEngineList->{'blastn'} -query /tmp/$hit[1].$$.seq -subject /tmp/$hit[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
-				while(<CMDB>)
-				{
-					/^#/ and next;
-					my @hit = split("\t",$_);
-					if($hit[3] >= $minOverlapSeqToSeq)
-					{
-						push @alignments, $_;
+						#switch query and subject
+						if($hit[8] < $hit[9])
+						{
+							my $exchange = $hit[8];
+							$hit[8] = $hit[6];
+							$hit[6] = $exchange;
+							$exchange = $hit[9];
+							$hit[9] = $hit[7];
+							$hit[7] = $exchange;
+							$exchange = $hit[1];
+							$hit[1] = $hit[0];
+							$hit[0] = $exchange;
+						}
+						else
+						{
+							my $exchange = $hit[8];
+							$hit[8] = $hit[7];
+							$hit[7] = $exchange;
+							$exchange = $hit[9];
+							$hit[9] = $hit[6];
+							$hit[6] = $exchange;
+							$exchange = $hit[1];
+							$hit[1] = $hit[0];
+							$hit[0] = $exchange;
+						}
+
 						if($hit[6] == 1 || $hit[7] == $getSequenceB[5])
 						{
 							$goodOverlap = 1;
 						}
+						my $reverseBlast = join "\t",@hit;
+						push @alignments, $reverseBlast;							
 					}									
 				}
-				close(CMDB);						
-				unlink("/tmp/$getSequenceA[0].$$.seq");
-				unlink("/tmp/$getSequenceB[0].$$.seq");
+				close(CMDA);
 				if($goodOverlap)
 				{
 					foreach (@alignments)
@@ -231,7 +246,6 @@ END
 		unlink("/tmp/$assembly[4].$$.seq.nin");
 		unlink("/tmp/$assembly[4].$$.seq.nsq");
 		`rm $commoncfg->{TMPDIR}/*.aln.html`; #delete cached files
-
 		foreach my $queryId (keys %$goodSequenceId)
 		{
 			unlink("/tmp/$queryId.$$.seq");
