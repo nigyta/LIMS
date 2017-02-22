@@ -127,6 +127,9 @@ __DATA__
 			<input type="radio" id="newAssemblyReplaceRadio1" name="replace" value="0" checked="checked"><label for="newAssemblyReplaceRadio1">No</label>
 		</div>
 	</td></tr>
+	<tr><td style='text-align:left'><label for="newAssemblySeqMinLength"><b>AssemblySeq Minimum Length (bp)</b></label></td>
+		<td><input name="assemblySeqMinLength" id="newAssemblySeqMinLength" size="4" type="text" maxlength="6" VALUE="0" /></td>
+	</tr>
 	</table>
 	<table>
 	<tr><td style='text-align:right'><label for="newAssemblyFpcOrAgp"><b>Physical Reference</b></label></td>
@@ -228,6 +231,22 @@ $( "#newAssemblySeqToGenome" ).buttonset();
 $( "#newAssemblyEndToEnd" ).buttonset();
 $( "#newAssemblyOrientSeqs" ).buttonset();
 $( "#newAssemblyRenumber" ).buttonset();
+$( "#newAssemblySeqMinLength" ).spinner({
+	min: 100,
+	max: 10000,
+	step: 100,
+	start: function( event, ui ) {
+		var current = $( "#newAssemblySeqMinLength" ).spinner( "value" );
+		if(current >= 2000)
+		{
+			$( "#newAssemblySeqMinLength" ).spinner( "option", "step", 500 );
+		}
+		else
+		{
+			$( "#newAssemblySeqMinLength" ).spinner( "option", "step", 100 );
+		}
+	}
+});
 $( "#newAssemblySeqToSeqMinOverlap" ).spinner({
 	min: 500,
 	max: 99999,

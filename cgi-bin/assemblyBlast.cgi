@@ -369,7 +369,6 @@ END
 				}
 			}
 			close(CMD);
-			close(BLAST);
 			unlink("/tmp/$assembly[4].$$.seq");
 			unlink("/tmp/$assembly[4].$querySeq.$$.seq");
 			unlink("/tmp/$assembly[4].$$.seq.nhr");

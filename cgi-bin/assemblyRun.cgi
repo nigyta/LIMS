@@ -35,6 +35,7 @@ my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
 my $refGenomeId = param ('refGenomeId') || '0';
 my $assignChr = param ('assignChr') || '0';
 my $orientContigs = param ('orientContigs') || '0';
+my $assemblySeqMinLength = param ('assemblySeqMinLength') || '0';
 my $seqToSeq = param ('seqToSeq') || '0';
 my $identitySeqToSeq = param ('identitySeqToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQIDENTITY");
 my $minOverlapSeqToSeq = param ('minOverlapSeqToSeq') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQMINOVERLAP");
@@ -125,8 +126,8 @@ END
 				while(my @getClones= $getClones->fetchrow_array())
 				{
 					my @assemblySeqList;
-					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ? ORDER BY y DESC");
-					$getSequences->execute($getClones[1]);
+					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND y >= ? AND name LIKE ? ORDER BY y DESC");
+					$getSequences->execute($assemblySeqMinLength,$getClones[1]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
 						$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
@@ -152,8 +153,8 @@ END
 			}
 			if($target[1] eq 'genome')
 			{
-				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ? ORDER BY id");
-				$getSequences->execute($assembly[4]);
+				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND y >= ? AND x = ? ORDER BY id");
+				$getSequences->execute($assemblySeqMinLength,$assembly[4]);
 				while(my @getSequences = $getSequences->fetchrow_array())
 				{
 					$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
@@ -192,8 +193,8 @@ END
 				$getClones->execute($assembly[4]);
 				while(my @getClones= $getClones->fetchrow_array())
 				{
-					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ? ORDER BY y DESC");
-					$getSequences->execute($getClones[1]);
+					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND y >= ? AND name LIKE ? ORDER BY y DESC");
+					$getSequences->execute($assemblySeqMinLength,$getClones[1]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
 						next if (exists $assemblySequenceLength->{$getSequences[0]}); #skip if seq has been assembled
@@ -242,8 +243,8 @@ END
 			}
 			if($target[1] eq 'genome')
 			{
-				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ? ORDER BY id");
-				$getSequences->execute($assembly[4]);
+				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND y >= ? AND x = ? ORDER BY id");
+				$getSequences->execute($assemblySeqMinLength,$assembly[4]);
 				while(my @getSequences = $getSequences->fetchrow_array())
 				{
 					next if (exists $assemblySequenceLength->{$getSequences[0]}); #skip if seq has been assembled
@@ -269,10 +270,10 @@ END
 			if($target[1] eq 'library')
 			{
 				my $getClones = $dbh->prepare("SELECT * FROM clones WHERE sequenced > 0 AND libraryId = ?");
-				$getClones->execute($assembly[4]);
+				$getClones->execute($assemblySeqMinLength,$assembly[4]);
 				while(my @getClones = $getClones->fetchrow_array())
 				{
-					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ?");
+					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND y >= ? AND name LIKE ?");
 					$getSequences->execute($getClones[1]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
@@ -289,8 +290,8 @@ END
 			}
 			if($target[1] eq 'genome')
 			{
-				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
-				$getSequences->execute($assembly[4]);
+				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND y >= ? AND x = ?");
+				$getSequences->execute($assemblySeqMinLength,$assembly[4]);
 				while(my @getSequences = $getSequences->fetchrow_array())
 				{
 					$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
@@ -692,8 +693,8 @@ END
 					$getClones->execute($assembly[4]);
 					while(my @getClones = $getClones->fetchrow_array())
 					{
-						my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ?");
-						$getSequences->execute($getClones[1]);
+						my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND y >= ? AND name LIKE ?");
+						$getSequences->execute($assemblySeqMinLength,$getClones[1]);
 						while(my @getSequences = $getSequences->fetchrow_array())
 						{
 							my $sequenceDetails = decode_json $getSequences[8];
@@ -708,8 +709,8 @@ END
 				}
 				if($target[1] eq 'genome')
 				{
-					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
-					$getSequences->execute($assembly[4]);
+					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND y >= ? AND x = ?");
+					$getSequences->execute($assemblySeqMinLength,$assembly[4]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
 						my $sequenceDetails = decode_json $getSequences[8];
