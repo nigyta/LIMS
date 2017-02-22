@@ -362,7 +362,7 @@ END
 						my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 						$getSequenceB->execute($hit[1]);
 						my @getSequenceB =  $getSequenceB->fetchrow_array();
-						open (SEQB,">/tmp/$getSequenceB[0].$$.seq") or die "can't open file: /tmp/$getSequenceB[0].$$.seq";
+						open (SEQB,">/tmp/$hit[1].$$.seq") or die "can't open file: /tmp/$hit[1].$$.seq";
 						my $sequenceDetailsB = decode_json $getSequenceB[8];
 						$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
 						$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
@@ -382,7 +382,7 @@ END
 						if($hit[3] >= $minOverlapSeqToSeq)
 						{
 							push @alignments, $_;
-							if($hit[6] == 1 || $hit[7] == $getSequenceA[5])
+							if($hit[6] == 1 || $hit[7] == $assemblySequenceLength->{$hit[0]})
 							{
 								$goodOverlap = 1;
 							}
@@ -413,7 +413,7 @@ END
 								$hit[0] = $exchange;
 							}
 
-							if($hit[6] == 1 || $hit[7] == $getSequenceB[5])
+							if($hit[6] == 1 || $hit[7] == $assemblySequenceLength->{$hit[0]})
 							{
 								$goodOverlap = 1;
 							}

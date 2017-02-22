@@ -282,7 +282,7 @@ END
 						my $getSequenceA = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 						$getSequenceA->execute($hit[0]);
 						my @getSequenceA =  $getSequenceA->fetchrow_array();
-						open (SEQA,">/tmp/$getSequenceA[0].$$.seq") or die "can't open file: /tmp/$getSequenceA[0].$$.seq";
+						open (SEQA,">/tmp/$hit[0].$$.seq") or die "can't open file: /tmp/$hit[0].$$.seq";
 						my $sequenceDetailsA = decode_json $getSequenceA[8];
 						$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
 						$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
@@ -296,7 +296,7 @@ END
 						my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 						$getSequenceB->execute($hit[1]);
 						my @getSequenceB =  $getSequenceB->fetchrow_array();
-						open (SEQB,">/tmp/$getSequenceB[0].$$.seq") or die "can't open file: /tmp/$getSequenceB[0].$$.seq";
+						open (SEQB,">/tmp/$hit[1].$$.seq") or die "can't open file: /tmp/$hit[1].$$.seq";
 						my $sequenceDetailsB = decode_json $getSequenceB[8];
 						$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
 						$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
@@ -308,15 +308,15 @@ END
 
 					my @alignments;
 					my $goodOverlap = ($checkGood) ? 0 : 1;
-					open (CMDA,"$alignEngineList->{'blastn'} -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMDA,"$alignEngineList->{'blastn'} -query /tmp/$hit[0].$$.seq -subject /tmp/$hit[1].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMDA>)
 					{
 						/^#/ and next;
 						my @hit = split("\t",$_);
-						if($hit[3] >= $minOverlapSeqToSeq)
+						if($hit[3] >= $minOverlapBlast)
 						{
 							push @alignments, $_;
-							if($hit[6] == 1 || $hit[7] == $getSequenceA[5])
+							if($hit[6] == 1 || $hit[7] == $assemblySequenceLength->{$hit[0]})
 							{
 								$goodOverlap = 1;
 							}
@@ -347,7 +347,7 @@ END
 								$hit[0] = $exchange;
 							}
 
-							if($hit[6] == 1 || $hit[7] == $getSequenceB[5])
+							if($hit[6] == 1 || $hit[7] == $assemblySequenceLength->{$hit[0]})
 							{
 								$goodOverlap = 1;
 							}
@@ -362,7 +362,7 @@ END
 						{
 							my @hit = split("\t",$_);
 							#write to alignment
-							my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', 'SEQtoSEQ\_1e-200\_$identitySeqToSeq\_$minOverlapSeqToSeq', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+							my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', 'SEQtoSEQ\_1e-200\_$identityBlast\_$minOverlapBlast', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 							$insertAlignment->execute(@hit);
 						}
 					}
