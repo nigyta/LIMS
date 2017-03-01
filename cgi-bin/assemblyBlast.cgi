@@ -32,6 +32,7 @@ my $identityBlast = param ('identityBlast') || $userConfig->getFieldValueWithUse
 my $minOverlapBlast = param ('minOverlapBlast') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQMINOVERLAP");
 my $task = param ('megablast') || 'blastn';
 
+my $speedyMode = param ('speedyMode') || '0';
 my $checkGood = param ('checkGood') || '0';
 my $seqOne = param ('seqOne') || '';
 my $seqTwo = param ('seqTwo') || '';
@@ -247,123 +248,181 @@ END
 
 			system( "$makeblastdb -in /tmp/$assembly[4].$$.seq -dbtype nucl" );
 			my $goodSequenceId;
-			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$querySeq.$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$querySeq.$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -max_target_seqs 500 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			while(<CMD>)
 			{
 				/^#/ and next;
 				my @hit = split("\t",$_);
 				next if($hit[0] eq $hit[1]);
 				next if($hit[3] < $minOverlapBlast);
-
-				my $rerunBlastTwo = 0;
-				if($hit[0] < $hit[1])
+				if($speedyMode)
 				{
-					unless(exists $goodSequenceId->{$hit[0]}->{$hit[1]})
+					my $deleteAlignmentFlag = 0;
+					if($hit[0] < $hit[1])
 					{
-						$goodSequenceId->{$hit[0]}->{$hit[1]} = 1;
-						$rerunBlastTwo = 1;
+						unless(exists $goodSequenceId->{$hit[0]}->{$hit[1]})
+						{
+							$goodSequenceId->{$hit[0]}->{$hit[1]} = 1;
+							$deleteAlignmentFlag = 1;
+						}
 					}
+					else
+					{
+						unless(exists $goodSequenceId->{$hit[1]}->{$hit[0]})
+						{
+							$goodSequenceId->{$hit[1]}->{$hit[0]} = 1;
+							$deleteAlignmentFlag = 1;
+						}
+					}
+					if($deleteAlignmentFlag)
+					{
+						my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $hit[0] AND subject = $hit[1]");
+						my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $hit[1] AND subject = $hit[0]");
+					}
+					my $insertAlignmentA=$dbh->prepare("INSERT INTO alignment VALUES ('', 'SEQtoSEQ\_1e-200\_$identitySeqToSeq\_$minOverlapSeqToSeq', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+					$insertAlignmentA->execute(@hit);
+
+					#switch query and subject
+					if($hit[8] < $hit[9])
+					{
+						my $exchange = $hit[8];
+						$hit[8] = $hit[6];
+						$hit[6] = $exchange;
+						$exchange = $hit[9];
+						$hit[9] = $hit[7];
+						$hit[7] = $exchange;
+						$exchange = $hit[1];
+						$hit[1] = $hit[0];
+						$hit[0] = $exchange;
+					}
+					else
+					{
+						my $exchange = $hit[8];
+						$hit[8] = $hit[7];
+						$hit[7] = $exchange;
+						$exchange = $hit[9];
+						$hit[9] = $hit[6];
+						$hit[6] = $exchange;
+						$exchange = $hit[1];
+						$hit[1] = $hit[0];
+						$hit[0] = $exchange;
+					}
+
+					my $insertAlignmentB=$dbh->prepare("INSERT INTO alignment VALUES ('', 'SEQtoSEQ\_1e-200\_$identitySeqToSeq\_$minOverlapSeqToSeq', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+					$insertAlignmentB->execute(@hit);
 				}
 				else
 				{
-					unless(exists $goodSequenceId->{$hit[1]}->{$hit[0]})
+					my $rerunBlastTwo = 0;
+					if($hit[0] < $hit[1])
 					{
-						$goodSequenceId->{$hit[1]}->{$hit[0]} = 1;
-						$rerunBlastTwo = 1;
-					}
-				}
-				if($rerunBlastTwo)
-				{
-					my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $hit[0] AND subject = $hit[1]");
-					my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $hit[1] AND subject = $hit[0]");
-
-					unless(-e "/tmp/$hit[0].$$.seq")
-					{
-						my $getSequenceA = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-						$getSequenceA->execute($hit[0]);
-						my @getSequenceA =  $getSequenceA->fetchrow_array();
-						open (SEQA,">/tmp/$hit[0].$$.seq") or die "can't open file: /tmp/$hit[0].$$.seq";
-						my $sequenceDetailsA = decode_json $getSequenceA[8];
-						$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
-						$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
-						$sequenceDetailsA->{'sequence'} = '' unless (exists $sequenceDetailsA->{'sequence'});
-						$sequenceDetailsA->{'gapList'} = '' unless (exists $sequenceDetailsA->{'gapList'});
-						print SEQA ">$getSequenceA[0]\n$sequenceDetailsA->{'sequence'}\n";
-						close(SEQA);
-					}
-					unless(-e "/tmp/$hit[1].$$.seq")
-					{
-						my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-						$getSequenceB->execute($hit[1]);
-						my @getSequenceB =  $getSequenceB->fetchrow_array();
-						open (SEQB,">/tmp/$hit[1].$$.seq") or die "can't open file: /tmp/$hit[1].$$.seq";
-						my $sequenceDetailsB = decode_json $getSequenceB[8];
-						$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
-						$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
-						$sequenceDetailsB->{'sequence'} = '' unless (exists $sequenceDetailsB->{'sequence'});
-						$sequenceDetailsB->{'gapList'} = '' unless (exists $sequenceDetailsB->{'gapList'});
-						print SEQB ">$getSequenceB[0]\n$sequenceDetailsB->{'sequence'}\n";
-						close(SEQB);
-					}
-
-					my @alignments;
-					my $goodOverlap = ($checkGood) ? 0 : 1;
-					open (CMDA,"$alignEngineList->{'blastn'} -query /tmp/$hit[0].$$.seq -subject /tmp/$hit[1].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -outfmt 6 |") or die "can't open CMD: $!";
-					while(<CMDA>)
-					{
-						/^#/ and next;
-						my @hit = split("\t",$_);
-						if($hit[3] >= $minOverlapBlast)
+						unless(exists $goodSequenceId->{$hit[0]}->{$hit[1]})
 						{
-							push @alignments, $_;
-							if($hit[6] == 1 || $hit[7] == $assemblySequenceLength->{$hit[0]})
-							{
-								$goodOverlap = 1;
-							}
-							
-							#switch query and subject
-							if($hit[8] < $hit[9])
-							{
-								my $exchange = $hit[8];
-								$hit[8] = $hit[6];
-								$hit[6] = $exchange;
-								$exchange = $hit[9];
-								$hit[9] = $hit[7];
-								$hit[7] = $exchange;
-								$exchange = $hit[1];
-								$hit[1] = $hit[0];
-								$hit[0] = $exchange;
-							}
-							else
-							{
-								my $exchange = $hit[8];
-								$hit[8] = $hit[7];
-								$hit[7] = $exchange;
-								$exchange = $hit[9];
-								$hit[9] = $hit[6];
-								$hit[6] = $exchange;
-								$exchange = $hit[1];
-								$hit[1] = $hit[0];
-								$hit[0] = $exchange;
-							}
-
-							if($hit[6] == 1 || $hit[7] == $assemblySequenceLength->{$hit[0]})
-							{
-								$goodOverlap = 1;
-							}
-							my $reverseBlast = join "\t",@hit;
-							push @alignments, $reverseBlast;							
+							$goodSequenceId->{$hit[0]}->{$hit[1]} = 1;
+							$rerunBlastTwo = 1;
 						}
 					}
-					close(CMDA);
-					if($goodOverlap)
+					else
 					{
-						foreach (@alignments)
+						unless(exists $goodSequenceId->{$hit[1]}->{$hit[0]})
 						{
-							my @hit = split("\t",$_);
-							#write to alignment
-							my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', 'SEQtoSEQ\_1e-200\_$identityBlast\_$minOverlapBlast', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-							$insertAlignment->execute(@hit);
+							$goodSequenceId->{$hit[1]}->{$hit[0]} = 1;
+							$rerunBlastTwo = 1;
+						}
+					}
+					if($rerunBlastTwo)
+					{
+						my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $hit[0] AND subject = $hit[1]");
+						my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $hit[1] AND subject = $hit[0]");
+
+						unless(-e "/tmp/$hit[0].$$.seq")
+						{
+							my $getSequenceA = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+							$getSequenceA->execute($hit[0]);
+							my @getSequenceA =  $getSequenceA->fetchrow_array();
+							open (SEQA,">/tmp/$hit[0].$$.seq") or die "can't open file: /tmp/$hit[0].$$.seq";
+							my $sequenceDetailsA = decode_json $getSequenceA[8];
+							$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
+							$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
+							$sequenceDetailsA->{'sequence'} = '' unless (exists $sequenceDetailsA->{'sequence'});
+							$sequenceDetailsA->{'gapList'} = '' unless (exists $sequenceDetailsA->{'gapList'});
+							print SEQA ">$getSequenceA[0]\n$sequenceDetailsA->{'sequence'}\n";
+							close(SEQA);
+						}
+						unless(-e "/tmp/$hit[1].$$.seq")
+						{
+							my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+							$getSequenceB->execute($hit[1]);
+							my @getSequenceB =  $getSequenceB->fetchrow_array();
+							open (SEQB,">/tmp/$hit[1].$$.seq") or die "can't open file: /tmp/$hit[1].$$.seq";
+							my $sequenceDetailsB = decode_json $getSequenceB[8];
+							$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
+							$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
+							$sequenceDetailsB->{'sequence'} = '' unless (exists $sequenceDetailsB->{'sequence'});
+							$sequenceDetailsB->{'gapList'} = '' unless (exists $sequenceDetailsB->{'gapList'});
+							print SEQB ">$getSequenceB[0]\n$sequenceDetailsB->{'sequence'}\n";
+							close(SEQB);
+						}
+
+						my @alignments;
+						my $goodOverlap = ($checkGood) ? 0 : 1;
+						open (CMDA,"$alignEngineList->{'blastn'} -query /tmp/$hit[0].$$.seq -subject /tmp/$hit[1].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -outfmt 6 |") or die "can't open CMD: $!";
+						while(<CMDA>)
+						{
+							/^#/ and next;
+							my @detailedHit = split("\t",$_);
+							if($detailedHit[3] >= $minOverlapBlast)
+							{
+								push @alignments, $_;
+								if($detailedHit[6] == 1 || $detailedHit[7] == $assemblySequenceLength->{$detailedHit[0]})
+								{
+									$goodOverlap = 1;
+								}
+							
+								#switch query and subject
+								if($detailedHit[8] < $detailedHit[9])
+								{
+									my $exchange = $detailedHit[8];
+									$detailedHit[8] = $detailedHit[6];
+									$detailedHit[6] = $exchange;
+									$exchange = $detailedHit[9];
+									$detailedHit[9] = $detailedHit[7];
+									$detailedHit[7] = $exchange;
+									$exchange = $detailedHit[1];
+									$detailedHit[1] = $detailedHit[0];
+									$detailedHit[0] = $exchange;
+								}
+								else
+								{
+									my $exchange = $detailedHit[8];
+									$detailedHit[8] = $detailedHit[7];
+									$detailedHit[7] = $exchange;
+									$exchange = $detailedHit[9];
+									$detailedHit[9] = $detailedHit[6];
+									$detailedHit[6] = $exchange;
+									$exchange = $detailedHit[1];
+									$detailedHit[1] = $detailedHit[0];
+									$detailedHit[0] = $exchange;
+								}
+
+								if($detailedHit[6] == 1 || $detailedHit[7] == $assemblySequenceLength->{$detailedHit[0]})
+								{
+									$goodOverlap = 1;
+								}
+								my $reverseBlast = join "\t",@detailedHit;
+								push @alignments, $reverseBlast;							
+							}
+						}
+						close(CMDA);
+						if($goodOverlap)
+						{
+							foreach (@alignments)
+							{
+								my @detailedHit = split("\t",$_);
+								#write to alignment
+								my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', 'SEQtoSEQ\_1e-200\_$identityBlast\_$minOverlapBlast', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+								$insertAlignment->execute(@detailedHit);
+							}
 						}
 					}
 				}

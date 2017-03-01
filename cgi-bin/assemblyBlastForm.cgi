@@ -75,7 +75,7 @@ __DATA__
 		<label for="assemblyBlastSeqTwoLabel"><b>Sequence-2.</b></label><input name="seqTwoLabel" id="assemblyBlastSeqTwoLabel" size="16" type="text" maxlength="32" VALUE="$seqTwoLabel" placeholder="Second Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqTwo" id="assemblyBlastSeqTwo" type="text" placeholder="Second SeqId" title="Second SeqId" VALUE="$seqTwo" readonly="readonly" />
 		</td>
 	</tr>
-	<tr><td><b>Alignment Settings:</b></td><td><input type="checkbox" id="assemblyCheckGood" name="checkGood" value="1"><label for="assemblyCheckGood">Check End Match</label></td><td></td></tr>
+	<tr><td><b>Alignment Settings:</b></td><td><input type="checkbox" id="assemblySpeedyMode" name="speedyMode" value="1"><label for="assemblySpeedyMode" title="This will skip 'Check End Match'">Speedy Mode</label><br><input type="checkbox" id="assemblyCheckGood" name="checkGood" value="1"><label for="assemblyCheckGood">Check End Match</label></td><td></td></tr>
 	<tr><td style='text-align:right'><input type="checkbox" id="megablastCheckbox" name="megablast" value="megablast" checked="checked"><label for="megablastCheckbox">Megablast</label></td><td style='text-align:right'><label for="assemblyBlastMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapBlast" id="assemblyBlastMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
 	<tr><td></td><td style='text-align:right'><label for="assemblyBlastIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityBlast" id="assemblyBlastIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
 	</table>

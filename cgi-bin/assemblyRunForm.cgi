@@ -152,6 +152,7 @@ __DATA__
 			<input type="radio" id="newAssemblySeqToSeqRadio1" name="seqToSeq" value="0" checked="checked"><label for="newAssemblySeqToSeqRadio1">No</label>
 		</div>
 			<input type="checkbox" id="newAssemblyRedoAllSeqToSeqCheckbox" name="redoAllSeqToSeq" value="1"><label for="newAssemblyRedoAllSeqToSeqCheckbox">For All Sequences</label><br>
+			<input type="checkbox" id="newAssemblySeqToSeqSpeedyMode" name="speedyMode" value="1"><label for="newAssemblySeqToSeqSpeedyMode" title="This will skip 'Check End Match'">Speedy Mode</label><br>
 			<input type="checkbox" id="newAssemblySeqToSeqCheckGood" name="checkGood" value="1" checked="checked"><label for="newAssemblySeqToSeqCheckGood">Check End Match</label>
 	</td><td style='text-align:right'><label for="newAssemblySeqToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToSeq" id="newAssemblySeqToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
 	<tr><td style='text-align:right'><label for="newAssemblySeqToSeqIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToSeq" id="newAssemblySeqToSeqIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
@@ -232,7 +233,7 @@ $( "#newAssemblyEndToEnd" ).buttonset();
 $( "#newAssemblyOrientSeqs" ).buttonset();
 $( "#newAssemblyRenumber" ).buttonset();
 $( "#newAssemblySeqMinLength" ).spinner({
-	min: 100,
+	min: 0,
 	max: 10000,
 	step: 100,
 	start: function( event, ui ) {
