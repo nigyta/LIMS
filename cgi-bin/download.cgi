@@ -599,11 +599,11 @@ elsif(param ('assemblyCtgIdForAgp'))
 				$seqLength=$position->[1]-$position->[0]+1;
 				if($sequence[3] > 50) #not BAC sequence
 				{
-					print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tD\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
+					print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
 				}
 				else
 				{
-					print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
+					print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
 				}
 				$begin += $seqLength;
 				$num++;
@@ -614,11 +614,11 @@ elsif(param ('assemblyCtgIdForAgp'))
 		{
 			if($sequence[3] > 50) #not BAC sequence
 			{
-				print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tD\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+				print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 			}
 			else
 			{
-				print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+				print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 			}
 			$begin += $assemblySeqEnd-$assemblySeqStart+1;
 			$num++;
@@ -1166,11 +1166,11 @@ elsif(param ('assemblyIdForAgp'))
 								$seqLength=$position->[1]-$position->[0]+1;
 								if($sequence[3] > 50) #not BAC sequence
 								{
-									print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tD\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
 								else
 								{
-									print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
 								$begin->{0} += $seqLength;
 								$num->{0}++;
@@ -1181,11 +1181,11 @@ elsif(param ('assemblyIdForAgp'))
 						{
 							if($sequence[3] > 50) #not BAC sequence
 							{
-								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tD\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
 							else
 							{
-								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
 							$begin->{0} += $assemblySeqEnd-$assemblySeqStart+1;
 							$num->{0}++;
@@ -1207,7 +1207,7 @@ elsif(param ('assemblyIdForAgp'))
 				{
 					 #element eq 'ctg'
 					 #no end Ns printed out
-					print "ChrUN$chrUnNumber\t1\t",$assemblyCtg[7],"\t$num->{0}\tD\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
+					print "ChrUN$chrUnNumber\t1\t",$assemblyCtg[7],"\t$num->{0}\tW\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
 					$lastComponentType->{0} = 'D';
 				}
 			}
@@ -1309,11 +1309,11 @@ elsif(param ('assemblyIdForAgp'))
 								$seqLength=$position->[1]-$position->[0]+1;
 								if($sequence[3] > 50) #not BAC sequence
 								{
-									print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$seqLength-1,"\t$num->{$chrNumber}\tD\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$seqLength-1,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
 								else
 								{
-									print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$seqLength-1,"\t$num->{$chrNumber}\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$seqLength-1,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
 								$begin->{$chrNumber} += $seqLength;
 								$num->{$chrNumber}++;
@@ -1324,11 +1324,11 @@ elsif(param ('assemblyIdForAgp'))
 						{
 							if($sequence[3] > 50) #not BAC sequence
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrNumber}\tD\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
 							else
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrNumber}\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
 							$begin->{$chrNumber} += $assemblySeqEnd-$assemblySeqStart+1;
 							$num->{$chrNumber}++;
@@ -1388,7 +1388,7 @@ elsif(param ('assemblyIdForAgp'))
 						}
 					}
 
-					print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblyCtg[7]-1,"\t$num->{$chrNumber}\tD\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
+					print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblyCtg[7]-1,"\t$num->{$chrNumber}\tW\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
 					$begin->{$chrNumber} += $assemblyCtg[7];
 					$num->{$chrNumber}++;
 					$lastComponentType->{$chrNumber} = 'D';
@@ -1509,11 +1509,11 @@ elsif(param ('assemblyIdForAgp'))
 						$seqLength=$position->[1]-$position->[0]+1;
 						if($sequence[3] > 50) #not BAC sequence
 						{
-							print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tD\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
+							print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
 						}
 						else
 						{
-							print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
+							print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$seqLength-1,"\t$num\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
 						}
 						$begin += $seqLength;
 						$num++;
@@ -1524,11 +1524,11 @@ elsif(param ('assemblyIdForAgp'))
 				{
 					if($sequence[3] > 50) #not BAC sequence
 					{
-						print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tD\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+						print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 					}
 					else
 					{
-						print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tD\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+						print "Ctg$assemblyCtg[2]\t$begin\t",$begin+$assemblySeqEnd-$assemblySeqStart,"\t$num\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 					}
 					$begin += $assemblySeqEnd-$assemblySeqStart+1;
 					$num++;
