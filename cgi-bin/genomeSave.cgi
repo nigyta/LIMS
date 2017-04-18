@@ -140,7 +140,8 @@ END
 
 						if($genomeFilePath)
 						{
-							$genomeInfile = $genomeFilePath;
+							#$genomeInfile = $genomeFilePath;
+							`cp $genomeFilePath $genomeInfile`;
 						}
 						else
 						{
@@ -150,6 +151,7 @@ END
 							}
 							close FILE;
 						}		
+						`perl -p -i -e 's/\r/\n/g' $genomeInfile`; #convert CR line terminators (MAC OS) into LF line terminators (Unix)
 
 						if ($replace) #delete old sequences
 						{
@@ -164,7 +166,7 @@ parent.errorPop("You can NOT replace this genome since it has already been used 
 </script>	
 END
 
-								unlink ($genomeInfile) if (!$genomeFilePath);
+								unlink ($genomeInfile);
 								exit;
 							}
 
@@ -178,7 +180,7 @@ parent.closeDialog();
 parent.errorPop("You can NOT replace this genome since it has already been used in an assembly!");
 </script>	
 END
-								unlink ($genomeInfile) if (!$genomeFilePath);
+								unlink ($genomeInfile);
 
 								exit;
 							}
@@ -336,7 +338,8 @@ END
 					}
 					if($genomeFilePath)
 					{
-						$genomeInfile = $genomeFilePath;
+						#$genomeInfile = $genomeFilePath;
+						`cp $genomeFilePath $genomeInfile`;
 					}
 					else
 					{
@@ -346,6 +349,7 @@ END
 						}
 						close FILE;
 					}		
+					`perl -p -i -e 's/\r/\n/g' $genomeInfile`; #convert CR line terminators (MAC OS) into LF line terminators (Unix)
 					#loading sequence
 					my $seqNumber = 0;
 					my $in = Bio::SeqIO->new(-file => $genomeInfile,
@@ -406,7 +410,7 @@ END
 						}
 						$seqNumber++;
 					}
-					unlink ($genomeInfile) if (!$genomeFilePath);
+					unlink ($genomeInfile);
 					unlink ($agpInfile);
 					my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1, creationDate = NOW() WHERE id = $genomeId");			
 					exit 0;

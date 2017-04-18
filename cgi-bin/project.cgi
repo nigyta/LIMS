@@ -22,6 +22,7 @@ my $html = <DATA>;
 my $active = 0;
 my $acitveDetector = 0;
 my $cookieLibrary = cookie('library') || '';
+my $cookieGenebank = cookie('genebank') || '';
 my $cookieService = cookie('service') || '';
 my $projectId = param ('projectId') || '';
 my $button;
@@ -51,6 +52,17 @@ if ($projectId)
 		$active = $acitveDetector if ($cookieLibrary eq $libraryInProject[0]);
 		$acitveDetector++;
 	}
+	my $genebankInProject=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' AND z = $projectId ORDER BY name");
+	$genebankInProject->execute();
+	while (my @genebankInProject = $genebankInProject->fetchrow_array())
+	{
+		my $genebankDetails = decode_json $genebankInProject[8];
+
+		$project = "<div id='inProject$projectId$$'><ul>\n" unless($project);
+		$project .= "<li style='white-space: nowrap;'><a href='genebank.cgi?genebankId=$genebankInProject[0]' title ='Genebank: $genebankInProject[2]'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-folder-collapsed'></span>$genebankInProject[2]</a></li>\n";
+		$active = $acitveDetector if ($cookieGenebank eq $genebankInProject[0]);
+		$acitveDetector++;
+	}
 	my $project=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$project->execute($projectId);
 	my @project = $project->fetchrow_array();
@@ -58,6 +70,7 @@ if ($projectId)
 	$project[8] =~ s/\n/<br>/g;
 	$button = "<div class='ui-state-highlight ui-corner-all' style='padding: 0 .7em;'>
 		<button style='z-index: 1;float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"serviceNew.cgi?projectId=$projectId\")'>New Service</button>
+		<button style='z-index: 1;float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"tableNew.cgi?type=genebank&parentId=$projectId\")'>New genebank</button>
 		<button style='z-index: 1;float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"libraryNew.cgi?projectId=$projectId\")'>New Library</button>
 		<button style='z-index: 1;float: right; margin-top: .3em; margin-right: .3em;' onclick='refresh(\"menu\")'>Refresh</button>
 		<div style='position: relative;'><h2><a id='project$projectId$$' onmouseover='editIconShow(\"project$projectId$$\")' onmouseout='editIconHide(\"project$projectId$$\")' onclick='openDialog(\"projectEdit.cgi?projectId=$projectId\")' title='Edit/Delete Project'>$project[2]</a></h2></div>";
@@ -65,7 +78,7 @@ if ($projectId)
 	unless($project)
 	{
 		$button .= "<p class='ui-state-error ui-corner-all' style='padding: .7em;'><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>
-			<strong>No library/item in this project.</strong></p>";
+			<strong>Nothing in this project.</strong></p>";
 	}
 	$button .= "</div>";
 	$project .= "</ul></div>\n" if($project);

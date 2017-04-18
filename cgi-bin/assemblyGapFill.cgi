@@ -138,6 +138,16 @@ END
 			$matchedSeqOneByBes->{$getBesOne[2]} = "$seqDir{$getBesOne[6]}-end";
 		}
 
+		my $matchedSeqOneByGenome;
+		my $getGenomeOne = $dbh->prepare("SELECT * FROM matrix,alignment WHERE matrix.container LIKE 'sequence' AND matrix.o = 99 AND matrix.x = ? AND matrix.id = alignment.query AND alignment.subject = ?");
+		$getGenomeOne->execute($assembly[4],$assemblySeqOne[5]);
+		while(my @getGenomeOne = $getGenomeOne->fetchrow_array())
+		{
+			$matchedSeqOne->{$getGenomeOne[2]} = 1;
+			$matchedSeqOneByGenome->{$getGenomeOne[2]} = 0 if (!exists $matchedSeqOneByGenome->{$getGenomeOne[2]});
+			$matchedSeqOneByGenome->{$getGenomeOne[2]} = $getGenomeOne[16] if($matchedSeqOneByGenome->{$getGenomeOne[2]} < $getGenomeOne[16]);
+		}
+
 		my $assemblyCtgTwo=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? AND name LIKE ?");
 		$assemblyCtgTwo->execute($assemblyId,$ctgTwo);
 		if($assemblyCtgTwo->rows < 1)
@@ -207,31 +217,45 @@ END
 			$matchedSeqTwoByBes->{$getBesTwo[2]} = "$seqDir{$getBesTwo[6]}-end";
 		}
 
+		my $matchedSeqTwoByGenome;
+		my $getGenomeTwo = $dbh->prepare("SELECT * FROM matrix,alignment WHERE matrix.container LIKE 'sequence' AND matrix.o = 99 AND matrix.x = ? AND matrix.id = alignment.query AND alignment.subject = ?");
+		$getGenomeTwo->execute($assembly[4],$assemblySeqTwo[5]);
+		while(my @getGenomeTwo = $getGenomeTwo->fetchrow_array())
+		{
+			$matchedSeqTwoByGenome->{$getGenomeTwo[2]} = 0 if (!exists $matchedSeqTwoByGenome->{$getGenomeTwo[2]});
+			$matchedSeqTwoByGenome->{$getGenomeTwo[2]} = $getGenomeTwo[16] if ($matchedSeqTwoByGenome->{$getGenomeTwo[2]} < $getGenomeTwo[16]);
+		}
+
+
 		open (GAPFILL,">$commoncfg->{TMPDIR}/$assemblyId-$ctgOne-$ctgTwo.gapfill.html") or die "can't open file: $commoncfg->{TMPDIR}/$assemblyId-$ctgOne-$ctgTwo.gapfill.html";
 		print GAPFILL <<END;
 <div id='gapFillerDiv$$' name='gapFillerDiv$$'>
 <table id='gapFiller$$' class='display'>
 <thead>
 <tr><th colspan='2'>Filler Candidates</th>
-<th colspan='3'><b>Ctg$ctgOne</b> R-end: <a title='$seqType{$assemblySequenceOne[3]}'>$assemblySeqOne[2]($assemblyCtgOneSeedSeq)</a> ($bacAssignType{$assemblySequenceOne[7]}: <a title='mapped tags'>$assemblySequenceOne[6]</a>)</th>
-<tr><th>Clone</th><th>Score</th><th>Tag: $wgpTagOne</th><th>BES</th><th>FPC $fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)</th></tr>
+<th colspan='4'><b>Ctg$ctgOne</b> R-end: <a title='$seqType{$assemblySequenceOne[3]}'>$assemblySeqOne[2]($assemblyCtgOneSeedSeq)</a> ($bacAssignType{$assemblySequenceOne[7]}: <a title='mapped tags'>$assemblySequenceOne[6]</a>)</th>
+<tr><th>Clone</th><th>Score</th><th>Tag: $wgpTagOne</th><th>BES</th><th>Genome</th><th>FPC $fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)</th></tr>
 </thead>
 <tfoot>
-<tr><th>Clone</th><th>Score</th><th>Tag: $wgpTagTwo</th><th>BES</th><th>FPC $fpcCtgTwo ($fpcCtgTwoLeft-$fpcCtgTwoRight)</th></tr>
+<tr><th>Clone</th><th>Score</th><th>Tag: $wgpTagTwo</th><th>BES</th><th>Genome</th><th>FPC $fpcCtgTwo ($fpcCtgTwoLeft-$fpcCtgTwoRight)</th></tr>
 <tr><th colspan='2'>Filler Candidates</th>
-<th colspan='3'><b>Ctg$ctgTwo</b> L-end: <a title='$seqType{$assemblySequenceTwo[3]}'>$assemblySeqTwo[2]($assemblyCtgTwoSeedSeq)</a> ($bacAssignType{$assemblySequenceTwo[7]}: <a title='mapped tags'>$assemblySequenceTwo[6]</a>)</th></tr>
+<th colspan='4'><b>Ctg$ctgTwo</b> L-end: <a title='$seqType{$assemblySequenceTwo[3]}'>$assemblySeqTwo[2]($assemblyCtgTwoSeedSeq)</a> ($bacAssignType{$assemblySequenceTwo[7]}: <a title='mapped tags'>$assemblySequenceTwo[6]</a>)</th></tr>
 </tfoot>
 <tbody>
 END
 		for (keys %$matchedSeqOne)
 		{
-			next unless (exists $matchedSeqTwoByTag->{$_} || exists $matchedSeqTwoByBes->{$_} );
+			next unless (exists $matchedSeqTwoByTag->{$_} || exists $matchedSeqTwoByBes->{$_} ||  exists $matchedSeqTwoByGenome->{$_});
 			my $score = 0;
 			if(exists $matchedSeqOneByTag->{$_} && exists $matchedSeqTwoByTag->{$_})
 			{
 				$score++;
 			}
 			if(exists $matchedSeqOneByBes->{$_} && exists $matchedSeqTwoByBes->{$_} && ($matchedSeqOneByBes->{$_} ne $matchedSeqTwoByBes->{$_}))
+			{
+				$score++;
+			}
+			if(exists $matchedSeqTwoByGenome->{$_} && exists $matchedSeqTwoByGenome->{$_})
 			{
 				$score++;
 			}
@@ -295,6 +319,22 @@ END
 			if(exists $matchedSeqTwoByBes->{$_})
 			{
 				print GAPFILL "/$matchedSeqTwoByBes->{$_}</td>";
+			}
+			else
+			{
+				print GAPFILL "/-</td>";
+			}
+			if(exists $matchedSeqOneByGenome->{$_})
+			{
+				print GAPFILL "<td>$matchedSeqOneByGenome->{$_}";
+			}
+			else
+			{
+				print GAPFILL "<td>-";
+			}
+			if(exists $matchedSeqTwoByGenome->{$_})
+			{
+				print GAPFILL "/$matchedSeqTwoByGenome->{$_}</td>";
 			}
 			else
 			{
@@ -416,6 +456,17 @@ END
 				$matchedSeqOne->{$getBesOne[2]} = 1;
 				$matchedSeqOneByBes->{$getBesOne[2]} = "$seqDir{$getBesOne[6]}-end";
 			}
+
+			my $matchedSeqOneByGenome;
+			my $getGenomeOne = $dbh->prepare("SELECT * FROM matrix,alignment WHERE matrix.container LIKE 'sequence' AND matrix.o = 99 AND matrix.x = ? AND matrix.id = alignment.query AND alignment.subject = ?");
+			$getGenomeOne->execute($assembly[4],$assemblySeqOne[5]);
+			while(my @getGenomeOne = $getGenomeOne->fetchrow_array())
+			{
+				$matchedSeqOne->{$getGenomeOne[2]} = 1;
+				$matchedSeqOneByGenome->{$getGenomeOne[2]} = 0 if (!exists $matchedSeqOneByGenome->{$getGenomeOne[2]});
+				$matchedSeqOneByGenome->{$getGenomeOne[2]} = $getGenomeOne[16] if($matchedSeqOneByGenome->{$getGenomeOne[2]} < $getGenomeOne[16]);
+			}
+
 			#Contig B
 			my $assemblyCtgTwoSeedSeq;
 			foreach (split ",", $assemblyCtgs[8])
@@ -472,26 +523,36 @@ END
 			{
 				$matchedSeqTwoByBes->{$getBesTwo[2]} = "$seqDir{$getBesTwo[6]}-end";
 			}
+
+			my $matchedSeqTwoByGenome;
+			my $getGenomeTwo = $dbh->prepare("SELECT * FROM matrix,alignment WHERE matrix.container LIKE 'sequence' AND matrix.o = 99 AND matrix.x = ? AND matrix.id = alignment.query AND alignment.subject = ?");
+			$getGenomeTwo->execute($assembly[4],$assemblySeqTwo[5]);
+			while(my @getGenomeTwo = $getGenomeTwo->fetchrow_array())
+			{
+				$matchedSeqTwoByGenome->{$getGenomeTwo[2]} = 0 if (!exists $matchedSeqTwoByGenome->{$getGenomeTwo[2]});
+				$matchedSeqTwoByGenome->{$getGenomeTwo[2]} = $getGenomeTwo[16] if ($matchedSeqTwoByGenome->{$getGenomeTwo[2]} < $getGenomeTwo[16]);
+			}
+
 			if($chrStart)
 			{
-				print GAPFILLTEXT ">Chromosome $assemblyCtgs[4]\t\t\t\t\t\n";
-				print GAPFILLTEXT "Ctg$lastAssemblyCtgNumber\tR-end: $assemblySeqOne[2]($assemblyCtgOneSeedSeq) ($seqType{$assemblySequenceOne[3]},$bacAssignType{$assemblySequenceOne[7]}: $assemblySequenceOne[6])\t$wgpTagOne\tBES\t$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)\t\n";
+				print GAPFILLTEXT ">Chromosome $assemblyCtgs[4]\t\t\t\t\t\t\n";
+				print GAPFILLTEXT "Ctg$lastAssemblyCtgNumber\tR-end: $assemblySeqOne[2]($assemblyCtgOneSeedSeq) ($seqType{$assemblySequenceOne[3]},$bacAssignType{$assemblySequenceOne[7]}: $assemblySequenceOne[6])\t$wgpTagOne\tBES\tGenome\t$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)\t\n";
 				print GAPFILL <<END;
-<tr><td class="ui-state-highlight" style='white-space: nowrap;'><span class='ui-icon ui-icon ui-icon-carat-1-e' style='float: left; margin-right: 0;'></span><b>Chromosome $assemblyCtgs[4]</b></td><td><hr class="ui-state-highlight ui-corner-all" /></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style='text-align:right' title='Chromosome $assemblyCtgs[4]'><b>Ctg$lastAssemblyCtgNumber</b><span class='ui-icon ui-icon-carat-1-sw' style='float: right; margin-right: 0;' title='R-end'></span></td><td>R-end: <a title='$seqType{$assemblySequenceOne[3]}'>$assemblySeqOne[2]($assemblyCtgOneSeedSeq)</a> ($bacAssignType{$assemblySequenceOne[7]}: <a title='mapped tags'>$assemblySequenceOne[6]</a>)</td><td>$wgpTagOne</td><td>BES</td><td>$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)</td><td></td></tr>
+<tr><td class="ui-state-highlight" style='white-space: nowrap;'><span class='ui-icon ui-icon ui-icon-carat-1-e' style='float: left; margin-right: 0;'></span><b>Chromosome $assemblyCtgs[4]</b></td><td><hr class="ui-state-highlight ui-corner-all" /></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td style='text-align:right' title='Chromosome $assemblyCtgs[4]'><b>Ctg$lastAssemblyCtgNumber</b><span class='ui-icon ui-icon-carat-1-sw' style='float: right; margin-right: 0;' title='R-end'></span></td><td>R-end: <a title='$seqType{$assemblySequenceOne[3]}'>$assemblySeqOne[2]($assemblyCtgOneSeedSeq)</a> ($bacAssignType{$assemblySequenceOne[7]}: <a title='mapped tags'>$assemblySequenceOne[6]</a>)</td><td>$wgpTagOne</td><td>BES</td><td>Genome</td><td>$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)</td><td></td></tr>
 END
 			}
 			else
 			{
-				print GAPFILLTEXT "\tR-end: $assemblySeqOne[2]($assemblyCtgOneSeedSeq) ($seqType{$assemblySequenceOne[3]},$bacAssignType{$assemblySequenceOne[7]}: $assemblySequenceOne[6])\t$wgpTagOne\tBES\t$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)\t\n";
+				print GAPFILLTEXT "\tR-end: $assemblySeqOne[2]($assemblyCtgOneSeedSeq) ($seqType{$assemblySequenceOne[3]},$bacAssignType{$assemblySequenceOne[7]}: $assemblySequenceOne[6])\t$wgpTagOne\tBES\tGenome\t$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)\t\n";
 				print GAPFILL <<END;
-<tr><td style='text-align:right' title='Chromosome $assemblyCtgs[4]'><span class='ui-icon ui-icon-carat-1-sw' style='float: right; margin-right: 0;' title='R-end'></span></td><td>R-end: <a title='$seqType{$assemblySequenceOne[3]}'>$assemblySeqOne[2]($assemblyCtgOneSeedSeq)</a> ($bacAssignType{$assemblySequenceOne[7]}: <a title='mapped tags'>$assemblySequenceOne[6]</a>)</td><td>$wgpTagOne</td><td>BES</td><td>$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)</td><td></td></tr>
+<tr><td style='text-align:right' title='Chromosome $assemblyCtgs[4]'><span class='ui-icon ui-icon-carat-1-sw' style='float: right; margin-right: 0;' title='R-end'></span></td><td>R-end: <a title='$seqType{$assemblySequenceOne[3]}'>$assemblySeqOne[2]($assemblyCtgOneSeedSeq)</a> ($bacAssignType{$assemblySequenceOne[7]}: <a title='mapped tags'>$assemblySequenceOne[6]</a>)</td><td>$wgpTagOne</td><td>BES</td><td>Genome</td><td>$fpcCtgOne ($fpcCtgOneLeft-$fpcCtgOneRight)</td><td></td></tr>
 END
 			}
 			my $candidates = 0;
 			for (keys %$matchedSeqOne)
 			{
-				next unless (exists $matchedSeqTwoByTag->{$_} || exists $matchedSeqTwoByBes->{$_} );
+				next unless (exists $matchedSeqTwoByTag->{$_} || exists $matchedSeqTwoByBes->{$_}  || exists $matchedSeqTwoByGenome->{$_});
 				$candidates++;
 				my $score = 0;
 				if(exists $matchedSeqOneByTag->{$_} && exists $matchedSeqTwoByTag->{$_})
@@ -499,6 +560,10 @@ END
 					$score++;
 				}
 				if(exists $matchedSeqOneByBes->{$_} && exists $matchedSeqTwoByBes->{$_} && ($matchedSeqOneByBes->{$_} ne $matchedSeqTwoByBes->{$_}))
+				{
+					$score++;
+				}
+				if(exists $matchedSeqTwoByGenome->{$_} && exists $matchedSeqTwoByGenome->{$_})
 				{
 					$score++;
 				}
@@ -579,6 +644,27 @@ END
 					print GAPFILLTEXT "/-";
 					print GAPFILL "/-</td>";
 				}
+				if(exists $matchedSeqOneByGenome->{$_})
+				{
+					print GAPFILLTEXT "\t$matchedSeqOneByGenome->{$_}";
+					print GAPFILL "<td>$matchedSeqOneByGenome->{$_}";
+				}
+				else
+				{
+					print GAPFILLTEXT "\t-";
+					print GAPFILL "<td>-";
+				}
+				if(exists $matchedSeqTwoByGenome->{$_})
+				{
+					print GAPFILLTEXT "\t$matchedSeqTwoByGenome->{$_}";
+					print GAPFILL "/$matchedSeqTwoByGenome->{$_}</td>";
+				}
+				else
+				{
+					print GAPFILLTEXT "/-";
+					print GAPFILL "/-</td>";
+				}
+
 				print GAPFILLTEXT "\t$fpcCtgMatch ($fpcCtgMatchLeft-$fpcCtgMatchRight)\t$score\n";
 				print GAPFILL "<td>$fpcCtgMatch ($fpcCtgMatchLeft-$fpcCtgMatchRight)</td><td>$score</td></tr>";
 			}
@@ -589,9 +675,9 @@ END
 <tr><td></td><td><div class="ui-state-error ui-corner-all">No Filler Found</div></td><td></td><td></td><td></td><td></td></tr>
 END
 			}
-			print GAPFILLTEXT "Ctg$assemblyCtgs[2]\tL-end: $assemblySeqTwo[2]($assemblyCtgTwoSeedSeq) ($seqType{$assemblySequenceTwo[3]},$bacAssignType{$assemblySequenceTwo[7]}: $assemblySequenceTwo[6])\t$wgpTagTwo\tBES\t$fpcCtgTwo ($fpcCtgTwoLeft-$fpcCtgTwoRight)\t\n";
+			print GAPFILLTEXT "Ctg$assemblyCtgs[2]\tL-end: $assemblySeqTwo[2]($assemblyCtgTwoSeedSeq) ($seqType{$assemblySequenceTwo[3]},$bacAssignType{$assemblySequenceTwo[7]}: $assemblySequenceTwo[6])\t$wgpTagTwo\tBES\tGenome\t$fpcCtgTwo ($fpcCtgTwoLeft-$fpcCtgTwoRight)\t\n";
 			print GAPFILL <<END;
-<tr><td style='text-align:right' title='Chromosome $assemblyCtgs[4]'><b>Ctg$assemblyCtgs[2]</b><span class='ui-icon ui-icon-carat-1-nw' style='float: right; margin-right: 0;' title='L-end'></span></td><td>L-end: <a title='$seqType{$assemblySequenceTwo[3]}'>$assemblySeqTwo[2]($assemblyCtgTwoSeedSeq)</a> ($bacAssignType{$assemblySequenceTwo[7]}: <a title='mapped tags'>$assemblySequenceTwo[6]</a>)</td><td>$wgpTagTwo</td><td>BES</td><td>$fpcCtgTwo ($fpcCtgTwoLeft-$fpcCtgTwoRight)</td><td></td></tr>
+<tr><td style='text-align:right' title='Chromosome $assemblyCtgs[4]'><b>Ctg$assemblyCtgs[2]</b><span class='ui-icon ui-icon-carat-1-nw' style='float: right; margin-right: 0;' title='L-end'></span></td><td>L-end: <a title='$seqType{$assemblySequenceTwo[3]}'>$assemblySeqTwo[2]($assemblyCtgTwoSeedSeq)</a> ($bacAssignType{$assemblySequenceTwo[7]}: <a title='mapped tags'>$assemblySequenceTwo[6]</a>)</td><td>$wgpTagTwo</td><td>BES</td><td>Genome</td><td>$fpcCtgTwo ($fpcCtgTwoLeft-$fpcCtgTwoRight)</td><td></td></tr>
 END
 
 			$lastAssemblyCtgChr = $assemblyCtgs[4];

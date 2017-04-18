@@ -456,6 +456,19 @@ END
 	</script>	
 END
 			}
+			elsif($item[1] eq 'dart')
+			{
+		
+				my $deleteDartSNP = $dbh->do("DELETE FROM matrix WHERE container LIKE 'dartSNP' AND o = $_");
+				my $deleteDartGenotype = $dbh->do("DELETE FROM matrix WHERE container LIKE 'dartGenotype' AND o = $_");
+				my $deleteDart=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				print <<END;
+	<script>
+		parent.closeDialog();
+		parent.refresh("general");
+	</script>	
+END
+			}
 			elsif($item[1] eq 'fpc')
 			{
 		

@@ -118,11 +118,11 @@ END
 		my $sequenceLength;
 		if($redoAllSeqToSeq)
 		{
-			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 500 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 10 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		}
 		else
 		{
-			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 500 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 10 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		}
 		while(<CMD>)
 		{
