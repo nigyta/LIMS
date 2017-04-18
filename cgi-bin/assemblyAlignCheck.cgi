@@ -63,7 +63,7 @@ my %bacAssignType = (
 	3=>'TagValid+BesValid',
 	4=>'TagForced'
 	);
-my $seqDir = (
+my %seqDir = (
 	0 => "NA",
 	1 => "f",
 	2 => "r"
