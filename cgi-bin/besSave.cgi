@@ -25,7 +25,7 @@ my $libraryId = param ('libraryId') || '';
 my $besFile = upload ('besFile');
 my $besFilePath = param ('besFilePath') || '';
 my $replace = param ('replace') || '0';
-my $infile = "/tmp/$$.bes";
+my $infile = "$commoncfg->{TMPDIR}/$$.bes";
 my $seqDir;
 $seqDir->{'NA'} = 0;
 $seqDir->{'f'} = 1;

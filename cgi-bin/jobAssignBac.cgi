@@ -21,7 +21,6 @@ my $userDetail = $user->getAllFieldsWithUserId($userId);
 my $userName = $userDetail->{"userName"};
 
 my $commoncfg = readConfig("main.conf");
-my $tmpdir = '/tmp';
 my $blastn = 'blast+/bin/blastn';
 my $jobdir = $commoncfg->{JOBDIR};
 my $tagMatchIdentity = 100; #identities for tags
@@ -70,8 +69,8 @@ elsif($pid == 0){
 			my $cloneBesNumber;
 			my $tagTotalNumber = 0;
 			my $besTotalNumber = 0;
-			open (TAG,">$tmpdir/$input.$$.tag") or die "can't open file: $tmpdir/$input.$$.tag";
-			open (BES,">$tmpdir/$input.$$.bes") or die "can't open file: $tmpdir/$input.$$.bes";
+			open (TAG,">$commoncfg->{TMPDIR}/$input.$$.tag") or die "can't open file: $commoncfg->{TMPDIR}/$input.$$.tag";
+			open (BES,">$commoncfg->{TMPDIR}/$input.$$.bes") or die "can't open file: $commoncfg->{TMPDIR}/$input.$$.bes";
 			my $poolToClone = $dbh->prepare("SELECT child FROM link WHERE type LIKE 'poolClone' AND parent = ?");
 			$poolToClone->execute($jobToPool[0]);
 			while (my @poolToClone = $poolToClone->fetchrow_array())
@@ -116,13 +115,13 @@ elsif($pid == 0){
 				my $sequenceDetails = decode_json $jobToSequence[8];
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 				next unless ($sequenceDetails->{'sequence'});
-				open (SEQ,">$tmpdir/$jobToSequence[0].seq") or die "can't open file: $tmpdir/$jobToSequence[0].seq";
+				open (SEQ,">$commoncfg->{TMPDIR}/$jobToSequence[0].seq") or die "can't open file: $commoncfg->{TMPDIR}/$jobToSequence[0].seq";
 				print SEQ ">$jobToSequence[0]\n$sequenceDetails->{'sequence'}";
 				close (SEQ);
 				if($tagTotalNumber > 0)
 				{
 					my $matchedTagNumber;
-					open (CMD,"$blastn -query $tmpdir/$jobToSequence[0].seq -subject $tmpdir/$input.$$.tag -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$blastn -query $commoncfg->{TMPDIR}/$jobToSequence[0].seq -subject $commoncfg->{TMPDIR}/$input.$$.tag -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMD>)
 					{
 						my @blastLine = split /\t/, $_;
@@ -196,7 +195,7 @@ elsif($pid == 0){
 				if($besTotalNumber > 0 && $bacIdAssigned < 1)
 				{
 					my $matchedBesNumber;
-					open (CMD,"$blastn -query $tmpdir/$jobToSequence[0].seq -subject $tmpdir/$input.$$.bes -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$blastn -query $commoncfg->{TMPDIR}/$jobToSequence[0].seq -subject $commoncfg->{TMPDIR}/$input.$$.bes -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMD>)
 					{
 						my @blastLine = split /\t/, $_;
@@ -276,10 +275,10 @@ elsif($pid == 0){
 						}				
 					}
 				}
-				unlink ("$tmpdir/$jobToSequence[0].seq");
+				unlink ("$commoncfg->{TMPDIR}/$jobToSequence[0].seq");
 			}
-			unlink ("$tmpdir/$input.$$.bes");
-			unlink ("$tmpdir/$input.$$.tag");
+			unlink ("$commoncfg->{TMPDIR}/$input.$$.bes");
+			unlink ("$commoncfg->{TMPDIR}/$input.$$.tag");
 		}
 		my $updateJob=$dbh->do("UPDATE matrix SET barcode = $assignedSequenceNumber WHERE container LIKE 'job' AND (name LIKE '$input' OR name LIKE '-$input')");
 		close(LOG);	

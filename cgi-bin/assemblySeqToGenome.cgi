@@ -66,7 +66,7 @@ END
 
 		my $hasAlignmentSequenceId;
 		my $updateAssemblyToRunningSeqToGenome=$dbh->do("UPDATE matrix SET barcode = '-4' WHERE id = $assemblyId");
-		open (GENOME,">/tmp/$refGenomeId.$$.genome") or die "can't open file: /tmp/$refGenomeId.$$.genome";
+		open (GENOME,">$commoncfg->{TMPDIR}/$refGenomeId.$$.genome") or die "can't open file: $commoncfg->{TMPDIR}/$refGenomeId.$$.genome";
 		my $getGenome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
 		$getGenome->execute($refGenomeId);
 		while(my @getGenome = $getGenome->fetchrow_array())
@@ -90,19 +90,19 @@ END
 		{
 			if($softMasking)
 			{
-				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome -infmt fasta -mk_counts -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.counts" );
-				system( "$windowmasker -in /tmp/$refGenomeId.$$.genome -infmt fasta -ustat /tmp/$refGenomeId.$$.genome_mask.counts -outfmt maskinfo_asn1_bin -parse_seqids -out /tmp/$refGenomeId.$$.genome_mask.asnb" );
-				system( "$makeblastdb -in /tmp/$refGenomeId.$$.genome -inputtype fasta -dbtype nucl -parse_seqids -mask_data /tmp/$refGenomeId.$$.genome_mask.asnb" );
+				system( "$windowmasker -in $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -infmt fasta -mk_counts -parse_seqids -out $commoncfg->{TMPDIR}/$refGenomeId.$$.genome_mask.counts" );
+				system( "$windowmasker -in $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -infmt fasta -ustat $commoncfg->{TMPDIR}/$refGenomeId.$$.genome_mask.counts -outfmt maskinfo_asn1_bin -parse_seqids -out $commoncfg->{TMPDIR}/$refGenomeId.$$.genome_mask.asnb" );
+				system( "$makeblastdb -in $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -inputtype fasta -dbtype nucl -parse_seqids -mask_data $commoncfg->{TMPDIR}/$refGenomeId.$$.genome_mask.asnb" );
 			}
 			else
 			{
-				system( "$makeblastdb -in /tmp/$refGenomeId.$$.genome -dbtype nucl" );
+				system( "$makeblastdb -in $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -dbtype nucl" );
 			}
 		}
 		
 		
-		open (SEQALL,">/tmp/$assembly[4].$$.seq") or die "can't open file: /tmp/$assembly[4].$$.seq";
-		open (SEQNEW,">/tmp/$assembly[4].$$.new.seq") or die "can't open file: /tmp/$assembly[4].$$.new.seq";
+		open (SEQALL,">$commoncfg->{TMPDIR}/$assembly[4].$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$assembly[4].$$.seq";
+		open (SEQNEW,">$commoncfg->{TMPDIR}/$assembly[4].$$.new.seq") or die "can't open file: $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq";
 		if($target[1] eq 'library')
 		{
 			my $getClones = $dbh->prepare("SELECT * FROM clones WHERE sequenced > 0 AND libraryId = ?");
@@ -147,16 +147,16 @@ END
 			{
 				if($softMasking)
 				{
-					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 				else
 				{
-					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 			}
 			else
 			{
-				open (CMD,"$alignEngineList->{$alignEngine} /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} $commoncfg->{TMPDIR}/$refGenomeId.$$.genome $commoncfg->{TMPDIR}/$assembly[4].$$.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
 			}
 		
 		}
@@ -166,16 +166,16 @@ END
 			{
 				if($softMasking)
 				{
-					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 				else
 				{
-					open (CMD,"$alignEngineList->{$alignEngine} -query /tmp/$assembly[4].$$.new.seq -task $task -db /tmp/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 				}
 			}
 			else
 			{
-				open (CMD,"$alignEngineList->{$alignEngine} /tmp/$refGenomeId.$$.genome /tmp/$assembly[4].$$.new.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} $commoncfg->{TMPDIR}/$refGenomeId.$$.genome $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -out=blast8 -minIdentity=$identitySeqToGenome |") or die "can't open CMD: $!";
 			}
 			
 	
@@ -199,12 +199,12 @@ END
 		
 		}
 		close(CMD);
-		unlink("/tmp/$assembly[4].$$.seq");
-		unlink("/tmp/$assembly[4].$$.new.seq");
-		unlink("/tmp/$refGenomeId.$$.genome");
-		unlink("/tmp/$refGenomeId.$$.genome.nhr");
-		unlink("/tmp/$refGenomeId.$$.genome.nin");
-		unlink("/tmp/$refGenomeId.$$.genome.nsq");
+		unlink("$commoncfg->{TMPDIR}/$assembly[4].$$.seq");
+		unlink("$commoncfg->{TMPDIR}/$assembly[4].$$.new.seq");
+		unlink("$commoncfg->{TMPDIR}/$refGenomeId.$$.genome");
+		unlink("$commoncfg->{TMPDIR}/$refGenomeId.$$.genome.nhr");
+		unlink("$commoncfg->{TMPDIR}/$refGenomeId.$$.genome.nin");
+		unlink("$commoncfg->{TMPDIR}/$refGenomeId.$$.genome.nsq");
 		`rm $commoncfg->{TMPDIR}/*.aln.html`; #delete cached files
 		if ($markRepeatRegion)
 		{

@@ -56,7 +56,7 @@ END
 		$target->execute($targetId);
 		my @target = $target->fetchrow_array();
 
-		open (SEQALL,">/tmp/$targetId.$$.seq") or die "can't open file: /tmp/$targetId.$$.seq";
+		open (SEQALL,">$commoncfg->{TMPDIR}/$targetId.$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$targetId.$$.seq";
 		if($target[1] eq 'library')
 		{
 			my $getClones = $dbh->prepare("SELECT * FROM clones WHERE sequenced > 0 AND libraryId = ?");
@@ -92,7 +92,7 @@ END
 		}
 		close(SEQALL);
 
-		open (BES,">/tmp/$libraryId.$$.bes") or die "can't open file: /tmp/$libraryId.$$.bes";
+		open (BES,">$commoncfg->{TMPDIR}/$libraryId.$$.bes") or die "can't open file: $commoncfg->{TMPDIR}/$libraryId.$$.bes";
 		my $getBesSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 98 AND x = ?");
 		$getBesSequences->execute($libraryId);
 		while(my @getBesSequences = $getBesSequences->fetchrow_array())
@@ -106,9 +106,9 @@ END
 		}
 		close(BES);
 
-		open (BLAST,">/tmp/$libraryId.$$.blastn") or die "can't open file: /tmp/$libraryId.$$.blastn";
-		system( "$makeblastdb -in /tmp/$targetId.$$.seq -dbtype nucl" );
-		open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$libraryId.$$.bes -db /tmp/$targetId.$$.seq -dust no -evalue 1e-200 -perc_identity $identityBesToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+		open (BLAST,">$commoncfg->{TMPDIR}/$libraryId.$$.blastn") or die "can't open file: $commoncfg->{TMPDIR}/$libraryId.$$.blastn";
+		system( "$makeblastdb -in $commoncfg->{TMPDIR}/$targetId.$$.seq -dbtype nucl" );
+		open (CMD,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$libraryId.$$.bes -db $commoncfg->{TMPDIR}/$targetId.$$.seq -dust no -evalue 1e-200 -perc_identity $identityBesToSeq -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 		while(<CMD>)
 		{
 			/^#/ and next;
@@ -127,7 +127,7 @@ END
 		}
 		close(CMD);
 		close(BLAST);
-		open (BLAST,"/tmp/$libraryId.$$.blastn") or die "can't open file: /tmp/$libraryId.$$.blastn";
+		open (BLAST,"$commoncfg->{TMPDIR}/$libraryId.$$.blastn") or die "can't open file: $commoncfg->{TMPDIR}/$libraryId.$$.blastn";
 		while(<BLAST>)
 		{
 			my @hit = split("\t",$_);
@@ -137,12 +137,12 @@ END
 		}
 		close(BLAST);
 
-		unlink("/tmp/$libraryId.$$.bes");
-		unlink("/tmp/$targetId.$$.seq");
-		unlink("/tmp/$targetId.$$.seq.nhr");
-		unlink("/tmp/$targetId.$$.seq.nin");
-		unlink("/tmp/$targetId.$$.seq.nsq");
-		unlink("/tmp/$libraryId.$$.blastn");
+		unlink("$commoncfg->{TMPDIR}/$libraryId.$$.bes");
+		unlink("$commoncfg->{TMPDIR}/$targetId.$$.seq");
+		unlink("$commoncfg->{TMPDIR}/$targetId.$$.seq.nhr");
+		unlink("$commoncfg->{TMPDIR}/$targetId.$$.seq.nin");
+		unlink("$commoncfg->{TMPDIR}/$targetId.$$.seq.nsq");
+		unlink("$commoncfg->{TMPDIR}/$libraryId.$$.blastn");
 	}
 	else{
 		die "couldn't fork: $!\n";

@@ -87,7 +87,7 @@ elsif($pid == 0){
 # 	{
 # 		if ($getSequences[8] =~ /^>/)
 # 		{
-# 			my $seqFile = "/tmp/$getSequences[0].seq";
+# 			my $seqFile = "$commoncfg->{TMPDIR}/$getSequences[0].seq";
 # 			open (FILE, ">$seqFile");
 # 			print FILE $getSequences[8];
 # 			close FILE;

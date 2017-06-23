@@ -55,7 +55,7 @@ END
 			$plateDescription->{$plateInLibrary[2]} = $plateInLibrary[8];
 		}
 
-		open(TMP,">/tmp/$$.clone");
+		open(TMP,">$commoncfg->{TMPDIR}/$$.clone");
 		if($library[5]) #rearrayed lib
 		{
 			my $sourceLibrary=$dbh->prepare("SELECT * FROM matrix WHERE id = $library[5]");
@@ -123,12 +123,12 @@ END
 			}
 		}
 		close(TMP);
-		my $loadClones = $dbh->do("LOAD DATA LOCAL INFILE '/tmp/$$.clone' INTO TABLE clones (name, libraryId, plate, well, origin, sequenced)");
+		my $loadClones = $dbh->do("LOAD DATA LOCAL INFILE '$commoncfg->{TMPDIR}/$$.clone' INTO TABLE clones (name, libraryId, plate, well, origin, sequenced)");
 		my $toDelete = 1;
 		do {
 			$toDelete = 0;
-			unlink("/tmp/$$.clone");
-			$toDelete = 1 if (-e "/tmp/$$.clone");
+			unlink("$commoncfg->{TMPDIR}/$$.clone");
+			$toDelete = 1 if (-e "$commoncfg->{TMPDIR}/$$.clone");
 			sleep 3;
 		} while($toDelete);
 		exit 0;

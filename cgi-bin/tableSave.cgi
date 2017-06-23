@@ -35,7 +35,7 @@ $idColumn = $idColumn - 1;
 my $refresh = param ('refresh') || 'menu';
 
 my $safeFilenameCharacters = "a-zA-Z0-9_.-";
-my $tableInfile = "/tmp/$$.table";
+my $tableInfile = "$commoncfg->{TMPDIR}/$$.table";
 my $json = JSON->new->allow_nonref;
 
 my $config = new config;

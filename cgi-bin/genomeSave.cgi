@@ -46,8 +46,8 @@ $agpFilename =~ tr/ /_/;
 $agpFilename =~ s/[^$safeFilenameCharacters]//g;
 
 my $agpObjectComponent = param ('agpObjectComponent') || '0';
-my $genomeInfile = "/tmp/$$.genome";
-my $agpInfile = "/tmp/$$.agp";
+my $genomeInfile = "$commoncfg->{TMPDIR}/$$.genome";
+my $agpInfile = "$commoncfg->{TMPDIR}/$$.agp";
 my $json = JSON->new->allow_nonref;
 
 my $config = new config;

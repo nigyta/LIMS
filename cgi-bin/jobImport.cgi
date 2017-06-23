@@ -21,7 +21,7 @@ my $userName = $userDetail->{"userName"};
 my $commoncfg = readConfig("main.conf");
 my $replace = param ('replace') || 0;
 my $jobFile = upload ('jobFile');
-my $infile = "/tmp/$$.job";
+my $infile = "$commoncfg->{TMPDIR}/$$.job";
 
 print header;
 if($jobFile)

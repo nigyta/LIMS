@@ -35,7 +35,7 @@ my $datasetFile = upload ('datasetFile');
 my $datasetFilePath = param ('datasetFilePath') || '';
 
 my $safeFilenameCharacters = "a-zA-Z0-9_.-";
-my $datasetInfile = "/tmp/$$.dataset";
+my $datasetInfile = "$commoncfg->{TMPDIR}/$$.dataset";
 my $json = JSON->new->allow_nonref;
 
 my $config = new config;

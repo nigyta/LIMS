@@ -79,7 +79,7 @@ END
 		my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $seqTwo AND subject = $seqOne");
 		$getSequenceA->execute($seqOne);
 		my @getSequenceA = $getSequenceA->fetchrow_array();
-		open (SEQA,">/tmp/$getSequenceA[0].$$.seq") or die "can't open file: /tmp/$getSequenceA[0].$$.seq";
+		open (SEQA,">$commoncfg->{TMPDIR}/$getSequenceA[0].$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$getSequenceA[0].$$.seq";
 		my $sequenceDetailsA = decode_json $getSequenceA[8];
 		$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
 		$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
@@ -90,7 +90,7 @@ END
 		my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$getSequenceB->execute($seqTwo);
 		my @getSequenceB =  $getSequenceB->fetchrow_array();
-		open (SEQB,">/tmp/$getSequenceB[0].$$.seq") or die "can't open file: /tmp/$getSequenceB[0].$$.seq";
+		open (SEQB,">$commoncfg->{TMPDIR}/$getSequenceB[0].$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$getSequenceB[0].$$.seq";
 		my $sequenceDetailsB = decode_json $getSequenceB[8];
 		$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
 		$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
@@ -101,7 +101,7 @@ END
 
 		my @alignments;
 		my $goodOverlap = ($checkGood) ? 0 : 1;
-		open (CMD,"$blastn -query /tmp/$getSequenceA[0].$$.seq -subject /tmp/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -outfmt 6 |") or die "can't open CMD: $!";
+		open (CMD,"$blastn -query $commoncfg->{TMPDIR}/$getSequenceA[0].$$.seq -subject $commoncfg->{TMPDIR}/$getSequenceB[0].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -outfmt 6 |") or die "can't open CMD: $!";
 		while(<CMD>)
 		{
 			/^#/ and next;
@@ -157,8 +157,8 @@ END
 				$insertAlignment->execute(@hit);
 			}
 		}
-		unlink("/tmp/$getSequenceB[0].$$.seq");
-		unlink("/tmp/$getSequenceA[0].$$.seq");
+		unlink("$commoncfg->{TMPDIR}/$getSequenceB[0].$$.seq");
+		unlink("$commoncfg->{TMPDIR}/$getSequenceA[0].$$.seq");
 	}
 	else{
 		die "couldn't fork: $!\n";
@@ -204,8 +204,8 @@ END
 			my $deleteAlignment = $dbh->do("DELETE FROM alignment WHERE (query = $querySeq OR subject = $querySeq) AND program LIKE 'SEQtoSEQ%'");
 
 			my $assemblySequenceLength;
-			open (SEQALL,">/tmp/$assembly[4].$$.seq") or die "can't open file: /tmp/$assembly[4].$$.seq";
-			open (SEQNEW,">/tmp/$assembly[4].$querySeq.$$.seq") or die "can't open file: /tmp/$assembly[4].$querySeq.$$.seq";
+			open (SEQALL,">$commoncfg->{TMPDIR}/$assembly[4].$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$assembly[4].$$.seq";
+			open (SEQNEW,">$commoncfg->{TMPDIR}/$assembly[4].$querySeq.$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$assembly[4].$querySeq.$$.seq";
 			if($target[1] eq 'library')
 			{
 				my $getClones = $dbh->prepare("SELECT * FROM clones WHERE sequenced > 0 AND libraryId = ?");
@@ -246,9 +246,9 @@ END
 			close(SEQALL);
 			close(SEQNEW);
 
-			system( "$makeblastdb -in /tmp/$assembly[4].$$.seq -dbtype nucl" );
+			system( "$makeblastdb -in $commoncfg->{TMPDIR}/$assembly[4].$$.seq -dbtype nucl" );
 			my $goodSequenceId;
-			open (CMD,"$alignEngineList->{'blastn'} -query /tmp/$assembly[4].$querySeq.$$.seq -task $task -db /tmp/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -max_target_seqs 10 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+			open (CMD,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$assembly[4].$querySeq.$$.seq -task $task -db $commoncfg->{TMPDIR}/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -max_target_seqs 10 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			while(<CMD>)
 			{
 				/^#/ and next;
@@ -335,12 +335,12 @@ END
 						my $deleteAlignmentA = $dbh->do("DELETE FROM alignment WHERE query = $hit[0] AND subject = $hit[1]");
 						my $deleteAlignmentB = $dbh->do("DELETE FROM alignment WHERE query = $hit[1] AND subject = $hit[0]");
 
-						unless(-e "/tmp/$hit[0].$$.seq")
+						unless(-e "$commoncfg->{TMPDIR}/$hit[0].$$.seq")
 						{
 							my $getSequenceA = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 							$getSequenceA->execute($hit[0]);
 							my @getSequenceA =  $getSequenceA->fetchrow_array();
-							open (SEQA,">/tmp/$hit[0].$$.seq") or die "can't open file: /tmp/$hit[0].$$.seq";
+							open (SEQA,">$commoncfg->{TMPDIR}/$hit[0].$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$hit[0].$$.seq";
 							my $sequenceDetailsA = decode_json $getSequenceA[8];
 							$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
 							$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
@@ -349,12 +349,12 @@ END
 							print SEQA ">$getSequenceA[0]\n$sequenceDetailsA->{'sequence'}\n";
 							close(SEQA);
 						}
-						unless(-e "/tmp/$hit[1].$$.seq")
+						unless(-e "$commoncfg->{TMPDIR}/$hit[1].$$.seq")
 						{
 							my $getSequenceB = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 							$getSequenceB->execute($hit[1]);
 							my @getSequenceB =  $getSequenceB->fetchrow_array();
-							open (SEQB,">/tmp/$hit[1].$$.seq") or die "can't open file: /tmp/$hit[1].$$.seq";
+							open (SEQB,">$commoncfg->{TMPDIR}/$hit[1].$$.seq") or die "can't open file: $commoncfg->{TMPDIR}/$hit[1].$$.seq";
 							my $sequenceDetailsB = decode_json $getSequenceB[8];
 							$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
 							$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
@@ -366,7 +366,7 @@ END
 
 						my @alignments;
 						my $goodOverlap = ($checkGood) ? 0 : 1;
-						open (CMDA,"$alignEngineList->{'blastn'} -query /tmp/$hit[0].$$.seq -subject /tmp/$hit[1].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -outfmt 6 |") or die "can't open CMD: $!";
+						open (CMDA,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$hit[0].$$.seq -subject $commoncfg->{TMPDIR}/$hit[1].$$.seq -dust no -evalue 1e-200 -perc_identity $identityBlast -outfmt 6 |") or die "can't open CMD: $!";
 						while(<CMDA>)
 						{
 							/^#/ and next;
@@ -428,17 +428,17 @@ END
 				}
 			}
 			close(CMD);
-			unlink("/tmp/$assembly[4].$$.seq");
-			unlink("/tmp/$assembly[4].$querySeq.$$.seq");
-			unlink("/tmp/$assembly[4].$$.seq.nhr");
-			unlink("/tmp/$assembly[4].$$.seq.nin");
-			unlink("/tmp/$assembly[4].$$.seq.nsq");
+			unlink("$commoncfg->{TMPDIR}/$assembly[4].$$.seq");
+			unlink("$commoncfg->{TMPDIR}/$assembly[4].$querySeq.$$.seq");
+			unlink("$commoncfg->{TMPDIR}/$assembly[4].$$.seq.nhr");
+			unlink("$commoncfg->{TMPDIR}/$assembly[4].$$.seq.nin");
+			unlink("$commoncfg->{TMPDIR}/$assembly[4].$$.seq.nsq");
 			foreach my $queryId (keys %$goodSequenceId)
 			{
-				unlink("/tmp/$queryId.$$.seq");
+				unlink("$commoncfg->{TMPDIR}/$queryId.$$.seq");
 				foreach my $subjectId (keys %{$goodSequenceId->{$queryId}})
 				{
-					unlink("/tmp/$subjectId.$$.seq");
+					unlink("$commoncfg->{TMPDIR}/$subjectId.$$.seq");
 				}
 			}
 		}

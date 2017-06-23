@@ -21,7 +21,7 @@ my $commoncfg = readConfig("main.conf");
 my $libraryId = param ('libraryId') || '';
 my $replace = param ('replace') || '0';
 my $fpcFile = upload ('fpcFile');
-my $infile = "/tmp/$libraryId-$$.fpc";
+my $infile = "$commoncfg->{TMPDIR}/$libraryId-$$.fpc";
 
 print header;
 

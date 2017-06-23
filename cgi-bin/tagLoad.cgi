@@ -22,7 +22,7 @@ my $commoncfg = readConfig("main.conf");
 my $libraryId = param ('libraryId') || '';
 my $replace = param ('replace') || 0;
 my $tagFile = upload ('tagFile');
-my $infile = "/tmp/$libraryId-$$.tag";
+my $infile = "$commoncfg->{TMPDIR}/$libraryId-$$.tag";
 
 print header;
 if($tagFile)

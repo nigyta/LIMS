@@ -22,7 +22,6 @@ my $userName = $userDetail->{"userName"};
 
 my $commoncfg = readConfig("main.conf");
 
-my $tmpdir = '/tmp';
 my $blastn = 'blast+/bin/blastn';
 my $jobdir = $commoncfg->{JOBDIR};
 my $tagMatchIdentity = 100; #identities for tags
@@ -79,7 +78,7 @@ elsif($pid == 0){
 				my $library=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 				$library->execute($pool[4]);
 				my @library = $library->fetchrow_array();
-				open (TAG,">$tmpdir/$pool[4].$$.tag") or die "can't open file: $tmpdir/$pool[4].$$.tag";
+				open (TAG,">$commoncfg->{TMPDIR}/$pool[4].$$.tag") or die "can't open file: $commoncfg->{TMPDIR}/$pool[4].$$.tag";
 				#get tag list
 				my $libraryToTag = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'tag' AND (x = ? OR x = ?) ORDER BY o");
 				$libraryToTag->execute($library[0],$library[5]);
@@ -90,7 +89,7 @@ elsif($pid == 0){
 					print TAG ">$libraryToTag[2].$libraryToTag[3]\n$libraryToTag[8]\n";						
 				}			
 				close (TAG);
-				open (BES,">$tmpdir/$pool[4].$$.bes") or die "can't open file: $tmpdir/$pool[4].$$.bes";
+				open (BES,">$commoncfg->{TMPDIR}/$pool[4].$$.bes") or die "can't open file: $commoncfg->{TMPDIR}/$pool[4].$$.bes";
 				#get tag list
 				my $libraryToBes = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 98 AND (x = ? OR x = ?) ORDER BY z");
 				$libraryToBes->execute($library[0],$library[5]);
@@ -115,13 +114,13 @@ elsif($pid == 0){
 				my $sequenceDetails = decode_json $jobToSequence[8];
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
 				next unless ($sequenceDetails->{'sequence'});
-				open (SEQ,">$tmpdir/$jobToSequence[0].seq") or die "can't open file: $tmpdir/$jobToSequence[0].seq";
+				open (SEQ,">$commoncfg->{TMPDIR}/$jobToSequence[0].seq") or die "can't open file: $commoncfg->{TMPDIR}/$jobToSequence[0].seq";
 				print SEQ ">$jobToSequence[0]\n$sequenceDetails->{'sequence'}";
 				close (SEQ);
 				if($tagTotalNumber > 0)
 				{
 					my $matchedTagNumber;
-					open (CMD,"$blastn -query $tmpdir/$jobToSequence[0].seq -subject $tmpdir/$pool[4].$$.tag -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$blastn -query $commoncfg->{TMPDIR}/$jobToSequence[0].seq -subject $commoncfg->{TMPDIR}/$pool[4].$$.tag -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMD>)
 					{
 						my @blastLine = split /\t/, $_;
@@ -164,7 +163,7 @@ elsif($pid == 0){
 				if($besTotalNumber > 0 && $bacIdAssigned < 1)
 				{
 					my $matchedBesNumber;
-					open (CMD,"$blastn -query $tmpdir/$jobToSequence[0].seq -subject $tmpdir/$pool[4].$$.bes -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMD,"$blastn -query $commoncfg->{TMPDIR}/$jobToSequence[0].seq -subject $commoncfg->{TMPDIR}/$pool[4].$$.bes -dust no -max_target_seqs 10000 -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMD>)
 					{
 						my @blastLine = split /\t/, $_;
@@ -214,7 +213,7 @@ elsif($pid == 0){
 						}				
 					}
 				}
-				unlink ("$tmpdir/$jobToSequence[0].seq");
+				unlink ("$commoncfg->{TMPDIR}/$jobToSequence[0].seq");
 			}
 		}
 		my $assignedSequenceCount = $dbh->prepare("SELECT COUNT(*) FROM matrix WHERE container LIKE 'sequence' AND name != '' AND name NOT LIKE '-%' AND o > 0 AND x = ?");
@@ -225,8 +224,8 @@ elsif($pid == 0){
 	}
 	for(keys %$relatedLibrary)
 	{
-		unlink ("$tmpdir/$_.$$.tag");
-		unlink ("$tmpdir/$_.$$.bes");
+		unlink ("$commoncfg->{TMPDIR}/$_.$$.tag");
+		unlink ("$commoncfg->{TMPDIR}/$_.$$.bes");
 	}
 	exit 0;
 }
