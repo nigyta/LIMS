@@ -74,6 +74,7 @@ END
 			$seqDetails->{'id'} = $seq->id;
 			$seqDetails->{'description'} = $seq->desc || '';
 			$seqDetails->{'sequence'} = $seq->seq;
+			$seqDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 			$seqDetails->{'gapList'} = '';
 			my $cloneName = $seq->id;
 			my $seqDirNumber = 0;

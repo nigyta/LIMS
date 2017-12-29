@@ -141,6 +141,7 @@ elsif($pid == 0){
 			$seqDetails->{'id'} = $seq->id;
 			$seqDetails->{'description'} = $seq->desc || '';
 			$seqDetails->{'sequence'} = $seq->seq;
+			$seqDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 			$seqDetails->{'gapList'} = '';
 			my $json = JSON->new->allow_nonref;
 			$seqDetails = $json->encode($seqDetails);
@@ -255,6 +256,7 @@ elsif($pid == 0){
 					$sequenceDetails->{'id'} = $seq->id;
 					$sequenceDetails->{'description'} = "($pieceLeftPosition-$_)";
 					$sequenceDetails->{'sequence'} = $seq->subseq($pieceLeftPosition,$_);
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 					$sequenceDetails->{'gapList'} = '';
 					$sequenceDetails = $json->encode($sequenceDetails);
 					$sequence = ">" . $seq->id() . " ($pieceLeftPosition-$_)\n" . $seq->subseq($pieceLeftPosition,$_) ."\n";
@@ -440,6 +442,7 @@ elsif($pid == 0){
 							$sequenceDetails->{'id'} = $seq->id;
 							$sequenceDetails->{'description'} = "($subSeqAStart-$subSeqARight,Overlap:$overlapLength-$overlapIdentities)";
 							$sequenceDetails->{'sequence'} = $seq->subseq($subSeqAStart, $subSeqARight);
+							$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 							$sequenceDetails->{'gapList'} = "";
 							$sequenceDetails = $json->encode($sequenceDetails);
 							$insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', '', 2, ?, ?, 0, 0, ?, ?, NOW())");
@@ -463,6 +466,7 @@ elsif($pid == 0){
 							$sequenceDetails->{'id'} = $seq->id;
 							$sequenceDetails->{'description'} = "($subSeqBLeft-$subSeqBEnd,$subSeqAStart-$subSeqARight,Overlap:$overlapLength-$overlapIdentities)";
 							$sequenceDetails->{'sequence'} = $seq->subseq($subSeqBLeft, $subSeqBEnd) ."\n". $seq->subseq($subSeqAStart, $subSeqARight);
+							$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 							$sequenceDetails->{'gapList'} = "";
 							$sequenceDetails = $json->encode($sequenceDetails);
 							$insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', '', 2, ?, ?, 0, 0, ?, ?, NOW())");
@@ -484,6 +488,7 @@ elsif($pid == 0){
 							$sequenceDetailsA->{'id'} = $seq->id;
 							$sequenceDetailsA->{'description'} = "($subSeqALeft-$subSeqARight)";
 							$sequenceDetailsA->{'sequence'} = $seq->subseq($subSeqALeft,$subSeqARight);
+							$sequenceDetailsA->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 							$sequenceDetailsA->{'gapList'} = '';
 							$sequenceDetailsA = $json->encode($sequenceDetailsA);
 							$insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', '', 5, ?, ?, 0, 0, ?, ?, NOW())");
@@ -497,6 +502,7 @@ elsif($pid == 0){
 							$sequenceDetailsB->{'id'} = $seq->id;
 							$sequenceDetailsB->{'description'} = "($subSeqBLeft-$subSeqBRight)";
 							$sequenceDetailsB->{'sequence'} = $seq->subseq($subSeqBLeft,$subSeqBRight);
+							$sequenceDetailsB->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 							$sequenceDetailsB->{'gapList'} = '';
 							$sequenceDetailsB = $json->encode($sequenceDetailsB);
 							$insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', '', 5, ?, ?, 0, 0, ?, ?, NOW())");
@@ -517,6 +523,7 @@ elsif($pid == 0){
 							$sequenceDetails->{'id'} = $seq->id;
 							$sequenceDetails->{'description'} = "(subSeqB:$subSeqBLeft-$subSeqBRight,100Ns,subSeqA:$subSeqALeft-$subSeqARight)";
 							$sequenceDetails->{'sequence'} = $seq->subseq($subSeqBLeft,$subSeqBRight) . "N" x 100 . $seq->subseq($subSeqALeft,$subSeqARight);
+							$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 							my $gapStart = $subSeqBRight - $subSeqBLeft + 2;
 							my $gapEnd = $gapStart + 99;
 							$sequenceDetails->{'gapList'} = "$gapStart-$gapEnd";
@@ -558,6 +565,7 @@ elsif($pid == 0){
 					$sequenceDetails->{'id'} = $seq->id;
 					$sequenceDetails->{'description'} = "($subSeqALeft-$subSeqARight)";
 					$sequenceDetails->{'sequence'} = $seq->subseq($subSeqALeft,$subSeqARight);
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 					$sequenceDetails->{'gapList'} = '';
 					$sequenceDetails = $json->encode($sequenceDetails);
 					$insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', '', 5, ?, ?, 0, 0, ?, ?, NOW())");
@@ -580,6 +588,7 @@ elsif($pid == 0){
 					$sequenceDetails->{'id'} = $seq->id;
 					$sequenceDetails->{'description'} = "($subSeqBLeft-$subSeqBRight)";
 					$sequenceDetails->{'sequence'} = $seq->subseq($subSeqBLeft,$subSeqBRight);
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 					$sequenceDetails->{'gapList'} = '';
 					$sequenceDetails = $json->encode($sequenceDetails);
 					$insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', '', 5, ?, ?, 0, 0, ?, ?, NOW())");
@@ -670,6 +679,7 @@ elsif($pid == 0){
 				my $bacIdAssigned = 0;
 				my $sequenceDetails = decode_json $jobToSequence[8];
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 				next unless ($sequenceDetails->{'sequence'});
 				open (SEQ,">$commoncfg->{TMPDIR}/$jobToSequence[0].seq") or die "can't open file: $commoncfg->{TMPDIR}/$jobToSequence[0].seq";
 				print SEQ ">$jobToSequence[0]\n$sequenceDetails->{'sequence'}";

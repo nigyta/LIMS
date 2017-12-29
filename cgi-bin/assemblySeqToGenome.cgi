@@ -75,6 +75,7 @@ END
 			$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 			$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+			$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			print GENOME ">$getGenome[0]\n$sequenceDetails->{'sequence'}\n";
 			my $alignmentChecker = $dbh->prepare("SELECT query FROM alignment WHERE subject = ? GROUP BY query");
@@ -117,6 +118,7 @@ END
 					$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 					$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 					print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $hasAlignmentSequenceId->{$getSequences[0]});
@@ -133,6 +135,7 @@ END
 				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 				print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $hasAlignmentSequenceId->{$getSequences[0]});

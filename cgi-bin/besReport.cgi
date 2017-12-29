@@ -47,6 +47,7 @@ if(param ('libraryId'))
 			$refSequenceDetails->{'id'} = '' unless (exists $refSequenceDetails->{'id'});
 			$refSequenceDetails->{'description'} = '' unless (exists $refSequenceDetails->{'description'});
 			$refSequenceDetails->{'sequence'} = '' unless (exists $refSequenceDetails->{'sequence'});
+			$refSequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 			$refSequenceDetails->{'gapList'} = '' unless (exists $refSequenceDetails->{'gapList'});
 			$refSequenceDetails->{'filter'} = '' unless (exists $refSequenceDetails->{'filter'});
 			my $besLeftPosition;
@@ -120,6 +121,7 @@ if(param ('libraryId'))
 		$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 		$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+		$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
@@ -161,7 +163,7 @@ if(param ('libraryId'))
 				$paredBesMapped->{$_}++ if (exists $besToGenome->{$_}->{$besCloneName});
 		}
 		$besDetails .= "<tr><td>$besCloneName</td><td>$besClone->{$besCloneName}</td><td></td>$targetGenomeMatch</tr>";
-		$paredBesNumber++ if ($paredBes->{$besCloneName} =~ /fr/);
+		$paredBesNumber++ if ($paredBes->{$besCloneName} =~ /fr/ || $paredBes->{$besCloneName} =~ /rf/);
 	}	
 
 	my $mappedPairs = '';

@@ -15,6 +15,9 @@ my $userCookie = new userCookie;
 my $userId = (cookie('cid')) ? $userCookie->checkCookie(cookie('cid')) : 0;
 exit if (!$userId);
 
+my $sortCtgByLength = 1; #temporally use fixed number, but will change to use cookie in the future
+#my $sortCtgByLength = cookie('sortCtgByLength') || '0';
+
 my $user = new user;
 my $userDetail = $user->getAllFieldsWithUserId($userId);
 my $userName = $userDetail->{"userName"};
@@ -143,7 +146,7 @@ if ($assemblyId)
 		$assemblyCtg->{$assemblyCtgs[0]} = $assemblyCtgs[2];
 		$assemblyCtgNumber = $assemblyCtgs[2] if($assemblyCtgs[2] > $assemblyCtgNumber);
 		$assemblyCtgChr->{$assemblyCtgs[0]} = $assemblyCtgs[4];
-		$assemblyCtgChrOrder->{$assemblyCtgs[0]} = ($assemblyCtgs[4]) ? $assemblyCtgs[5] : $assemblyCtgs[2];
+		$assemblyCtgChrOrder->{$assemblyCtgs[0]} = ($assemblyCtgs[4]) ? $assemblyCtgs[5] : ($sortCtgByLength) ? "-$assemblyCtgs[7]" : $assemblyCtgs[2];
 		$assemblyCtgLength->{$assemblyCtgs[0]} = $assemblyCtgs[7];
 		$totalLength->{'all'} += $assemblyCtgs[7];
 		push @lengthList,$assemblyCtgs[7];
@@ -395,13 +398,14 @@ END
 END
     }
     my $assembledCtgDetails = '';
-    for (sort {$b <=> $a} keys %$assembledCtgByChr)
+    for (sort {($b % 100 == $a % 100) ? ($b <=> $a) : ($b % 100 <=> $a % 100) } keys %$assembledCtgByChr)
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
 		my $headerByChr;
+		my $formattedChr = ($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
 		$headerByChr->{$_} = ($_ > 0 && $assembly[5] > 0) ?
-			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>Chromosome $_</a>"
-			: "<h3>Chromosome $_";
+			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>$formattedChr</a>"
+			: "<h3>$formattedChr";
 
 		$headerByChr->{$_} .= ($totalAssembledContigByChr->{$_} > 1) ?
 			" ($totalAssembledContigByChr->{$_} Contigs)"

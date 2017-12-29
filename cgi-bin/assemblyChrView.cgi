@@ -25,7 +25,8 @@ my $assemblyId = param ('assemblyId') || '';
 my $cookieCompanionAssemblyId = cookie("companionAssembly$assemblyId") || '';
 my $companionAssemblyId = param ('companionAssemblyId') || $cookieCompanionAssemblyId;
 $companionAssemblyId = '' if ($companionAssemblyId eq $assemblyId);
-my $chr = param ('chr') || '';
+my $chr = param ('chr') || '0';
+my $refChr = $chr % 100; #get ref chr number for polyploid genomes.
 my $scrollLeft = param ('scrollLeft') || '0';
 my $highlight = param ('highlight') || '';
 my $assemblyChrDetails = '';
@@ -55,19 +56,15 @@ if ($assemblyId && $chr)
 		$companionAssemblyList .= ($companionAssemblyId eq $companionAssembly[0]) ? "<option value='$companionAssembly[0]' selected>$companionAssembly[2].$companionAssembly[3]</option>":"<option value='$companionAssembly[0]'>$companionAssembly[2].$companionAssembly[3]</option>";
 	}
 	my $refGenomeSequence=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ? AND z = ?");
-	$refGenomeSequence->execute($assembly[5],$chr);
+	$refGenomeSequence->execute($assembly[5],$refChr);
 	my @refGenomeSequence = $refGenomeSequence->fetchrow_array();
 # 	$refGenomeSequence[8] =~ s/"sequence":"(.*?)",//g; #here is the trick, to get sequence from JSON string in case of sequence is too long to effect decode_json
-# 	my $refSequenceDetails = decode_json $refGenomeSequence[8];
-# 	$refSequenceDetails->{'id'} = '' unless (exists $refSequenceDetails->{'id'});
-# 	$refSequenceDetails->{'description'} = '' unless (exists $refSequenceDetails->{'description'});
-# 	$refSequenceDetails->{'sequence'} = $1 unless (exists $refSequenceDetails->{'sequence'});
-# 	$refSequenceDetails->{'gapList'} = '' unless (exists $refSequenceDetails->{'gapList'});
 
 	my $refSequenceDetails = decode_json $refGenomeSequence[8];
 	$refSequenceDetails->{'id'} = '' unless (exists $refSequenceDetails->{'id'});
 	$refSequenceDetails->{'description'} = '' unless (exists $refSequenceDetails->{'description'});
 	$refSequenceDetails->{'sequence'} = '' unless (exists $refSequenceDetails->{'sequence'});
+	$refSequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 	$refSequenceDetails->{'gapList'} = '' unless (exists $refSequenceDetails->{'gapList'});
 	$refSequenceDetails->{'filter'} = '' unless (exists $refSequenceDetails->{'filter'});
 	my $totalSeqs = 0;
@@ -350,6 +347,7 @@ if ($assemblyId && $chr)
 				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 				if ($companionAssemblySeqHide->{$currentSeq} > 0)
@@ -760,6 +758,7 @@ if ($assemblyId && $chr)
 			$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 			$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+			$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 			if ($assemblySeqHide->{$currentSeq} > 0)

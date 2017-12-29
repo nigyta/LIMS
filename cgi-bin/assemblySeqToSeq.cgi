@@ -88,6 +88,7 @@ END
 					$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 					$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 					print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $inAssemblySequenceId->{$getSequences[0]});
@@ -105,6 +106,7 @@ END
 				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 				print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $inAssemblySequenceId->{$getSequences[0]});
@@ -221,6 +223,7 @@ END
 						$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
 						$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
 						$sequenceDetailsA->{'sequence'} = '' unless (exists $sequenceDetailsA->{'sequence'});
+						$sequenceDetailsA->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 						$sequenceDetailsA->{'gapList'} = '' unless (exists $sequenceDetailsA->{'gapList'});
 						print SEQA ">$getSequenceA[0]\n$sequenceDetailsA->{'sequence'}\n";
 						close(SEQA);
@@ -235,6 +238,7 @@ END
 						$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
 						$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
 						$sequenceDetailsB->{'sequence'} = '' unless (exists $sequenceDetailsB->{'sequence'});
+						$sequenceDetailsB->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 						$sequenceDetailsB->{'gapList'} = '' unless (exists $sequenceDetailsB->{'gapList'});
 						print SEQB ">$getSequenceB[0]\n$sequenceDetailsB->{'sequence'}\n";
 						close(SEQB);

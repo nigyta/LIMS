@@ -55,12 +55,14 @@ if ($seqId)
 # 	$refSequenceDetails->{'id'} = '' unless (exists $refSequenceDetails->{'id'});
 # 	$refSequenceDetails->{'description'} = '' unless (exists $refSequenceDetails->{'description'});
 # 	$refSequenceDetails->{'sequence'} = $1 unless (exists $refSequenceDetails->{'sequence'});
+#	$refSequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 # 	$refSequenceDetails->{'gapList'} = '' unless (exists $refSequenceDetails->{'gapList'});
 
 	my $refSequenceDetails = decode_json $refSequence[8];
 	$refSequenceDetails->{'id'} = '' unless (exists $refSequenceDetails->{'id'});
 	$refSequenceDetails->{'description'} = '' unless (exists $refSequenceDetails->{'description'});
 	$refSequenceDetails->{'sequence'} = '' unless (exists $refSequenceDetails->{'sequence'});
+	$refSequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 	$refSequenceDetails->{'gapList'} = '' unless (exists $refSequenceDetails->{'gapList'});
 	$refSequenceDetails->{'filter'} = '' unless (exists $refSequenceDetails->{'filter'});
 	my $totalSeqs = 0;
@@ -236,7 +238,7 @@ if ($seqId)
 		}
 	}
 	close (BES);
-	`gzip -f $commoncfg->{TMPDIR}/BES-$refSequence[2].txt`;
+	`gzip -f '$commoncfg->{TMPDIR}/BES-$refSequence[2].txt'`;
 	my $besEvaluation = "<a href='$commoncfg->{TMPURL}/BES-$refSequence[2].txt.gz' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>BES Evaluation</a>" if (-e "$commoncfg->{TMPDIR}/BES-$refSequence[2].txt.gz");
 
 
@@ -475,7 +477,7 @@ if ($seqId)
 	open (SVGFILE,">$commoncfg->{TMPDIR}/BES-$refSequence[2].svg") or die "can't open file: $commoncfg->{TMPDIR}/BES-$refSequence[2].svg";
 	print SVGFILE $seqDetails;
 	close (SVGFILE);
-	`gzip -f $commoncfg->{TMPDIR}/BES-$refSequence[2].svg`;
+	`gzip -f '$commoncfg->{TMPDIR}/BES-$refSequence[2].svg'`;
 	my $besSvg = "<a href='$commoncfg->{TMPURL}/BES-$refSequence[2].svg.gz' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>SVG</a>" if (-e "$commoncfg->{TMPDIR}/BES-$refSequence[2].svg.gz");
 
 	$html =~ s/\$besEvaluation/$besEvaluation/g;

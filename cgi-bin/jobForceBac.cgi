@@ -99,6 +99,7 @@ elsif($pid == 0){
 					$besTotalNumber++;
 					my $sequenceDetails = decode_json $libraryToBes[8];
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 					next unless ($sequenceDetails->{'sequence'});
 					print BES ">$libraryToBes[2].$libraryToBes[6]\n$sequenceDetails->{'sequence'}\n";						
 				}			

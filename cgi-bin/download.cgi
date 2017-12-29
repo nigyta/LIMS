@@ -57,6 +57,7 @@ if (param ('seqId'))
 	$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 	$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 	$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+	$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 	$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 	$getSequences[2] = $getSequences[0] unless ($getSequences[2]);
 	$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
@@ -102,6 +103,7 @@ elsif (param ('jobId'))
 		$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 		$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+		$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$getSequences[2] = $getSequences[0] unless ($getSequences[2]);
 		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
@@ -146,6 +148,7 @@ elsif (param ('genomeId'))
 		$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 		$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+		$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
@@ -186,6 +189,7 @@ elsif(param ('libraryId'))
 			$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 			$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+			$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 			$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
@@ -275,6 +279,7 @@ elsif(param ('besLibraryId'))
 		$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 		$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+		$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 		$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
@@ -389,6 +394,7 @@ elsif(param ('assemblyCtgId'))
 			$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 			$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+			$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 			$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
@@ -499,6 +505,7 @@ elsif(param ('assemblyCtgId'))
 			$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 			$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+			$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 			$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
@@ -694,6 +701,7 @@ elsif(param ('assemblyId'))
 					$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 					$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 					$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
@@ -705,7 +713,6 @@ elsif(param ('assemblyId'))
 					{
 						print "$assemblySeq[2].$assemblySeq[5]";
 					}
-					$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 					my $assemblySeqStart;
 					my $assemblySeqEnd;
 					if($assemblySeq[8])
@@ -827,6 +834,7 @@ elsif(param ('assemblyId'))
 					$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 					$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 					$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
@@ -838,7 +846,6 @@ elsif(param ('assemblyId'))
 					{
 						print "$assemblySeq[2].$assemblySeq[5]";
 					}
-					$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 					my $assemblySeqStart;
 					my $assemblySeqEnd;
 					if($assemblySeq[8])
@@ -958,6 +965,7 @@ elsif(param ('assemblyId'))
 				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 				$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;

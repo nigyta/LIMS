@@ -71,6 +71,7 @@ END
 					$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 					$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 				}
@@ -86,6 +87,7 @@ END
 				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 			}
@@ -101,6 +103,7 @@ END
 			$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 			$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+			$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			print BES ">$getBesSequences[0]\n$sequenceDetails->{'sequence'}\n";
 		}

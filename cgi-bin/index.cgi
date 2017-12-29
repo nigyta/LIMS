@@ -158,6 +158,9 @@ __DATA__
 <link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/lims.css" />
 <script src="$commoncfg->{HTDOCS}/js/jquery-1.10.2.js" type="text/javascript"></script>
 <script src="$commoncfg->{HTDOCS}/js/jquery-ui-1.10.4.min.js" type="text/javascript"></script>
+<script src="$commoncfg->{HTDOCS}/js/d3.v3.min.js" type="text/javascript"></script>
+<script src="$commoncfg->{HTDOCS}/js/newick.js" type="text/javascript"></script>
+<script src="$commoncfg->{HTDOCS}/js/d3.phylogram.js" type="text/javascript"></script>
 <script src="$commoncfg->{HTDOCS}/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <script src="$commoncfg->{HTDOCS}/js/dataTables.jqueryui.js" type="text/javascript"></script>
 <script src="$commoncfg->{HTDOCS}/js/jquery.ui-contextmenu.min.js" type="text/javascript"></script>

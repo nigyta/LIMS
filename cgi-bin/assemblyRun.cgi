@@ -271,11 +271,11 @@ END
 			if($target[1] eq 'library')
 			{
 				my $getClones = $dbh->prepare("SELECT * FROM clones WHERE sequenced > 0 AND libraryId = ?");
-				$getClones->execute($assemblySeqMinLength,$assembly[4]);
+				$getClones->execute($assembly[4]);
 				while(my @getClones = $getClones->fetchrow_array())
 				{
 					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND y >= ? AND name LIKE ?");
-					$getSequences->execute($getClones[1]);
+					$getSequences->execute($assemblySeqMinLength,$getClones[1]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
 						$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
@@ -283,6 +283,7 @@ END
 						$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 						$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 						$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+						$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 						$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 						print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 						print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $inAssemblySequenceId->{$getSequences[0]});
@@ -300,6 +301,7 @@ END
 					$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 					$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 					$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 					print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 					print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $inAssemblySequenceId->{$getSequences[0]});
@@ -414,6 +416,7 @@ END
 							$sequenceDetailsA->{'id'} = '' unless (exists $sequenceDetailsA->{'id'});
 							$sequenceDetailsA->{'description'} = '' unless (exists $sequenceDetailsA->{'description'});
 							$sequenceDetailsA->{'sequence'} = '' unless (exists $sequenceDetailsA->{'sequence'});
+							$sequenceDetailsA->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 							$sequenceDetailsA->{'gapList'} = '' unless (exists $sequenceDetailsA->{'gapList'});
 							print SEQA ">$getSequenceA[0]\n$sequenceDetailsA->{'sequence'}\n";
 							close(SEQA);
@@ -428,6 +431,7 @@ END
 							$sequenceDetailsB->{'id'} = '' unless (exists $sequenceDetailsB->{'id'});
 							$sequenceDetailsB->{'description'} = '' unless (exists $sequenceDetailsB->{'description'});
 							$sequenceDetailsB->{'sequence'} = '' unless (exists $sequenceDetailsB->{'sequence'});
+							$sequenceDetailsB->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 							$sequenceDetailsB->{'gapList'} = '' unless (exists $sequenceDetailsB->{'gapList'});
 							print SEQB ">$getSequenceB[0]\n$sequenceDetailsB->{'sequence'}\n";
 							close(SEQB);
@@ -717,6 +721,7 @@ END
 				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 				print GENOME ">$getGenome[0]\n$sequenceDetails->{'sequence'}\n";
 				my $alignmentChecker = $dbh->prepare("SELECT query FROM alignment WHERE subject = ? GROUP BY query");
@@ -762,6 +767,7 @@ END
 							$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 							$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 							$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+							$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 							$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 							print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 							print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $hasAlignmentSequenceId->{$getSequences[0]});
@@ -778,6 +784,7 @@ END
 						$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
 						$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
 						$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+						$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
 						$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 						print SEQALL ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n";
 						print SEQNEW ">$getSequences[0]\n$sequenceDetails->{'sequence'}\n" if (!exists $hasAlignmentSequenceId->{$getSequences[0]});
@@ -2014,7 +2021,7 @@ END
 		}
 
 		my $updateAssemblyToEstimatingLength=$dbh->do("UPDATE matrix SET barcode = '-11' WHERE id = $assemblyId");
-		my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
+		my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,barcode");
 		$assemblyAllCtgList->execute($assemblyId);
 		my $totalCtgNumber = $assemblyAllCtgList->rows;
 		my $assignedChrOrder = 1;

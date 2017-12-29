@@ -75,6 +75,7 @@ if ($seqId)
 			$sequenceDetails->{'description'} = "<a title='$sequenceDetails->{'description'}'>". substr($sequenceDetails->{'description'},0,20). "...". substr($sequenceDetails->{'description'},-5). "</a>";
 		}
 		$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+		$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 		$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 		$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 		my @gaps = split (",",$sequenceDetails->{'gapList'});

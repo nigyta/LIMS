@@ -82,7 +82,7 @@ __DATA__
 <h3>Please check ctgs for assigning chromosome number:</h3>
 $ctgList
 <table>
-<tr><td style='text-align:right'><label for="chr$$"><b>Chromosome #</b></label></td><td><input class='ui-widget-content ui-corner-all' name="chrNumber" id="editchrNumber" size="15" type="text" maxlength="15" ></td></tr>
+<tr><td style='text-align:right'><label for="chr$$"><b>Chromosome #</b></label></td><td><input class='ui-widget-content ui-corner-all' name="chrNumber" id="editchrNumber" size="4" type="text" maxlength="3" ></td></tr>
 </table>
 </form>
 <script>

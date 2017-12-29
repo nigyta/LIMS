@@ -117,6 +117,7 @@ if($jobId)
 				$sequenceDetails->{'description'} = "<sup title='$sequenceDetails->{'description'}'>$sequenceDetails->{'description'}</sup>";
 			}
 			$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+			$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 			$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
 			my $seqTitle = $sequenceDetails->{'id'}.$sequenceDetails->{'description'};
 			if($sequencesOfJob[3] == 1 || $sequencesOfJob[3] == 2)

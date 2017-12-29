@@ -93,6 +93,7 @@ elsif($pid == 0){
 					$besTotalNumber++;
 					my $sequenceDetails = decode_json $cloneToBes[8];
 					$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+					$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 					next unless ($sequenceDetails->{'sequence'});
 					print BES ">$cloneToBes[2].$cloneToBes[6]\n$sequenceDetails->{'sequence'}\n";						
 				}			
@@ -114,6 +115,7 @@ elsif($pid == 0){
 				my $bacIdAssigned = 0;
 				my $sequenceDetails = decode_json $jobToSequence[8];
 				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 				next unless ($sequenceDetails->{'sequence'});
 				open (SEQ,">$commoncfg->{TMPDIR}/$jobToSequence[0].seq") or die "can't open file: $commoncfg->{TMPDIR}/$jobToSequence[0].seq";
 				print SEQ ">$jobToSequence[0]\n$sequenceDetails->{'sequence'}";
