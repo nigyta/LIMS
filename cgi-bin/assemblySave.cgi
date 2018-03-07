@@ -27,6 +27,7 @@ my $assemblyName = param ('name') || '';
 my $targetId = param ('targetId') || '';
 my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
 my $refGenomeId = param ('refGenomeId') || '0';
+my @extraId = param ('extraId');
 
 my $config = new config;
 my $userPermission;
@@ -62,6 +63,12 @@ if($assemblyName)
 			$assemblyDetails = $json->encode($assemblyDetails);
 			my $updateAssembly=$dbh->prepare("UPDATE matrix SET name = ?, y = ?, z = ?, note = ? WHERE id = ?");
 			$updateAssembly->execute($assemblyName,$refGenomeId,$fpcOrAgpId,$assemblyDetails,$assemblyId);
+			my $deleteAsbGenomeLink = $dbh->do("DELETE FROM link WHERE parent = $assemblyId AND type LIKE 'asbGenome'");
+			foreach(@extraId)
+			{
+				my $insertLink = $dbh->do("INSERT INTO link VALUES ($assemblyId,$_,'asbGenome')");
+			}
+
 			print header;
 			print <<END;
 <script>
@@ -95,6 +102,10 @@ END
 			my $insertAssembly=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assembly', ?, ?, ?, ?, ?, 0, ?, ?, NOW())");
 			$insertAssembly->execute($assemblyName,$version,$targetId,$refGenomeId,$fpcOrAgpId,$assemblyDetails,$userName);
 			$assemblyId = $dbh->{mysql_insertid};
+			foreach(@extraId)
+			{
+				my $insertLink = $dbh->do("INSERT INTO link VALUES ($assemblyId,$_,'asbGenome')");
+			}
 			print header(-cookie=>cookie(-name=>'assembly',-value=>$assemblyId));
 			print <<END;
 <script>
@@ -112,6 +123,10 @@ END
 			my $insertAssembly=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assembly', ?, ?, ?, ?, ?, 0, ?, ?, NOW())");
 			$insertAssembly->execute($assemblyName,$version,$targetId,$refGenomeId,$fpcOrAgpId,$assemblyDetails,$userName);
 			$assemblyId = $dbh->{mysql_insertid};
+			foreach (@extraId)
+			{
+				my $insertLink = $dbh->do("INSERT INTO link VALUES ($assemblyId,$_,'asbGenome')");
+			}
 			print header(-cookie=>cookie(-name=>'assembly',-value=>$assemblyId));
 			print <<END;
 <script>

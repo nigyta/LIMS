@@ -42,7 +42,7 @@ while (my @allDart = $allDart->fetchrow_array())
 		<table id='darts$$' class='display' style='width: 100%;'>
 			<thead>
 				<tr>
-					<th style='text-align:left'><b>DArT</b></th>
+					<th style='text-align:left'><b>DArTseq</b></th>
 					<th style='text-align:left'><b>SNPs</b></th>
 					<th style='text-align:left'><b>Genotypes</b></th>
 					<th style='text-align:left'><b>Creator</b></th>
@@ -60,15 +60,15 @@ while (my @allDart = $allDart->fetchrow_array())
 }
 $darts .= "</tbody></table></form>\n" if($darts);
 my $button = "<div class='ui-state-highlight ui-corner-all' style='padding: 0 .7em;'>
-	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"dartNew.cgi\")'>New DArT Report</button>
+	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"dartNew.cgi\")'>New DArTseq</button>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='refresh(\"general\")'>Refresh</button>
 	";
-$button .= "<h2>DArT Reports</h2>";
+$button .= "<h2>DArTseq</h2>";
 
 unless($darts)
 {
 	$button .= "<p class='ui-state-error ui-corner-all' style='padding: .7em;'><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>
-			<strong>No DArT Report, please upload one!</strong></p>";
+			<strong>No DArTseq, please upload one!</strong></p>";
 }
 $button .= "</div>\n";
 
@@ -77,7 +77,7 @@ $html =~ s/\$darts/$darts/g;
 $html =~ s/\$\$/$$/g;
 
 
-print header(-cookie=>cookie(-name=>'general',-value=>5));
+print header(-cookie=>cookie(-name=>'general',-value=>6));
 print $html;
 
 __DATA__

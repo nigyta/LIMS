@@ -42,6 +42,7 @@ if ($asbProjectId)
 	$asbProject[8] = escapeHTML($asbProject[8]);
 	$asbProject[8] =~ s/\n/<br>/g;
 	$button = "<div class='ui-state-highlight ui-corner-all' style='padding: 0 .7em;'>
+		<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeNew.cgi?asbProjectId=$asbProjectId\")'>New Genome for GPM</button>
 		<div style='position: relative;'><h2><a id='asbProject$asbProjectId$$' onmouseover='editIconShow(\"asbProject$asbProjectId$$\")' onmouseout='editIconHide(\"asbProject$asbProjectId$$\")' onclick='openDialog(\"asbProjectEdit.cgi?asbProjectId=$asbProjectId\")' title='Edit/Delete'>$asbProject[2]</a></h2></div>";
 	$button .= "<p>$asbProject[8]</p>" if ($asbProject[8]);
 	unless($asbProjectContent)

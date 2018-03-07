@@ -43,9 +43,10 @@ __DATA__
 		<li><a href="vector.cgi">Vectors</a></li>
 		<li><a href="serviceAll.cgi">Services</a></li>
 		<li><a href="smrtrun.cgi">SMRT Runs</a></li>
+		<li><a href='job.cgi'>PacBio Assembly</a></li>
 		<li><a href="genome.cgi">Genomes</a></li>
 		<li><a href="dataset.cgi">Datasets</a></li>
-		<li><a href="dart.cgi">DArT GBS</a></li>
+		<li><a href="dart.cgi">DArTseq</a></li>
 		<li><a href="system.cgi">System</a></li>
 	</ul>
 </div>

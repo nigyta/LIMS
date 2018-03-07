@@ -27,6 +27,12 @@ eof
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my %datasetType = (
+	0=>'Universal',
+	1=>'Species',
+	2=>'Picture'
+	);
+
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
@@ -43,6 +49,7 @@ while (my @allDataset = $allDataset->fetchrow_array())
 			<thead>
 				<tr>
 					<th style='text-align:left'><b>Dataset</b></th>
+					<th style='text-align:left'><b>Type</b></th>
 					<th style='text-align:left'><b>Records</b></th>
 					<th style='text-align:left'><b>Creator</b></th>
 					<th style='text-align:left'><b>Creation Date</b></th>
@@ -51,7 +58,8 @@ while (my @allDataset = $allDataset->fetchrow_array())
 			<tbody>" unless($datasets);
 	$datasets .= "<tr>
 		<td title='Dataset'><a id='datasetId$allDataset[0]$$' onclick='openDialog(\"datasetView.cgi?datasetId=$allDataset[0]\")' title='View'>$allDataset[2]</a></td>
-		<td title='Click to download dataset'><a href='download.cgi?datasetId=$allDataset[0]' target='hiddenFrame'>$allDataset[3]</a></td>
+		<td title='Type'>$datasetType{$allDataset[3]}</td>
+		<td title='Click to download dataset'><a href='download.cgi?datasetId=$allDataset[0]' target='hiddenFrame'>$allDataset[4]</a></td>
 		<td title='Creator'>$allDataset[9]</td>
 		<td title='Creation date'>$allDataset[10]</td>
 		</tr>";
@@ -75,7 +83,7 @@ $html =~ s/\$datasets/$datasets/g;
 $html =~ s/\$\$/$$/g;
 
 
-print header(-cookie=>cookie(-name=>'general',-value=>4));
+print header(-cookie=>cookie(-name=>'general',-value=>5));
 print $html;
 
 __DATA__

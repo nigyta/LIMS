@@ -16,6 +16,12 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my %datasetType = (
+	0=>'Universal',
+	1=>'Species',
+	2=>'Picture'
+	);
+
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
@@ -27,10 +33,17 @@ my @dataset=$dataset->fetchrow_array();
 my $datasetStatus;
 $datasetStatus->{0} = "not ";
 $datasetStatus->{-1} = "is being ";
-$datasetStatus->{1} = ($dataset[3] > 1) ? "$dataset[3] records " : "$dataset[3] record ";
+$datasetStatus->{1} = ($dataset[4] > 1) ? "$dataset[4] records " : "$dataset[4] record ";
 
 $html =~ s/\$datasetId/$datasetId/g;
 $html =~ s/\$datasetName/$dataset[2]/g;
+
+my $datasetTypeList = '';
+foreach (sort {$a <=> $b} keys %datasetType)
+{
+	$datasetTypeList .= ($_ == $dataset[3]) ? "<option value='$_' selected>$datasetType{$_}</option>" : "<option value='$_'>$datasetType{$_}</option>";
+}
+$html =~ s/\$datasetType/$datasetTypeList/g;
 
 my $parentId = "<option class='ui-state-error-text' value='0'>None</option>";
 my $parentList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' ORDER BY name");
@@ -55,6 +68,7 @@ __DATA__
 	<input name="datasetId" id="editDatasetId" type="hidden" value="$datasetId" />
 	<table>
 	<tr><td style='text-align:right'><label for="editDatasetName"><b>Dataset Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="editDatasetName" size="40" type="text" maxlength="32" value="$datasetName"/><br><sup class='ui-state-disabled'>$datasetStatus loaded by $datasetCreator on $datasetCreationDate</sup></td></tr>
+	<tr><td style='text-align:right'><label for="editDatasetType"><b>Type</b></label></td><td><select class='ui-widget-content ui-corner-all' name="datasetType" id="editDatasetType">$datasetType</select></td></tr>
 	<tr><td style='text-align:right' rowspan='3'><label for="editDatasetFile"><b>File</b></label></td><td><input name="datasetFile" id="editDatasetFile" type="file" />(in Tab Delimited Text format)</td></tr>
 	<tr><td>or <input name="datasetFilePath" id="editDatasetFilePath" type="text" />(On-server file name with full path)</td></tr>
 	<tr>

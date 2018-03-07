@@ -19,17 +19,18 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
-my $genebankId = "<option class='ui-state-error-text' value='0'>None</option>";
-my $genebankList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' ORDER BY name");
-$genebankList->execute();
-while (my @genebankList = $genebankList->fetchrow_array())
+my $givenParentId = param ('parentId') || '';
+my $parentId = "<option class='ui-state-error-text' value='0'>None</option>";
+my $parentList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' ORDER BY name");
+$parentList->execute();
+while (my @parentList = $parentList->fetchrow_array())
 {
-	my $genebankDetails = decode_json $genebankList[8];
+	my $genebankDetails = decode_json $parentList[8];
 	$genebankDetails->{'comments'} = escapeHTML($genebankDetails->{'comments'});
-	$genebankId .= "<option value='$genebankList[0]' title='$genebankDetails->{'comments'}'>Genebank: $genebankList[2]</option>";
+	$parentId .= ($givenParentId eq $parentList[0]) ? "<option value='$parentList[0]' title='$genebankDetails->{'comments'}' selected>$parentList[1]: $parentList[2]</option>" : "<option value='$parentList[0]' title='$genebankDetails->{'comments'}'>$parentList[1]: $parentList[2]</option>";
 }
 
-$html =~ s/\$genebankId/$genebankId/g;
+$html =~ s/\$parentId/$parentId/g;
 
 print header;
 print $html;
@@ -37,14 +38,14 @@ print $html;
 __DATA__
 <form id="newDart" name="newDart" action="dartSave.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<table>
-	<tr><td style='text-align:right'><label for="newDartName"><b>DArT Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="newDartName" size="40" type="text" maxlength="32" /></td></tr>
-	<tr><td style='text-align:right' rowspan='2'><label for="newDartFile"><b>DArT Report</b></label></td><td><input name="dartFile" id="newDartFile" type="file" />(in Tab Delimited Text format)</td></tr>
+	<tr><td style='text-align:right'><label for="newDartName"><b>DArTseq Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="newDartName" size="40" type="text" maxlength="32" /></td></tr>
+	<tr><td style='text-align:right' rowspan='2'><label for="newDartFile"><b>DArTseq File</b></label></td><td><input name="dartFile" id="newDartFile" type="file" />(in Tab Delimited Text format)</td></tr>
 	<tr><td>or <input name="dartFilePath" id="newDartFilePath" type="text" />(On-server file name with full path)</td></tr>
-	<tr><td style='text-align:right'><label for="newDartGenebankId"><b>Link to</b></label></td><td><select class='ui-widget-content ui-corner-all' name='genebankId' id='newDartGenebankId'>$genebankId</select></td></tr>
+	<tr><td style='text-align:right'><label for="newDartGenebankId"><b>Link to</b></label></td><td><select class='ui-widget-content ui-corner-all' name='genebankId' id='newDartGenebankId'>$parentId</select></td></tr>
 	<tr><td style='text-align:right'><label for="newDartDescription"><b>Description</b></label></td><td><textarea class='ui-widget-content ui-corner-all' name="description" id="newDartDescription" cols="50" rows="10"></textarea></td></tr>
 	</table>
 </form>
 <script>
-$('#dialog').dialog("option", "title", "New DArt Report");
+$('#dialog').dialog("option", "title", "New DArTseq");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Save", click: function() { submitForm('newDart'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 </script>

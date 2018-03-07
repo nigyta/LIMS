@@ -53,11 +53,11 @@ print $html;
 
 __DATA__
 <table>
-	<tr><td style='text-align:right;white-space: nowrap;'><b>DArT</b></td><td>$dartName<br>$dartStatus <sup class='ui-state-disabled'>loaded by $dartCreator on $dartCreationDate</sup></td></tr>
+	<tr><td style='text-align:right;white-space: nowrap;'><b>DArTseq</b></td><td>$dartName<br>$dartStatus <sup class='ui-state-disabled'>loaded by $dartCreator on $dartCreationDate</sup></td></tr>
 	<tr><td style='text-align:right;white-space: nowrap;'>Link to genebank:</td><td>$relatedGenebank</td></tr>
 	<tr><td style='text-align:right'><b>Description</b></td><td>$dartDescription</td></tr>
 </table>
 <script>
-$('#dialog').dialog("option", "title", "View DArT Report");
+$('#dialog').dialog("option", "title", "View DArTseq");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Edit", click: function() { closeDialog();openDialog("dartEdit.cgi?dartId=$dartId"); } }, { text: "OK", click: function() {closeDialog(); } } ] );
 </script>

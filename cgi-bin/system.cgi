@@ -41,7 +41,7 @@ $html =~ s/\$button/$button/g;
 $html =~ s/\$\$/$$/g;
 
 
-print header(-cookie=>cookie(-name=>'general',-value=>5));
+print header(-cookie=>cookie(-name=>'general',-value=>6));
 print $html;
 
 __DATA__

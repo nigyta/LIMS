@@ -16,6 +16,12 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my %datasetType = (
+	0=>'Universal',
+	1=>'Species',
+	2=>'Picture'
+	);
+
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
@@ -26,7 +32,7 @@ my @dataset = $dataset->fetchrow_array();
 my $datasetStatus;
 $datasetStatus->{0} = "not ";
 $datasetStatus->{-1} = "is being ";
-$datasetStatus->{1} = ($dataset[3] > 1) ? "$dataset[3] records " : "$dataset[3] record ";
+$datasetStatus->{1} = ($dataset[4] > 1) ? "$dataset[4] records " : "$dataset[4] record ";
 
 my $relatedParent = 'None.';
 if ($dataset[6] > 0)
@@ -40,6 +46,7 @@ if ($dataset[6] > 0)
 
 $html =~ s/\$datasetId/$datasetId/g;
 $html =~ s/\$datasetName/$dataset[2]/g;
+$html =~ s/\$datasetType/$datasetType{$dataset[3]}/g;
 $html =~ s/\$relatedParent/$relatedParent/g;
 $html =~ s/\$datasetStatus/$datasetStatus->{$dataset[7]}/g;
 $dataset[8] = escapeHTML($dataset[8]);
@@ -53,7 +60,7 @@ print $html;
 
 __DATA__
 <table>
-	<tr><td style='text-align:right;white-space: nowrap;'><b>DArT</b></td><td>$datasetName<br>$datasetStatus <sup class='ui-state-disabled'>loaded by $datasetCreator on $datasetCreationDate</sup></td></tr>
+	<tr><td style='text-align:right;white-space: nowrap;'><b>$datasetType Dataset</b></td><td>$datasetName<br>$datasetStatus <sup class='ui-state-disabled'>loaded by $datasetCreator on $datasetCreationDate</sup></td></tr>
 	<tr><td style='text-align:right;white-space: nowrap;'>Link to:</td><td>$relatedParent</td></tr>
 	<tr><td style='text-align:right'><b>Description</b></td><td>$datasetDescription</td></tr>
 </table>

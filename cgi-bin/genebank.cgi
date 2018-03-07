@@ -16,6 +16,12 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my %datasetType = (
+	0=>'Universal',
+	1=>'Species',
+	2=>'Picture'
+	);
+
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
@@ -75,7 +81,7 @@ if ($genebankId)
 	{
 		$relatedDataset = "<div id='datasetList$genebankId$$'>" unless ($relatedDataset);
 		$relatedDataset .= "<h3 title='$datasetList[8]'>
-			<a href='table.cgi?type=record&parentId=$datasetList[0]&refresh=viewGenebankTabs$genebankId'>$datasetList[2] ($datasetList[3] records ) <sup class='ui-state-disabled'>loaded by $datasetList[9] on $datasetList[10]</sup></a>
+			<a href='table.cgi?type=record&parentId=$datasetList[0]&refresh=viewGenebankTabs$genebankId'>$datasetType{$datasetList[3]} Dataset: $datasetList[2] ($datasetList[4] records ) <sup class='ui-state-disabled'>loaded by $datasetList[9] on $datasetList[10]</sup></a>
 			</h3>
 			<div><img src='$commoncfg->{HTDOCS}/css/images/loading.gif'>Loading...</div>";
 		$activeDataset = $acitveDatasetDetector if ($datasetList[0] eq $cookieDataset);
@@ -86,14 +92,15 @@ if ($genebankId)
 	$button = "<ul id='genebankInfoMenu$genebankId$$' style='margin-top: .3em;width: 250px;'><li><a><span class='ui-icon ui-icon-triangle-1-e'></span><b>Genebank '$genebank[2]'</b></a>
 				<ul style='z-index: 1000;white-space: nowrap;'>
 				<li><a onclick='openDialog(\"itemEdit.cgi?itemId=$genebankId\")' title='Edit/Delete $genebank[2]'><span class='ui-icon ui-icon-pencil'></span>Edit/Delete</a></li>
+				<li><a onclick='openDialog(\"datasetNew.cgi?parentId=$genebankId\")' title='Upload New Dataset'>New Dataset</a></li>
+				<li><a onclick='openDialog(\"dartNew.cgi?parentId=$genebankId\")' title='Upload New DArTseq'>New DArTseq</a></li>
 				</ul></li></ul>
 			<div id='viewGenebankTabs$genebankId'>
 				<ul>
 				<li><a href='#viewGenebankTabs-1'>General</a></li>
-				<li><a href='table.cgi?type=species&parentId=$genebankId&refresh=viewGenebankTabs$genebankId'>Species</a></li>
 				";
 	$button .= ($relatedDataset) ? "<li><a href='#datasetList$genebankId$$'>Datasets</a></li>" : "";				
-	$button .= ($relatedDart) ? "<li><a href='#dartList$genebankId$$'>DArT</a></li>" : "";
+	$button .= ($relatedDart) ? "<li><a href='#dartList$genebankId$$'>DArTseq</a></li>" : "";
 	$button .= "</ul>
 				<div id='viewGenebankTabs-1'>
 					<table>

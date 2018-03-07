@@ -196,7 +196,7 @@ my $button = "<ul id='jobInfoMenu$$' style='margin-top: .3em; width: 250px;'>
 						<li><a onclick='openDialogForm(\"jobForceBacForm.cgi\",\"jobList$$\")'><span class='ui-icon ui-icon-bullet'></span>Forcing Mode</a></li>
 					</ul>
 				</li>
-				<li><a onclick='refresh(\"asbProjects\")'><span class='ui-icon ui-icon-refresh'></span>Refresh</a></li>
+				<li><a onclick='refresh(\"general\")'><span class='ui-icon ui-icon-refresh'></span>Refresh</a></li>
 			</ul>
 		</li>
 	</ul>";
@@ -212,7 +212,7 @@ $html =~ s/\$jobs/$jobs/g;
 $html =~ s/\$\$/$$/g;
 
 
-print header(-cookie=>cookie(-name=>'asbProject',-value=>0));
+print header(-cookie=>cookie(-name=>'general',-value=>3));
 print $html;
 
 __DATA__

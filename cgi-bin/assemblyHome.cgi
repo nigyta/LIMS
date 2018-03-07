@@ -39,10 +39,10 @@ my $asbProject=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'asbProj
 $asbProject->execute();
 while (my @asbProject = $asbProject->fetchrow_array())
 {
-	$acitveDetector++;
 	$asbProject[2] = "AsbProject: Name N/A, please edit!" unless($asbProject[2]);
 	$asbProjects .= "<li><a href='asbProject.cgi?asbProjectId=$asbProject[0]'>$asbProject[2]</a></li>\n";
 	$active = $acitveDetector if ($cookieAsbProject eq $asbProject[0]);
+	$acitveDetector++;
 }
 
 $html =~ s/\$asbProjects/$asbProjects/;
@@ -55,7 +55,6 @@ print $html;
 __DATA__
 <div id="asbProjects">
 	<ul>
-		<li><a href='job.cgi'>PacBio Assembly</a></li>
 		$asbProjects
 		<li><a href='asbProjectNew.cgi'>New GPM Project</a></li>
 	</ul>

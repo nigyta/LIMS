@@ -96,7 +96,9 @@ while (my @allGenome = $allGenome->fetchrow_array())
 }
 $genomes .= "</tbody></table></form>\n" if($genomes);
 my $button = "<div class='ui-state-highlight ui-corner-all' style='padding: 0 .7em;'>
-	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeNew.cgi\")'>New genome</button>
+	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeAlignmentLoadForm.cgi\")'>Load Tabular Alignment</button>
+	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeAlignmentForm.cgi\")'>Run Alignment</button>
+	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeNew.cgi\")'>New Genome</button>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='refresh(\"general\")'>Refresh</button>
 	";
 $button .= "<h2>Genomes</h2>";
@@ -113,7 +115,7 @@ $html =~ s/\$genomes/$genomes/g;
 $html =~ s/\$\$/$$/g;
 
 
-print header(-cookie=>cookie(-name=>'general',-value=>3));
+print header(-cookie=>cookie(-name=>'general',-value=>4));
 print $html;
 
 __DATA__

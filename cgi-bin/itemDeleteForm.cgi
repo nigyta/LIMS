@@ -47,6 +47,10 @@ for(@itemId)
 	{
 		$items->{$item[0]} = "Vector-$item[2]";
 	}
+	elsif($item[1] eq "record")
+	{
+		$items->{$item[0]} = "Record-$item[2]";
+	}
 	elsif($item[1] eq "paclib")
 	{
 		my $paclibToSample=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
@@ -77,9 +81,7 @@ print $html;
 __DATA__
 <form id="deleteItem" name="deleteItem" action="itemDelete.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<h3 class='ui-state-error-text'>Are you sure to delete the below items?</h3>
-	<table width='100%'>
-	<tr><td style='text-align:right'><label for="deleteItemList"><b>Items</b></label></td><td>$itemList</td></tr>
-	</table>
+	$itemList
 </form>
 <script>
 $('#dialog').dialog("option", "title", "Delete Item");

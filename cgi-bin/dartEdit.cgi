@@ -56,8 +56,8 @@ __DATA__
 <form id="editDart" name="editDart" action="dartSave.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<input name="dartId" id="editDartId" type="hidden" value="$dartId" />
 	<table>
-	<tr><td style='text-align:right'><label for="editDartName"><b>DArT Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="editDartName" size="40" type="text" maxlength="32" value="$dartName"/><br><sup class='ui-state-disabled'>$dartStatus loaded by $dartCreator on $dartCreationDate</sup></td></tr>
-	<tr><td style='text-align:right' rowspan='3'><label for="editDartFile"><b>DArT Report</b></label></td><td><input name="dartFile" id="editDartFile" type="file" />(in Tab Delimited Text format)</td></tr>
+	<tr><td style='text-align:right'><label for="editDartName"><b>DArTseq Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="editDartName" size="40" type="text" maxlength="32" value="$dartName"/><br><sup class='ui-state-disabled'>$dartStatus loaded by $dartCreator on $dartCreationDate</sup></td></tr>
+	<tr><td style='text-align:right' rowspan='3'><label for="editDartFile"><b>DArTseq File</b></label></td><td><input name="dartFile" id="editDartFile" type="file" />(in Tab Delimited Text format)</td></tr>
 	<tr><td>or <input name="dartFilePath" id="editDartFilePath" type="text" />(On-server file name with full path)</td></tr>
 	<tr>
 		<td><div class="ui-state-error-text">The new file will replace the existing data set.</div>
@@ -68,6 +68,6 @@ __DATA__
 	</table>
 </form>
 <script>
-$('#dialog').dialog("option", "title", "Edit DArT Report");
+$('#dialog').dialog("option", "title", "Edit DArTseq");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Save", click: function() { submitForm('editDart'); } }, { text: "Delete", click: function() { deleteItem($dartId); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 </script>

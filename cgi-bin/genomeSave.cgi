@@ -24,6 +24,7 @@ my $userName = $userDetail->{"userName"};
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my $asbProjectId = param ('asbProjectId') || '';
 my $genomeId = param ('genomeId') || '';
 my $genomeName = param ('name') || '';
 my $replace = param ('replace') || '0';
@@ -306,6 +307,7 @@ END
 				my $insertGenome=$dbh->prepare("INSERT INTO matrix VALUES ('', 'genome', ?, 0, ?, ?, ?, 0, ?, ?, NOW())");
 				$insertGenome->execute($genomeName,$forAssembly,$asReference,$libraryId,$genomeDescription,$userName);
 				$genomeId = $dbh->{mysql_insertid};
+				my $insertLink = $dbh->do("INSERT INTO link VALUES ($asbProjectId,$genomeId,'asbProject')") if ($asbProjectId);
 				my $pid = fork();
 				if ($pid) {
 					print <<END;
@@ -416,7 +418,7 @@ END
 					}
 					unlink ($genomeInfile);
 					unlink ($agpInfile);
-					my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1, creationDate = NOW() WHERE id = $genomeId");			
+					my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1, creationDate = NOW() WHERE id = $genomeId");
 					exit 0;
 				}
 				else{

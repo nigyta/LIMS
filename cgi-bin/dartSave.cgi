@@ -134,7 +134,7 @@ END
 							}
 							else
 							{
-								if($dartLine[0] eq 'CloneID')
+								if($dartLine[0] =~ /ID/) # any words with 'ID', e.g. CloneID, SNP-ID, etc.
 								{
 									my $metadataLineCol = 0;
 									$genotypeNumber = 0;
@@ -273,6 +273,7 @@ END
 					open (INFILE, "$dartInfile");
 					while (<INFILE>) {
 						chop;
+						/^\s*$/ and next; #skip blank line;
 						my @dartLine =  split("\t",$_);
 						if($dartLine[0] eq '*')
 						{
@@ -295,7 +296,7 @@ END
 						}
 						else
 						{
-							if($dartLine[0] eq 'CloneID')
+							if($dartLine[0] =~ /ID/) # any words with 'ID', e.g. CloneID, SNP-ID, etc.
 							{
 								my $metadataLineCol = 0;
 								$genotypeNumber = 0;

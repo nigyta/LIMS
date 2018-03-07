@@ -195,7 +195,7 @@ __DATA__
 </table>
 <script>
 $('#dialog').dialog("option", "title", "View Genome");
-$( "#dialog" ).dialog( "option", "buttons", [{ text: "Edit", click: function() { closeDialog();openDialog("genomeEdit.cgi?genomeId=$genomeId"); } }, { text: "OK", click: function() {closeDialog(); } } ] );
+$( "#dialog" ).dialog( "option", "buttons", [{ text: "Alignment as Query", click: function() { closeDialog();openDialog("genomeAlignmentForm.cgi?queryId=$genomeId"); } }, { text: "Alignment as Reference", click: function() { closeDialog();openDialog("genomeAlignmentForm.cgi?subjectId=$genomeId"); } }, { text: "Edit", click: function() { closeDialog();openDialog("genomeEdit.cgi?genomeId=$genomeId"); } }, { text: "OK", click: function() {closeDialog(); } } ] );
 $( "#gap$$" ).dataTable({
 	"dom": 'lfrtip',
 	"scrollY": "300px",

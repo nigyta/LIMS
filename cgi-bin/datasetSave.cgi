@@ -26,6 +26,7 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 
 my $datasetId = param ('datasetId') || '';
 my $datasetName = param ('name') || '';
+my $datasetType = param ('datasetType') || '0';
 my $parentId = param ('parentId') || '0';
 my $idColumn = param ('idColumn') || '1';
 $idColumn = $idColumn - 1;
@@ -71,8 +72,8 @@ if($datasetName)
 			my @checkCreator=$checkCreator->fetchrow_array();
 			if($checkCreator[9] eq $userName || exists $userPermission->{$userId}->{'dataset'})
 			{
-				my $updateDataset=$dbh->prepare("UPDATE matrix SET name = ?, z = ?, note = ? WHERE id = ?");
-				$updateDataset->execute($datasetName,$parentId,$datasetDescription,$datasetId);
+				my $updateDataset=$dbh->prepare("UPDATE matrix SET name = ?, o = ?, z = ?, note = ? WHERE id = ?");
+				$updateDataset->execute($datasetName,$datasetType,$parentId,$datasetDescription,$datasetId);
 				if($datasetFile || $datasetFilePath)
 				{
 					my $pid = fork();
@@ -143,7 +144,7 @@ END
 						close INFILE;
 						$line--;
 						unlink ($datasetInfile);
-						my $updateDatasetToLoaded = $dbh->do("UPDATE matrix SET o = $line, barcode = 1, creationDate = NOW() WHERE id = $datasetId");			
+						my $updateDatasetToLoaded = $dbh->do("UPDATE matrix SET x = $line, barcode = 1, creationDate = NOW() WHERE id = $datasetId");			
 						exit 0;
 					}
 					else{
@@ -186,8 +187,8 @@ END
 			$checkDatasetName->execute($datasetName);
 			if($checkDatasetName->rows < 1)
 			{
-				my $insertDataset=$dbh->prepare("INSERT INTO matrix VALUES ('', 'dataset', ?, 0, 0, 0, ?, 0, ?, ?, NOW())");
-				$insertDataset->execute($datasetName,$parentId,$datasetDescription,$userName);
+				my $insertDataset=$dbh->prepare("INSERT INTO matrix VALUES ('', 'dataset', ?, ?, 0, 0, ?, 0, ?, ?, NOW())");
+				$insertDataset->execute($datasetName,$datasetType,$parentId,$datasetDescription,$userName);
 				$datasetId = $dbh->{mysql_insertid};
 				my $pid = fork();
 				if ($pid) {
@@ -256,7 +257,7 @@ END
 					my $countTable = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'record' AND z = $datasetId");
 					$countTable->execute();
 					$line = $countTable->rows;
-					my $updateDatasetToLoaded = $dbh->do("UPDATE matrix SET o = $line, barcode = 1, creationDate = NOW() WHERE id = $datasetId");			
+					my $updateDatasetToLoaded = $dbh->do("UPDATE matrix SET x = $line, barcode = 1, creationDate = NOW() WHERE id = $datasetId");			
 					exit 0;
 				}
 				else{

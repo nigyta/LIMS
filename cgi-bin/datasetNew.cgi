@@ -16,18 +16,34 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my %datasetType = (
+	0=>'Universal',
+	1=>'Species',
+	2=>'Picture'
+	);
+
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
+my $givenParentId = param ('parentId') || '';
 my $parentId = "<option class='ui-state-error-text' value='0'>None</option>";
 my $parentList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' ORDER BY name");
 $parentList->execute();
 while (my @parentList = $parentList->fetchrow_array())
 {
-	$parentId .= "<option value='$parentList[0]' title='$parentList[2]}'>$parentList[1]: $parentList[2]</option>";
+	my $genebankDetails = decode_json $parentList[8];
+	$genebankDetails->{'comments'} = escapeHTML($genebankDetails->{'comments'});
+	$parentId .= ($givenParentId eq $parentList[0]) ? "<option value='$parentList[0]' title='$genebankDetails->{'comments'}' selected>$parentList[1]: $parentList[2]</option>" : "<option value='$parentList[0]' title='$genebankDetails->{'comments'}'>$parentList[1]: $parentList[2]</option>";
+}
+
+my $datasetTypeList = '';
+foreach (sort {$a <=> $b} keys %datasetType)
+{
+	$datasetTypeList .= "<option value='$_'>$datasetType{$_}</option>";
 }
 
 $html =~ s/\$parentId/$parentId/g;
+$html =~ s/\$datasetType/$datasetTypeList/g;
 
 print header;
 print $html;
@@ -36,6 +52,7 @@ __DATA__
 <form id="newDataset" name="newDataset" action="datasetSave.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<table>
 	<tr><td style='text-align:right'><label for="newDatasetName"><b>Dataset Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="newDatasetName" size="40" type="text" maxlength="32" /></td></tr>
+	<tr><td style='text-align:right'><label for="newDatasetType"><b>Type</b></label></td><td><select class='ui-widget-content ui-corner-all' name="datasetType" id="newDatasetType">$datasetType</select></td></tr>
 	<tr><td style='text-align:right' rowspan='2'><label for="newDatasetFile"><b>File</b></label></td><td><input name="datasetFile" id="newDatasetFile" type="file" />(in Tab Delimited Text format)</td></tr>
 	<tr><td>or <input name="datasetFilePath" id="newDatasetFilePath" type="text" />(On-server file name with full path)</td></tr>
 	<tr><td><label for="newDatasetIdColumn">Column for Name </label></td><td><input type="text" id="newDatasetIdColumn" name="idColumn" value="1"></td></tr>

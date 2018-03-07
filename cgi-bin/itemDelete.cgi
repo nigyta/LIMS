@@ -295,6 +295,7 @@ END
 						my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtg[0]");
 						my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $assemblyCtg[0]");
 					}
+					my $deleteAsbGenomeLink = $dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'asbGenome'");
 					my $deleteAssembly=$dbh->do("DELETE FROM matrix WHERE id = $_");
 				}
 				print <<END;
@@ -466,6 +467,28 @@ END
 	<script>
 		parent.closeDialog();
 		parent.refresh("general");
+	</script>	
+END
+			}
+			elsif($item[1] eq 'dataset')
+			{
+		
+				my $deleteRecord = $dbh->do("DELETE FROM matrix WHERE container LIKE 'record' AND z = $_");
+				my $deleteDart=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				print <<END;
+	<script>
+		parent.closeDialog();
+		parent.refresh("general");
+	</script>	
+END
+			}
+			elsif($item[1] eq 'record')
+			{
+				my $deleteRecord=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				print <<END;
+	<script>
+		parent.closeDialog();
+		parent.refresh("menu");
 	</script>	
 END
 			}

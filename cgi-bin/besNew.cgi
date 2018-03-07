@@ -36,7 +36,7 @@ __DATA__
 	<table>
 	<tr><td style='text-align:right'><label for="newBesFile"><b>BES File</b></label></td><td><input name="besFile" id="newBesFile" type="file" />(in FASTA format)</td></tr>
 	<tr><td></td><td>or <input name="besFilePath" id="newBesFilePath" type="text" />(On-server file name with full path)</td></tr>
-	<tr><td style='text-align:right'></td><td>Sequence title must be formated like 'cloneName.direction'<br>e.g., OSIABa0001A01.f, OSIABa0001A01.r, ... </td></tr>
+	<tr><td style='text-align:right'></td><td>Sequence title must be formated like 'cloneName.direction'<br>e.g., $libraryName0001A01.f, $libraryName0001A01.r, ... </td></tr>
 	<tr><td style='text-align:left' colspan='2'><label for="newBesReplace"><b>Are you going to update any existing BES in database?</b></label></td></tr>
 	<tr><td style='text-align:right'></td>
 		<td>
