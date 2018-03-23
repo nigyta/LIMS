@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -90,7 +90,7 @@ END
 					my $commentDetails = decode_json $checkComment[8];
 					$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
 					$commentDetails->{'description'} .= "\n".$appendCtgCommentDetails->{'description'};
-					my $json = JSON->new->allow_nonref;
+					my $json = JSON::XS->new->allow_nonref;
 					my $newCommentDetails = $json->encode($commentDetails);
 					my $updateComment=$dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
 					$updateComment->execute($newCommentDetails,$checkComment[0]);

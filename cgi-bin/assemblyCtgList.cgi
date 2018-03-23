@@ -3,7 +3,7 @@ use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
 use DBI;
-use JSON;
+use JSON::XS;
 use lib "lib/";
 use lib "lib/pangu";
 use pangu;

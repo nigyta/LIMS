@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -41,7 +41,7 @@ $paclibDetails->{'bluepippinConcentration'} = param('bluepippinConcentration') |
 $paclibDetails->{'bluepippinOperator'} = param('bluepippinOperator') || '';
 $paclibDetails->{'description'} = param('description') || '';
 
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 $paclibDetails = $json->encode($paclibDetails);
 
 my $config = new config;

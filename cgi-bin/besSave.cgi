@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use Bio::SeqIO;
 use lib "lib/";
@@ -89,7 +89,7 @@ END
 			my $col =  sprintf "%0*d", 2, $3;
 			$cloneName = "$library[2]$plateName$row$col";
 			my $seqLength = $seq->length();
-			my $json = JSON->new->allow_nonref;
+			my $json = JSON::XS->new->allow_nonref;
 			my $seqDetailsEncoded = $json->encode($seqDetails);
 			my $insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', ?, 98, ?, ?, ?, 0, ?, ?, NOW())");
 			$insertSequence->execute($cloneName,$libraryId,$seqLength,$seqDirNumber,$seqDetailsEncoded,$userName);

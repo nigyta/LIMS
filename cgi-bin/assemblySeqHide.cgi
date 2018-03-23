@@ -26,13 +26,13 @@ print header;
 
 if($assemblySeqId)
 {
-	my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
-	$assemblyCtgOfSeq->execute("($assemblySeqId)");
+	my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE ?");
+	$assemblyCtgOfSeq->execute("%($assemblySeqId)%");
 	my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
 	my @newCloneList;
 	foreach (split ",", $assemblyCtgOfSeq[8])
 	{
-		if(/$assemblySeqId/)
+		if(/($assemblySeqId)/)
 		{
 			if(/^-/)
 			{

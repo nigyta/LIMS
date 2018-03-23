@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON; # imports encode_json, decode_json, to_json and from_json.
+use JSON::XS; # imports encode_json, decode_json, to_json and from_json.
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -30,6 +30,6 @@ if($assemblyId)
 		push @results, \%hash;
 	}
 }
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 my $json_text = $json->encode(\@results);
 print $json_text;

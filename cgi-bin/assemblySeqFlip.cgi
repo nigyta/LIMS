@@ -38,8 +38,8 @@ END
 	else
 	{
 		my $updateAssemblySeq=$dbh->do("UPDATE matrix SET barcode = barcode * (-1) WHERE id = $assemblySeqId");
-		my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
-		$assemblyCtgOfSeq->execute("($assemblySeqId)");
+		my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE ?");
+		$assemblyCtgOfSeq->execute("%($assemblySeqId)%");
 		my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
 		print <<END;
 <script>

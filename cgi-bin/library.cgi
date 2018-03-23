@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";

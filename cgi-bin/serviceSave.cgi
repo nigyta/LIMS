@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -61,7 +61,7 @@ $serviceDetails->{'startDate'} = param ('startDate') || '';
 $serviceDetails->{'endDate'} = param ('endDate') || '';
 $serviceDetails->{'comments'} = param ('comments') || '';
 
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 $serviceDetails = $json->encode($serviceDetails);
 
 my $config = new config;

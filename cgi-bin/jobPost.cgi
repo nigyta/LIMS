@@ -4,7 +4,7 @@ use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
 use Bio::SeqIO;
 use LWP::Simple qw/getstore/;
-use JSON; #JSON::XS is recommended to be installed for handling JSON string of big size 
+use JSON::XS; #JSON::XS is recommended to be installed for handling JSON string of big size 
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -143,7 +143,7 @@ elsif($pid == 0){
 			$seqDetails->{'sequence'} = $seq->seq;
 			$seqDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 			$seqDetails->{'gapList'} = '';
-			my $json = JSON->new->allow_nonref;
+			my $json = JSON::XS->new->allow_nonref;
 			$seqDetails = $json->encode($seqDetails);
 			my $insertSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', ? , 0, ?, ?, 0, 0, ?, ?, NOW())");
 			$insertSequence->execute($seq->id(),$input,$seqLength,$seqDetails,$userName);

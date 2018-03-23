@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -22,7 +22,7 @@ my $userName = $userDetail->{"userName"};
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 my $seqId = param ('seqId') || '';
 my $filter = param ('filter') || '';
 

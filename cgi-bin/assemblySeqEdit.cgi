@@ -33,8 +33,8 @@ print header;
 if($assemblySeqId && $seqId && $seqLength && $seqStart && $seqEnd)
 {
 	my $updateAssemblySeq=$dbh->do("UPDATE matrix SET x = $gapType, y = $seqId, z = $seqLength, note = '$seqStart,$seqEnd' WHERE id = $assemblySeqId");
-	my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
-	$assemblyCtgOfSeq->execute("($assemblySeqId)");
+	my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE ?");
+	$assemblyCtgOfSeq->execute("%($assemblySeqId)%");
 	my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
 	print <<END;
 <script>

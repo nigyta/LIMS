@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON; #JSON::XS is recommended to be installed for handling JSON string of big size 
+use JSON::XS; #JSON::XS is recommended to be installed for handling JSON string of big size 
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -179,8 +179,8 @@ END
 			while(my @assemblySeqs = $assemblySeqs->fetchrow_array())
 			{
 				$inAssemblySequenceId->{$assemblySeqs[5]} = 1;
-				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
-				$assemblyCtgOfSeq->execute("($assemblySeqs[0])");
+				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE ?");
+				$assemblyCtgOfSeq->execute("%($assemblySeqs[0])%");
 				my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
 				$assemblySequenceLength->{$assemblySeqs[5]} = $assemblySeqs[6];
 				$assemblySequenceName->{$assemblySeqs[5]} = $assemblySeqs[2];
@@ -906,7 +906,7 @@ END
 				{
 					my $chrNumber;
 					my $chrPosition;
-					my $ctgAllSeqLength;
+					my $ctgAllSeqLength = 0;
 					for (split ",", $assemblyAllCtgList[8])
 					{
 						next unless ($_);
@@ -2149,7 +2149,7 @@ END
 			."Auto-Orient Seqs: $orientSeqs;\n"
 			."Renumber Contigs: $renumber."
 			;
-		my $json = JSON->new->allow_nonref;
+		my $json = JSON::XS->new->allow_nonref;
 		$assemblyDetails = $json->encode($assemblyDetails);
 		my $updateAssemblyToWork=$dbh->prepare("UPDATE matrix SET barcode = '1', note = ? WHERE id = ?");
 		$updateAssemblyToWork->execute($assemblyDetails,$assemblyId);

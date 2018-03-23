@@ -4,7 +4,7 @@ use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
 use Bio::SeqIO;
 use LWP::Simple qw/getstore/;
-use JSON; #JSON::XS is recommended to be installed for handling JSON string of big size 
+use JSON::XS; #JSON::XS is recommended to be installed for handling JSON string of big size 
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";

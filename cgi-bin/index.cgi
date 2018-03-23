@@ -4,7 +4,7 @@ use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
 use URI::Escape::XS;
 #use Date::Calc qw(:all);
-use JSON;
+use JSON::XS;
 use DBI;
 use Bio::SeqIO;
 use lib "lib/";
@@ -110,7 +110,7 @@ elsif($pid == 0){
 # 						$seqDetails->{'gapList'} .= ($seqDetails->{'gapList'} ne '') ? ",$seqstart-$seqend" : "$seqstart-$seqend" ;
 # 					}
 # 				}
-# 				my $json = JSON->new->allow_nonref;
+# 				my $json = JSON::XS->new->allow_nonref;
 # 				$seqDetails = $json->encode($seqDetails);
 # 				my $updateToSequence = $dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
 # 				$updateToSequence->execute($seqDetails,$getSequences[0]);
@@ -128,7 +128,7 @@ elsif($pid == 0){
 # 		{
 # 			my $assemblyDetails;
 # 			$assemblyDetails->{'description'} = $getAssembly[8];
-# 			my $json = JSON->new->allow_nonref;
+# 			my $json = JSON::XS->new->allow_nonref;
 # 			$assemblyDetails = $json->encode($assemblyDetails);
 # 			my $updateToAssembly = $dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
 # 			$updateToAssembly->execute($assemblyDetails,$getAssembly[0]);

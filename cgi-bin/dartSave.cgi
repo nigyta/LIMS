@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use Bio::SeqIO;
 use File::Basename;
@@ -34,7 +34,7 @@ my $dartFilePath = param ('dartFilePath') || '';
 
 my $safeFilenameCharacters = "a-zA-Z0-9_.-";
 my $dartInfile = "$commoncfg->{TMPDIR}/$$.dart";
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 
 my $config = new config;
 my $userPermission;

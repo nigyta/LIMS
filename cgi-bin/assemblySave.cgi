@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -59,7 +59,7 @@ if($assemblyName)
 			my $assemblyDetails = decode_json $checkCreator[8];
 			$assemblyDetails->{'autoCheckNewSeq'} = param ('autoCheckNewSeq') || '0';
 			$assemblyDetails->{'description'} =  param('description') || '';
-			my $json = JSON->new->allow_nonref;
+			my $json = JSON::XS->new->allow_nonref;
 			$assemblyDetails = $json->encode($assemblyDetails);
 			my $updateAssembly=$dbh->prepare("UPDATE matrix SET name = ?, y = ?, z = ?, note = ? WHERE id = ?");
 			$updateAssembly->execute($assemblyName,$refGenomeId,$fpcOrAgpId,$assemblyDetails,$assemblyId);
@@ -92,7 +92,7 @@ END
 		my $assemblyDetails;
 		$assemblyDetails->{'autoCheckNewSeq'} = param ('autoCheckNewSeq') || '0';
 		$assemblyDetails->{'description'} =  param('description') || '';
-		my $json = JSON->new->allow_nonref;
+		my $json = JSON::XS->new->allow_nonref;
 		$assemblyDetails = $json->encode($assemblyDetails);
 		my $version = 1;
 		my $checkAssembly = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = ?");

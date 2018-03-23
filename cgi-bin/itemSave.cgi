@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -73,7 +73,7 @@ $genebankDetails->{'dateGenebankWasAutoclaved'} = param('dateGenebankWasAutoclav
 $genebankDetails->{'archiveStartDate'} = param('archiveStartDate') || '0000-00-00';
 $genebankDetails->{'archiveEndDate'} = param('archiveEndDate') || '0000-00-00';
 
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 $genebankDetails = $json->encode($genebankDetails);
 
 my $config = new config;

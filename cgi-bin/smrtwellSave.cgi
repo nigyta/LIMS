@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -30,7 +30,7 @@ my $movieLength = param ('movieLength') || '0';
 my $condition = param ('condition') || '0';
 my $smrtrunId = param ('smrtrunId') || '';
 
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 my $smrtwellDetails;
 $smrtwellDetails->{'loadingName'} = param ('loadingName') || '';
 $smrtwellDetails->{'comments'} = param ('comments') || '';

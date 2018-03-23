@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use Bio::SeqIO;
 use File::Basename;
@@ -49,7 +49,7 @@ $agpFilename =~ s/[^$safeFilenameCharacters]//g;
 my $agpObjectComponent = param ('agpObjectComponent') || '0';
 my $genomeInfile = "$commoncfg->{TMPDIR}/$$.genome";
 my $agpInfile = "$commoncfg->{TMPDIR}/$$.agp";
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 
 my $config = new config;
 my $userPermission;

@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON;
+use JSON::XS;
 use DBI;
 use lib "lib/";
 use lib "lib/pangu";
@@ -42,7 +42,7 @@ my $groupDetails;
 $groupDetails->{'description'} = param('description') || '';
 $groupDetails->{'permission'} = $permissionIds;
 
-my $json = JSON->new->allow_nonref;
+my $json = JSON::XS->new->allow_nonref;
 $groupDetails = $json->encode($groupDetails);
 
 print header;

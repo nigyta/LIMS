@@ -2,7 +2,7 @@
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON; #JSON::XS is recommended to be installed for handling JSON string of big size 
+use JSON::XS; #JSON::XS is recommended to be installed for handling JSON string of big size 
 use DBI;
 use SVG;
 use lib "lib/";
