@@ -207,6 +207,7 @@ END
 							$seqDetails->{'description'} = $seq->desc || '';
 							$seqDetails->{'sequence'} = $seq->seq;
 							$seqDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
+#							$seqDetails->{'sequence'} =~ s/^N+|N+$//g; #replace Ns at both ends.	
 							$seqDetails->{'gapList'} = '';
 							my $chrNumber = 0;
 							if($assignChr)
@@ -216,7 +217,7 @@ END
 							my $seqLength = $seq->length();
 							my $seqend = 0;
 							my @piece = ();
-							foreach (split(/([N|n]{20,})/,$seq->seq)) #at least 20 Ns to be a gap
+							foreach (split(/([N|n]{20,})/,$seqDetails->{'sequence'})) #at least 20 Ns to be a gap
 							{
 								my $seqstart=$seqend+1;
 								$seqend=$seqend + length($_);
@@ -364,6 +365,7 @@ END
 						$seqDetails->{'description'} = $seq->desc || '';
 						$seqDetails->{'sequence'} = $seq->seq;
 						$seqDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
+#						$seqDetails->{'sequence'} =~ s/^N+|N+$//g; #replace Ns at both ends.	
 						$seqDetails->{'gapList'} = '';
 						my $chrNumber = 0;
 						if($assignChr)
@@ -373,7 +375,7 @@ END
 						my $seqLength = $seq->length();
 						my $seqend = 0;
 						my @piece = ();
-						foreach (split(/([N|n]{20,})/,$seq->seq)) #at least 20 Ns to be a gap
+						foreach (split(/([N|n]{20,})/,$seqDetails->{'sequence'})) #at least 20 Ns to be a gap
 						{
 							my $seqstart=$seqend+1;
 							$seqend=$seqend + length($_);
@@ -387,7 +389,6 @@ END
 								$pieceDetails->{'id'} = $seq->id;
 								$pieceDetails->{'description'} = $seq->desc || '';
 								$pieceDetails->{'sequence'} = $_;
-								$pieceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 								$pieceDetails->{'gapList'} = '';
 								$pieceDetails->{'coordinates'} = "$seqstart-$seqend";
 								my $pieceDetailsEncoded = $json->encode($pieceDetails);
@@ -407,7 +408,6 @@ END
 								my $pieceDetails = decode_json $_;
 								$pieceDetails->{'id'} = '' unless (exists $pieceDetails->{'id'});
 								$pieceDetails->{'sequence'} = '' unless (exists $pieceDetails->{'sequence'});
-								$pieceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.
 								$seqLength = length ($pieceDetails->{'sequence'});
 								my $insertChildSequence=$dbh->prepare("INSERT INTO matrix VALUES ('', 'sequence', ?, 97, ?, ?, ?, ?, ?, ?, NOW())");
 								$insertChildSequence->execute($pieceDetails->{'id'}.'-'.$pieceNumber,$genomeId,$seqLength,$pieceNumber,$parentSequenceId,$_,$userName);

@@ -20,6 +20,7 @@ URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
 Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
 
 JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
+JSON::XS http://search.cpan.org/~mlehmann/JSON-XS-3.04/XS.pm
 
 jQuery http://jquery.com/
 
