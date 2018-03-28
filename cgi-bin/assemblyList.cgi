@@ -111,6 +111,7 @@ if ($assemblyId)
 	$assemblyList .= "</ul>
 						</li>
 						<li><a onclick='openDialog(\"assemblyRunForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-shuffle'></span>Run Assembly</a></li>
+						<li><a onclick='openDialog(\"assemblyCtgResetForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Reset Redundancy</a></li>
 						<li><a><span class='ui-icon ui-icon-link'></span>Gap Filler</a>
 							<ul style='z-index: 1000;white-space: nowrap;'>
 								<li><a onclick='openDialog(\"assemblyGapFillForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Run</a></li>

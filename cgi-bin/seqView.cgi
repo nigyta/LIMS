@@ -121,9 +121,8 @@ if ($seqId)
 		while (my @assemblySeq = $assemblySeq->fetchrow_array())
 		{
 			$assemblyView = "<tr><td style='text-align:right'><b>Assembly</b></td><td><div id='assemblySeqTabs$$'><ul>" unless ($assemblyView);
-
-			my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE ?");
-			$assemblyCtg->execute("%($assemblySeq[0])%");
+			my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
+			$assemblyCtg->execute($assemblySeq[0]);
 			my @assemblyCtg = $assemblyCtg->fetchrow_array();
 
 			my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");

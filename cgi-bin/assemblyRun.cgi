@@ -179,8 +179,8 @@ END
 			while(my @assemblySeqs = $assemblySeqs->fetchrow_array())
 			{
 				$inAssemblySequenceId->{$assemblySeqs[5]} = 1;
-				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE ?");
-				$assemblyCtgOfSeq->execute("%($assemblySeqs[0])%");
+				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
+				$assemblyCtgOfSeq->execute($assemblySeqs[0]);
 				my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
 				$assemblySequenceLength->{$assemblySeqs[5]} = $assemblySeqs[6];
 				$assemblySequenceName->{$assemblySeqs[5]} = $assemblySeqs[2];
@@ -651,6 +651,8 @@ END
 							my $assemblySeqByName = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ? AND name LIKE ?");
 							$assemblySeqByName->execute($assemblyId,$agpLine[5]);
 							my @assemblySeqByName = $assemblySeqByName->fetchrow_array();
+							$agpLine[6] = $assemblySeqByName[6] if ($agpLine[6] > $assemblySeqByName[0]);
+							$agpLine[7] = $assemblySeqByName[6] if ($agpLine[7] > $assemblySeqByName[0]);
 							my $updateAssemblySeq=$dbh->prepare("UPDATE matrix SET barcode = ?, note = ? WHERE id = ?");
 							$updateAssemblySeq->execute($agpOrientation,"$agpLine[6],$agpLine[7]",$assemblySeqByName[0]);
 							if ($agpLine[3] - $partNumber == 1) #connected

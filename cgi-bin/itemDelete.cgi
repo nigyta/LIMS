@@ -326,8 +326,8 @@ END
 			elsif($item[1] eq 'assemblySeq')
 			{
 				my $scrollLeft = param ('scrollLeft') || '0';
-				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND note LIKE ?");
-				$assemblyCtgOfSeq->execute("%($_)%");
+				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
+				$assemblyCtgOfSeq->execute($_);
 				my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
 				my @seqList = split ",", $assemblyCtgOfSeq[8];
 				my $number=@seqList;
