@@ -659,7 +659,6 @@ elsif(param ('assemblyId'))
 	if($unit eq 'chr')
 	{
 		my $preChr = 'na';
-		my $chrUn = 1;
 		my $chrSequence;
 		my $lastComponentTypeOnChr;
 		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
@@ -673,9 +672,7 @@ elsif(param ('assemblyId'))
 
 			if($assemblyCtg[4] == 0)
 			{
-				my $chrUnNumber = sprintf "%0*d", 2, $chrUn;
-				$chrUn++;
-				print ">ChrUN$chrUnNumber (Ctg$assemblyCtg[2]-";
+				print ">ChrUN-Ctg$assemblyCtg[2] (Ctg$assemblyCtg[2]-";
 
 				my @assemblySeqList;
 				my $lastAssemblySeq = "";
@@ -1076,7 +1073,6 @@ elsif(param ('assemblyIdForAgp'))
 	if($unit eq 'chr')
 	{
 		my $preChr = 'na';
-		my $chrUn = 1;
 		my $num;
 		my $begin;
 		my $lastComponentType;
@@ -1094,8 +1090,6 @@ elsif(param ('assemblyIdForAgp'))
 				$num->{0} = 1; #reset component number
 				$begin->{0} = 1;
 				$lastComponentType->{0} = '';
-				my $chrUnNumber = sprintf "%0*d", 2, $chrUn;
-				$chrUn++;
 				if($element eq 'seq')
 				{
 					my @assemblySeqList;
@@ -1124,7 +1118,7 @@ elsif(param ('assemblyIdForAgp'))
 						{
 							if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
 							{
-								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$gapLength-1,"\t$num->{0}\tU\t$gapLength\tcontig\tno\tna\n";
+								print "ChrUN-Ctg$assemblyCtg[2]\t$begin->{0}\t",$begin->{0}+$gapLength-1,"\t$num->{0}\tU\t$gapLength\tcontig\tno\tna\n";
 								$begin->{0} += $gapLength;
 								$num->{0}++;
 								$lastComponentType->{0} = 'U';
@@ -1174,11 +1168,11 @@ elsif(param ('assemblyIdForAgp'))
 								$seqLength=$position->[1]-$position->[0]+1;
 								if($sequence[3] > 50) #not BAC sequence
 								{
-									print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "ChrUN-Ctg$assemblyCtg[2]\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
 								else
 								{
-									print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "ChrUN-Ctg$assemblyCtg[2]\t$begin->{0}\t",$begin->{0}+$seqLength-1,"\t$num->{0}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
 								$begin->{0} += $seqLength;
 								$num->{0}++;
@@ -1189,11 +1183,11 @@ elsif(param ('assemblyIdForAgp'))
 						{
 							if($sequence[3] > 50) #not BAC sequence
 							{
-								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "ChrUN-Ctg$assemblyCtg[2]\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
 							else
 							{
-								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "ChrUN-Ctg$assemblyCtg[2]\t$begin->{0}\t",$begin->{0}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{0}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
 							$begin->{0} += $assemblySeqEnd-$assemblySeqStart+1;
 							$num->{0}++;
@@ -1203,7 +1197,7 @@ elsif(param ('assemblyIdForAgp'))
 						{
 							if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 3' 100 Ns
 							{
-								print "ChrUN$chrUnNumber\t$begin->{0}\t",$begin->{0}+$gapLength-1,"\t$num\tU\t$gapLength\tcontig\tno\tna\n";
+								print "ChrUN-Ctg$assemblyCtg[2]\t$begin->{0}\t",$begin->{0}+$gapLength-1,"\t$num\tU\t$gapLength\tcontig\tno\tna\n";
 								$begin->{0} += $gapLength;
 								$num->{0}++;
 								$lastComponentType->{0} = 'U';
@@ -1215,7 +1209,7 @@ elsif(param ('assemblyIdForAgp'))
 				{
 					 #element eq 'ctg'
 					 #no end Ns printed out
-					print "ChrUN$chrUnNumber\t1\t",$assemblyCtg[7],"\t$num->{0}\tW\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
+					print "ChrUN-Ctg$assemblyCtg[2]\t1\t",$assemblyCtg[7],"\t$num->{0}\tW\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
 					$lastComponentType->{0} = 'D';
 				}
 			}
