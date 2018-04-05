@@ -78,6 +78,8 @@ print header;
 print $html;
 
 __DATA__
+<button style='float: right; margin-top: .3em; margin-right: .3em;'  onClick='uncheckAll("assemblyCtgId");return false;'>Uncheck All</button>
+<button style='float: right; margin-top: .3em; margin-right: .3em;'  onClick='checkAll("assemblyCtgId");return false;'>Check All</button>
 <form id="assemblyAssign" name="assemblyAssign" action="assemblyAssignSave.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 <h3>Please check ctgs for assigning chromosome number:</h3>
 $ctgList
@@ -86,6 +88,7 @@ $ctgList
 </table>
 </form>
 <script>
+buttonInit();
 $('#dialog').dialog("option", "title", "Assign Ctg To Chromosome");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Assign", click: function() { submitForm('assemblyAssign'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 </script>

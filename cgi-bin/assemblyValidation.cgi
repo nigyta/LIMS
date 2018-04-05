@@ -129,7 +129,7 @@ END
 		$assemblySeqWithoutCtgNum++ unless (exists $seqCount{$validateAssemblySeq[0]});
 	}
 
-	$validateDetail="<table>
+	$validateDetail = "<table>
 	<tr><td style='text-align:right'><b>No sequence</b></td><td>$noSequenceNum</td></tr>
 	<tr><td style='text-align:right'><b>Null assemblySeq</b></td><td>$nullAssemblySeqNum</td></tr>
 	<tr><td style='text-align:right'><b>Error assemblySeq</b></td><td>$errorAssemblySeqNum</td></tr>

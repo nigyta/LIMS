@@ -72,6 +72,10 @@ while (my @allGenome = $allGenome->fetchrow_array())
 		<table id='genomes$$' class='display' style='width: 100%;'>
 			<thead>
 				<tr>
+					<th>
+						<input type='checkbox' id='checkAllBox$$' name='checkAllBox$$' value='Check all' checked='checked' onClick='checkAll(\"itemId\");return false;' title='Check all'>
+						<input type='checkbox' id='uncheckAllBox$$' name='uncheckAllBox$$' value='Uncheck all' onClick='uncheckAll(\"itemId\");return false;' title='Uncheck all'>
+					</th>
 					<th style='text-align:left'><b>Genome</b></th>
 					<th style='text-align:left'><b>Sequences</b></th>
 					<th style='text-align:left'><b>For Reassembly</b></th>
@@ -84,6 +88,7 @@ while (my @allGenome = $allGenome->fetchrow_array())
 			</thead>
 			<tbody>" unless($genomes);
 	$genomes .= "<tr>
+		<td style='text-align:center;'><input type='checkbox' id='genomeList$allGenome[0]$$' name='itemId' value='$allGenome[0]'></td>
 		<td title='Genome'><a id='genomeId$allGenome[0]$$' onclick='openDialog(\"genomeView.cgi?genomeId=$allGenome[0]\")' title='View'>$allGenome[2]</a></td>
 		<td title='Click to download $allGenome[3] Sequences'><a href='download.cgi?genomeId=$allGenome[0]' target='hiddenFrame'>$allGenome[3]</a></td>
 		<td>$yesOrNo{$allGenome[4]}. $agpAvailable</td>
@@ -97,9 +102,12 @@ while (my @allGenome = $allGenome->fetchrow_array())
 $genomes .= "</tbody></table></form>\n" if($genomes);
 my $button = "<div class='ui-state-highlight ui-corner-all' style='padding: 0 .7em;'>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeAlignmentLoadForm.cgi\")'>Load Tabular Alignment</button>
-	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeAlignmentForm.cgi\")'>Run Alignment</button>
-	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeNew.cgi\")'>New Genome</button>
+	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeAlignmentForm.cgi\")'>Run Alignment</button>";
+$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"itemDeleteForm.cgi\",\"genomeList$$\")'>Delete genome</button>" if($allGenome->rows > 0);
+#$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"genomeMergeForm.cgi\",\"genomeList$$\")'>Merge genomes</button>" if($allGenome->rows > 1);
+$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeNew.cgi\")'>New Genome</button>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='refresh(\"general\")'>Refresh</button>
+	<input style='float: right;; margin-top: .3em; margin-right: .3em;' class='ui-widget-content ui-corner-all' name='seqName' id='searchSeqName$$' size='16' type='text' maxlength='32' VALUE='' placeholder='Search Seq' />
 	";
 $button .= "<h2>Genomes</h2>";
 
@@ -130,7 +138,17 @@ buttonInit();
 $( "#genomes$$" ).dataTable({
 	"scrollY": "600px",
 	"scrollCollapse": true,
-	"paging": false
+	"paging": false,
+	"columnDefs": [
+    { "orderable": false, "targets": 0 }
+  ]
+});
+$( "#searchSeqName$$" ).autocomplete({
+	source: "autoSeqSearch.cgi",
+	minLength: 4,
+	select: function( event, ui ) {
+		openDialog("seqView.cgi?seqId=" + ui.item.id);
+	}
 });
 loadingHide();
 </script>

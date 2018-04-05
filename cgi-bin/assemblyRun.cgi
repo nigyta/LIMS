@@ -902,7 +902,7 @@ END
 			{
 				my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
 				#assign ctg to genome chr
-				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ?");
+				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND x = 0 AND o = ?");
 				$assemblyAllCtgList->execute($assemblyId);
 				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
 				{
@@ -912,8 +912,8 @@ END
 					for (split ",", $assemblyAllCtgList[8])
 					{
 						next unless ($_);
+						/^-/ and next;
 						$_ =~ s/[^a-zA-Z0-9]//g;
-						$ctgAllSeqLength += $assemblySequenceLength->{$_};
 						my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
 						$getAlignment->execute($assemblySequenceId->{$_});
 						while (my @getAlignment = $getAlignment->fetchrow_array())
@@ -921,62 +921,28 @@ END
 							next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
 							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
 							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
-							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = "$getAlignment[10]-$getAlignment[11]" unless (exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}});
-							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$getAlignment[10]-$getAlignment[11]" if ($chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} ne "$getAlignment[10]-$getAlignment[11]");
+							my $estimatedPosition = $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength;
+							if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
+							{
+								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
+							}
+							else
+							{
+								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
+							}
 						}
+						$ctgAllSeqLength += $assemblySequenceLength->{$_};
 					}
 					my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
 					my $assignedChr = (@assignedChr) ? shift @assignedChr : 0;
 					my $assignedPosition = 0;
+					
 					if($assignedChr)
 					{
-						my $occupiedKeyPoint;
-						for (split ",",$chrPosition->{$assignedChr})
-						{
-							my ($start, $end) = split "-",$_;
-							if($start < $end)
-							{
-								$occupiedKeyPoint->{$start} = $end unless (exists $occupiedKeyPoint->{$start});
-								$occupiedKeyPoint->{$start} = $end if ($occupiedKeyPoint->{$start} < $end);
-							}
-							else
-							{
-								$occupiedKeyPoint->{$end} = $start unless (exists $occupiedKeyPoint->{$end});
-								$occupiedKeyPoint->{$end} = $start if ($occupiedKeyPoint->{$end} < $start);
-							}
-						}
-						my @occupiedKeyPoint = sort {$a <=> $b} keys %$occupiedKeyPoint;
-						my $preKeyPoint = shift @occupiedKeyPoint;
-						for (@occupiedKeyPoint) #merge overlapped alignments
-						{
-							if($_ < $occupiedKeyPoint->{$preKeyPoint})
-							{
-								$occupiedKeyPoint->{$preKeyPoint} = $occupiedKeyPoint->{$_} if($occupiedKeyPoint->{$_} > $occupiedKeyPoint->{$preKeyPoint});
-								delete $occupiedKeyPoint->{$_};
-							}
-							else
-							{
-								$preKeyPoint = $_;
-							}
-						}
-						@occupiedKeyPoint = sort {$a <=> $b} keys %$occupiedKeyPoint;
-						my $maxCounts = 0;
-						do
-						{
-							my $currentKeyPoint = shift @occupiedKeyPoint;
-							my $positionCounts = $occupiedKeyPoint->{$currentKeyPoint} - $currentKeyPoint + 1;
-						
-							for (@occupiedKeyPoint)
-							{
-								$positionCounts += $occupiedKeyPoint->{$_} - $_ + 1 if($_ > $occupiedKeyPoint->{$currentKeyPoint} && $_ < $currentKeyPoint + $ctgAllSeqLength);
-							}
-
-							if ($positionCounts > $maxCounts)
-							{
-								$assignedPosition = $currentKeyPoint ;
-								$maxCounts = $positionCounts;
-							}
-						}while(@occupiedKeyPoint);
+						my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
+						sort {$a <=> $b} @assignedPositionCandidates;
+						my $median = int ($#assignedPositionCandidates/2);
+						$assignedPosition = $assignedPositionCandidates[$median];
 					}
 					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
 				}

@@ -13,7 +13,6 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 
 my $keyword = param("term");
 my $assemblyId =  param("assemblyId") || '';
-my $assemblyCtgId =  param("assemblyCtgId") || '';
 my @results;
 print header('application/json');
 

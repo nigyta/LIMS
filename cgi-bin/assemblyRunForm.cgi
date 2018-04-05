@@ -139,7 +139,7 @@ __DATA__
 	<table>
 	<tr><td style='text-align:right'><label for="newAssemblyGenome"><b>Reference Genome</b></label></td>
 	<td><select class='ui-widget-content ui-corner-all' name="refGenomeId" id="newAssemblyGenome">$refGenomeId</select><br>
-			<input type="checkbox" id="newAssemblyAssignChrCheckbox" name="assignChr" value="1" checked="checked"><label for="newAssemblyAssignChrCheckbox">Assign chromosome number for contigs</label><br>
+			<input type="checkbox" id="newAssemblyAssignChrCheckbox" name="assignChr" value="1" checked="checked"><label for="newAssemblyAssignChrCheckbox">Assign chromosome number for Chr0 contigs</label><br>
 			<input type="checkbox" id="newAssemblyOrientContigsCheckbox" name="orientContigs" value="1" checked="checked"><label for="newAssemblyOrientContigsCheckbox">Orient contigs based-on reference genome</label>
 	</td>
 	</tr>
