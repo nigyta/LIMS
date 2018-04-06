@@ -45,7 +45,6 @@ END
 	my $deleteEmptyAssemblyCtg = $dbh->prepare("DELETE FROM matrix WHERE container LIKE 'assemblyCtg' AND note = '' AND o = ?");
 	$deleteEmptyAssemblyCtg->execute($assemblyId);
 
-
 	my %assemblySeqToCtg;
 	my %seqCount;
 	my %hideSeqCtg;

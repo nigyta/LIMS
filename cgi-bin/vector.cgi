@@ -71,8 +71,8 @@ while (my @allVector = $allVector->fetchrow_array())
 $vectors .= "</tbody></table></form>\n" if($vectors);
 my $button = "<div class='ui-state-highlight ui-corner-all' style='padding: 0 .7em;'>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"vectorNew.cgi\")'>New vector</button>";
-$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"itemDeleteForm.cgi\",\"vectorList$$\")'>Delete vector</button>" if($vectors);
-$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"vectorMergeForm.cgi\",\"vectorList$$\")'>Merge vectors</button>" if($allVector->rows > 1);
+$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"itemDeleteForm.cgi\",\"vectorList$$\")'>Delete</button>" if($vectors);
+$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"vectorMergeForm.cgi\",\"vectorList$$\")'>Merge</button>" if($allVector->rows > 1);
 $button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='refresh(\"general\")'>Refresh</button>
 			<h2>Vectors</h2>";
 

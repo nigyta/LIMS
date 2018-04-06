@@ -103,8 +103,8 @@ $genomes .= "</tbody></table></form>\n" if($genomes);
 my $button = "<div class='ui-state-highlight ui-corner-all' style='padding: 0 .7em;'>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeAlignmentLoadForm.cgi\")'>Load Tabular Alignment</button>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeAlignmentForm.cgi\")'>Run Alignment</button>";
-$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"itemDeleteForm.cgi\",\"genomeList$$\")'>Delete genome</button>" if($allGenome->rows > 0);
-#$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"genomeMergeForm.cgi\",\"genomeList$$\")'>Merge genomes</button>" if($allGenome->rows > 1);
+$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"itemDeleteForm.cgi\",\"genomeList$$\")'>Delete</button>" if($allGenome->rows > 0);
+$button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialogForm(\"genomeMergeForm.cgi\",\"genomeList$$\")'>Merge</button>" if($allGenome->rows > 1);
 $button .= "<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='openDialog(\"genomeNew.cgi\")'>New Genome</button>
 	<button style='float: right; margin-top: .3em; margin-right: .3em;' onclick='refresh(\"general\")'>Refresh</button>
 	<input style='float: right;; margin-top: .3em; margin-right: .3em;' class='ui-widget-content ui-corner-all' name='seqName' id='searchSeqName$$' size='16' type='text' maxlength='32' VALUE='' placeholder='Search Seq' />

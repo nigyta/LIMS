@@ -51,7 +51,8 @@ print header;
 my $libraryId = 0;
 for(@items)
 {
-	if ($_ eq 0)
+	my $itemId = $_;
+	if ($itemId eq 0)
 	{
 		my $pid = fork();
 		if ($pid) {
@@ -135,13 +136,13 @@ END
 	else
 	{
 		my $item = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-		$item->execute($_);
+		$item->execute($itemId);
 		my @item=$item->fetchrow_array();
 		if($item[9] eq $userName || exists $userPermission->{$userId}->{'item'})
 		{
 			if($item[1] eq 'room')
 			{
-				my $freezerInRoom = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'freezer' AND o = $_");
+				my $freezerInRoom = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'freezer' AND o = $itemId");
 				$freezerInRoom->execute();
 				if ($freezerInRoom->rows > 0)
 				{
@@ -153,7 +154,7 @@ END
 END
 					exit;
 				}
-				my $deleteRoom=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteRoom=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -163,7 +164,7 @@ END
 			}
 			elsif($item[1] eq 'freezer')
 			{
-				my $boxInFreezer = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'box' AND o = $_");
+				my $boxInFreezer = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'box' AND o = $itemId");
 				$boxInFreezer->execute();
 				if ($boxInFreezer->rows > 0)
 				{
@@ -175,7 +176,7 @@ END
 END
 					exit;
 				}
-				my $deleteFreezer=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteFreezer=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -185,7 +186,7 @@ END
 			}
 			elsif($item[1] eq 'box')
 			{
-				my $itemInBox = $dbh->prepare("SELECT * FROM link WHERE type LIKE 'box' AND parent = $_");
+				my $itemInBox = $dbh->prepare("SELECT * FROM link WHERE type LIKE 'box' AND parent = $itemId");
 				$itemInBox->execute();
 				if ($itemInBox->rows > 0)
 				{
@@ -196,8 +197,8 @@ END
 	</script>	
 END
 				}
-				my $deleteBox=$dbh->do("DELETE FROM matrix WHERE id = $_");
-				my $deleteLinkA=$dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'box'");
+				my $deleteBox=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteLinkA=$dbh->do("DELETE FROM link WHERE parent = $itemId AND type LIKE 'box'");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -207,7 +208,7 @@ END
 			}
 			elsif($item[1] eq "project")
 			{
-				my $serviceInProject = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'service' AND z = $_");
+				my $serviceInProject = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'service' AND z = $itemId");
 				$serviceInProject->execute();
 				if($serviceInProject->rows > 0)
 				{
@@ -220,7 +221,7 @@ END
 					exit;
 				}
 
-				my $libraryInProject = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' AND z = $_");
+				my $libraryInProject = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' AND z = $itemId");
 				$libraryInProject->execute();
 				if($libraryInProject->rows > 0)
 				{
@@ -232,7 +233,7 @@ END
 END
 					exit;
 				}
-				my $deleteProject=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteProject=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -242,7 +243,7 @@ END
 			}
 			elsif($item[1] eq 'asbProject')
 			{
-				my $childInAsbProject = $dbh->prepare("SELECT * FROM link WHERE parent = $_ AND type LIKE 'asbProject'");
+				my $childInAsbProject = $dbh->prepare("SELECT * FROM link WHERE parent = $itemId AND type LIKE 'asbProject'");
 				$childInAsbProject->execute();
 				if($childInAsbProject->rows > 0)
 				{
@@ -255,8 +256,8 @@ END
 					exit;
 				}
 
-				my $deleteAsbProject=$dbh->do("DELETE FROM matrix WHERE id = $_");
-				my $deleteLink=$dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'asbProject'");
+				my $deleteAsbProject=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteLink=$dbh->do("DELETE FROM link WHERE parent = $itemId AND type LIKE 'asbProject'");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -268,7 +269,7 @@ END
 			{
 				if ($option eq 'chrZeroOnly')
 				{
-					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $_ AND x = 0");
+					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $itemId AND x = 0");
 					$assemblyCtg->execute();
 					while (my @assemblyCtg=$assemblyCtg->fetchrow_array())
 					{
@@ -283,7 +284,7 @@ END
 				}
 				else
 				{
-					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $_");
+					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $itemId");
 					$assemblyCtg->execute();
 					while (my @assemblyCtg=$assemblyCtg->fetchrow_array())
 					{
@@ -295,8 +296,8 @@ END
 						my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtg[0]");
 						my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $assemblyCtg[0]");
 					}
-					my $deleteAsbGenomeLink = $dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'asbGenome'");
-					my $deleteAssembly=$dbh->do("DELETE FROM matrix WHERE id = $_");
+					my $deleteAsbGenomeLink = $dbh->do("DELETE FROM link WHERE parent = $itemId AND type LIKE 'asbGenome'");
+					my $deleteAssembly=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				}
 				print <<END;
 	<script>
@@ -307,13 +308,13 @@ END
 			}
 			elsif($item[1] eq 'assemblyCtg')
 			{
-				my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $_");
 				foreach (split ",", $item[8])
 				{
 					$_ =~ s/[^a-zA-Z0-9]//g;
 					my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $_");
 				}
-				my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $_");
+				my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $itemId");
 
 				print <<END;
 	<script>
@@ -327,30 +328,27 @@ END
 			{
 				my $scrollLeft = param ('scrollLeft') || '0';
 				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
-				$assemblyCtgOfSeq->execute($_);
+				$assemblyCtgOfSeq->execute($itemId);
 				my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
 				my @seqList = split ",", $assemblyCtgOfSeq[8];
 				my $number=@seqList;
 				my @newSeqList;
-				my $seqId;
 				if ($number > 1)
 				{
 					for (@seqList)
 					{
-						$seqId=$_;
-						$_ =~ s/[^a-zA-Z0-9]//g;
-						if (/$_/)
+						if (/($itemId)/)
 						{
 							next;
 						}
 						else
 						{
-							push @newSeqList, $seqId;
+							push @newSeqList, $_;
 						}
 					}
-					my $newCloneList = join ",", @newSeqList;
-					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET note = '$newCloneList' WHERE id = $assemblyCtgOfSeq[0]");
-					my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $_");
+					my $newAsbSeqList = join ",", @newSeqList;
+					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET note = '$newAsbSeqList' WHERE id = $assemblyCtgOfSeq[0]");
+					my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 					print <<END;
 	<script>
 	parent.closeViewer();
@@ -362,7 +360,7 @@ END
 				else
 				{
 					my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtgOfSeq[0]");
-					my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $_");
+					my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 					my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $assemblyCtgOfSeq[0]");
 					print <<END;
 	<script>
@@ -377,7 +375,7 @@ END
 			elsif($item[1] eq 'sequence')
 			{
 				my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND y = ?");
-				$assemblySeq->execute($_);
+				$assemblySeq->execute($itemId);
 				my @assemblySeq = $assemblySeq->fetchrow_array();
 				if ($assemblySeq->rows > 0)
 				{
@@ -390,8 +388,8 @@ END
 				}
 				else
 				{
-					my $deleteSequence=$dbh->do("DELETE FROM matrix WHERE id = $_");
-					my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $_ OR subject = $_");
+					my $deleteSequence=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+					my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $itemId OR subject = $itemId");
 				
 					if ($item[3] eq '99' )
 					{
@@ -415,7 +413,7 @@ END
 			elsif($item[1] eq 'genome')
 			{
 		
-				my $genomeAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND y = $_");
+				my $genomeAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND y = $itemId");
 				$genomeAsReference->execute();
 				if($genomeAsReference->rows > 0)
 				{
@@ -428,7 +426,7 @@ END
 					exit;
 				}
 
-				my $genomeForAssembly = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = $_");
+				my $genomeForAssembly = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = $itemId");
 				$genomeForAssembly->execute();
 				if ($genomeForAssembly->rows > 0)
 				{
@@ -441,15 +439,28 @@ END
 					exit;
 				}
 
-				my $genomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $_");
+				my $asbGenomeForAssembly = $dbh->prepare("SELECT * FROM link WHERE child = $itemId AND type LIKE 'asbGenome'");
+				$asbGenomeForAssembly->execute();
+				if($asbGenomeForAssembly->rows > 0)
+				{
+					print <<END;
+	<script>
+		parent.closeDialog();
+		parent.errorPop("Please unlink related assemblies first!");
+	</script>	
+END
+					exit;
+				}
+
+				my $genomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $itemId");
 				$genomeSequence->execute();
 				while(my @genomeSequence = $genomeSequence->fetchrow_array())
 				{
 					my $deleteAlignment=$dbh->do("DELETE FROM alignment WHERE query = $genomeSequence[0] OR subject = $genomeSequence[0]");
 				}
-				my $deleteGenomeSequence = $dbh->do("DELETE FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $_"); # both sequence and piece
-				my $deleteAgp=$dbh->do("DELETE FROM matrix WHERE container LIKE 'agp' AND x = $_");
-				my $deleteGenome=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteGenomeSequence = $dbh->do("DELETE FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $itemId"); # both sequence and piece
+				my $deleteAgp=$dbh->do("DELETE FROM matrix WHERE container LIKE 'agp' AND x = $itemId");
+				my $deleteGenome=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -460,9 +471,9 @@ END
 			elsif($item[1] eq 'dart')
 			{
 		
-				my $deleteDartSNP = $dbh->do("DELETE FROM matrix WHERE container LIKE 'dartSNP' AND o = $_");
-				my $deleteDartGenotype = $dbh->do("DELETE FROM matrix WHERE container LIKE 'dartGenotype' AND o = $_");
-				my $deleteDart=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteDartSNP = $dbh->do("DELETE FROM matrix WHERE container LIKE 'dartSNP' AND o = $itemId");
+				my $deleteDartGenotype = $dbh->do("DELETE FROM matrix WHERE container LIKE 'dartGenotype' AND o = $itemId");
+				my $deleteDart=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -473,8 +484,8 @@ END
 			elsif($item[1] eq 'dataset')
 			{
 		
-				my $deleteRecord = $dbh->do("DELETE FROM matrix WHERE container LIKE 'record' AND z = $_");
-				my $deleteDart=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteRecord = $dbh->do("DELETE FROM matrix WHERE container LIKE 'record' AND z = $itemId");
+				my $deleteDart=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -484,7 +495,7 @@ END
 			}
 			elsif($item[1] eq 'record')
 			{
-				my $deleteRecord=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteRecord=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -495,7 +506,7 @@ END
 			elsif($item[1] eq 'fpc')
 			{
 		
-				my $fpcAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND z = $_");
+				my $fpcAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND z = $itemId");
 				$fpcAsReference->execute();
 				if($fpcAsReference->rows > 0)
 				{
@@ -508,9 +519,9 @@ END
 					exit;
 				}
 
-				my $deleteFpcClone=$dbh->do("DELETE FROM matrix WHERE container LIKE 'fpcClone' AND o = $_");
-				my $deleteFpcCtg=$dbh->do("DELETE FROM matrix WHERE container LIKE 'fpcCtg' AND o = $_");
-				my $deleteFpc=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteFpcClone=$dbh->do("DELETE FROM matrix WHERE container LIKE 'fpcClone' AND o = $itemId");
+				my $deleteFpcCtg=$dbh->do("DELETE FROM matrix WHERE container LIKE 'fpcCtg' AND o = $itemId");
+				my $deleteFpc=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -521,7 +532,7 @@ END
 			elsif($item[1] eq 'agp')
 			{
 		
-				my $agpAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND z = $_");
+				my $agpAsReference = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND z = $itemId");
 				$agpAsReference->execute();
 				if($agpAsReference->rows > 0)
 				{
@@ -533,7 +544,7 @@ END
 END
 					exit;
 				}
-				my $deleteAgp=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteAgp=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -557,8 +568,8 @@ END
 					}
 				}
 
-				my $deletePlate=$dbh->do("DELETE FROM matrix WHERE id = $_");
-				my $deleteLink=$dbh->do("DELETE FROM link WHERE child = $_ AND type LIKE 'box'");
+				my $deletePlate=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteLink=$dbh->do("DELETE FROM link WHERE child = $itemId AND type LIKE 'box'");
 				my $plateId;
 				my $plateInLibrary=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'plate' AND z = $item[6] ORDER BY o");
 				$plateInLibrary->execute();
@@ -578,9 +589,9 @@ END
 			elsif($item[1] eq 'pool')
 			{
 				$libraryId = $item[4];
-				my $deletePool=$dbh->do("DELETE FROM matrix WHERE id = $_");
-				my $deleteLinkPoolJob=$dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'poolJob'");
-				my $deleteLinkPoolClone=$dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'poolClone'");
+				my $deletePool=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteLinkPoolJob=$dbh->do("DELETE FROM link WHERE parent = $itemId AND type LIKE 'poolJob'");
+				my $deleteLinkPoolClone=$dbh->do("DELETE FROM link WHERE parent = $itemId AND type LIKE 'poolClone'");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -590,7 +601,7 @@ END
 			}
 			elsif($item[1] eq "library")
 			{
-				my $plateInLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'plate' AND z = $_");
+				my $plateInLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'plate' AND z = $itemId");
 				$plateInLibrary->execute();
 				if ($plateInLibrary->rows > 0)
 				{
@@ -603,7 +614,7 @@ END
 					exit;
 				}
 
-				my $rearrayingLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' AND y = $_");
+				my $rearrayingLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' AND y = $itemId");
 				$rearrayingLibrary->execute();
 				if ($rearrayingLibrary->rows > 0)
 				{
@@ -616,7 +627,7 @@ END
 					exit;
 				}
 
-				my $fpcForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpc' AND barcode = $_");
+				my $fpcForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpc' AND barcode = $itemId");
 				$fpcForLibrary->execute();
 				if ($fpcForLibrary->rows > 0)
 				{
@@ -629,7 +640,7 @@ END
 					exit;
 				}
 
-				my $besForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 98 AND x = $_");
+				my $besForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 98 AND x = $itemId");
 				$besForLibrary->execute();
 				if ($besForLibrary->rows > 0)
 				{
@@ -642,7 +653,7 @@ END
 					exit;
 				}
 
-				my $poolForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'pool' AND x = $_");
+				my $poolForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'pool' AND x = $itemId");
 				$poolForLibrary->execute();
 				if ($poolForLibrary->rows > 0)
 				{
@@ -655,7 +666,7 @@ END
 					exit;
 				}
 
-				my $tagForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'tag' AND x = $_");
+				my $tagForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'tag' AND x = $itemId");
 				$tagForLibrary->execute();
 				if ($tagForLibrary->rows > 0)
 				{
@@ -668,7 +679,7 @@ END
 					exit;
 				}
 
-				my $assemblyForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = $_");
+				my $assemblyForLibrary = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND x = $itemId");
 				$assemblyForLibrary->execute();
 				if ($assemblyForLibrary->rows > 0)
 				{
@@ -681,7 +692,7 @@ END
 					exit;
 				}
 
-				my $deleteLibrary=$dbh->do("DELETE FROM matrix WHERE id = $_");					
+				my $deleteLibrary=$dbh->do("DELETE FROM matrix WHERE id = $itemId");					
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -691,7 +702,7 @@ END
 			}
 			elsif($item[1] eq "service")
 			{
-				my $sampleInService = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sample' AND z = $_");
+				my $sampleInService = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sample' AND z = $itemId");
 				$sampleInService->execute();
 				if ($sampleInService->rows > 0)
 				{
@@ -703,7 +714,7 @@ END
 END
 					exit;
 				}
-				my $deleteService=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteService=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -714,7 +725,7 @@ END
 			}
 			elsif($item[1] eq "sample")
 			{
-				my $paclibForSample = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'paclib' AND z = $_");
+				my $paclibForSample = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'paclib' AND z = $itemId");
 				$paclibForSample->execute();
 				if ($paclibForSample->rows > 0)
 				{
@@ -726,8 +737,8 @@ END
 END
 					exit;
 				}
-				my $deleteSample=$dbh->do("DELETE FROM matrix WHERE id = $_");
-				my $deleteLink=$dbh->do("DELETE FROM link WHERE child = $_ AND type LIKE 'box'");
+				my $deleteSample=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteLink=$dbh->do("DELETE FROM link WHERE child = $itemId AND type LIKE 'box'");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -738,7 +749,7 @@ END
 			}
 			elsif($item[1] eq "paclib")
 			{
-				my $smrtcellForPaclib = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'smrtcell' AND o = $_");
+				my $smrtcellForPaclib = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'smrtcell' AND o = $itemId");
 				$smrtcellForPaclib->execute();
 				if ($smrtcellForPaclib->rows > 0)
 				{
@@ -750,8 +761,8 @@ END
 END
 					exit;
 				}
-				my $deletePaclib=$dbh->do("DELETE FROM matrix WHERE id = $_");
-				my $deleteLink=$dbh->do("DELETE FROM link WHERE child = $_ AND type LIKE 'box'");
+				my $deletePaclib=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteLink=$dbh->do("DELETE FROM link WHERE child = $itemId AND type LIKE 'box'");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -774,7 +785,7 @@ END
 				}
 				else
 				{
-					my $smrtwellInRun = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'smrtwell' AND z = $_");
+					my $smrtwellInRun = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'smrtwell' AND z = $itemId");
 					$smrtwellInRun->execute();
 					if ($smrtwellInRun->rows > 0)
 					{
@@ -786,7 +797,7 @@ END
 END
 						exit;
 					}
-					my $deleteSmrtrun=$dbh->do("DELETE FROM matrix WHERE id = $_");
+					my $deleteSmrtrun=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				}
 				print <<END;
 	<script>
@@ -812,7 +823,7 @@ END
 END
 					exit;
 				}
-				my $deleteSmrtwell=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteSmrtwell=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -823,7 +834,7 @@ END
 			}
 			elsif($item[1] eq "vector")
 			{
-				my $libraryWithVector = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE library AND x = $_");
+				my $libraryWithVector = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE library AND x = $itemId");
 				$libraryWithVector->execute();
 				if ($libraryWithVector->rows > 0)
 				{
@@ -835,7 +846,7 @@ END
 END
 						exit;
 				}
-				my $deleteVector=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteVector=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -845,8 +856,8 @@ END
 			}
 			elsif($item[1] eq 'group')
 			{
-				my $deleteGroup=$dbh->do("DELETE FROM matrix WHERE id = $_");
-				my $deleteLink=$dbh->do("DELETE FROM link WHERE parent = $_ AND type LIKE 'group'");
+				my $deleteGroup=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
+				my $deleteLink=$dbh->do("DELETE FROM link WHERE parent = $itemId AND type LIKE 'group'");
 				print <<END;
 	<script>
 		parent.closeDialog();
@@ -856,7 +867,7 @@ END
 			}
 			elsif($item[1] eq 'comment')
 			{
-				my $deleteComment=$dbh->do("DELETE FROM matrix WHERE id = $_");
+				my $deleteComment=$dbh->do("DELETE FROM matrix WHERE id = $itemId");
 				print <<END;
 	<script>
 		parent.closeDialog();

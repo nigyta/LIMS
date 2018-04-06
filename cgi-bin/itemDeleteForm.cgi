@@ -32,6 +32,14 @@ for(@itemId)
 		my @plateToLibrary = $plateToLibrary->fetchrow_array();
 		$items->{$item[0]} = "$plateToLibrary[2]-$item[2].$item[4]";
 	}
+	elsif($item[1] eq "library")
+	{
+		$items->{$item[0]} = "Library-$item[2]";
+	}
+	elsif($item[1] eq "vector")
+	{
+		$items->{$item[0]} = "Vector-$item[2]";
+	}
 	elsif($item[1] eq "sample")
 	{
 		my $sampleToService=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
@@ -39,17 +47,57 @@ for(@itemId)
 		my @sampleToService = $sampleToService->fetchrow_array();
 		$items->{$item[0]} = "$sampleToService[2] Sample-$item[2]";
 	}
+	elsif($item[1] eq "room")
+	{
+		$items->{$item[0]} = "Room-$item[2]";
+	}
+	elsif($item[1] eq "freezer")
+	{
+		$items->{$item[0]} = "Freezer-$item[2]";
+	}
+	elsif($item[1] eq "box")
+	{
+		$items->{$item[0]} = "Box-$item[2]";
+	}
 	elsif($item[1] eq "pool")
 	{
 		$items->{$item[0]} = "Pool-$item[2]";
 	}
-	elsif($item[1] eq "vector")
+	elsif($item[1] eq "project")
 	{
-		$items->{$item[0]} = "Vector-$item[2]";
+		$items->{$item[0]} = "Project-$item[2]";
+	}
+	elsif($item[1] eq "asbProject")
+	{
+		$items->{$item[0]} = "Assembly Project-$item[2]";
+	}
+	elsif($item[1] eq "assembly")
+	{
+		$items->{$item[0]} = "Assembly-$item[2]";
+	}
+	elsif($item[1] eq "genome")
+	{
+		$items->{$item[0]} = "Genome-$item[2]";
+	}
+	elsif($item[1] eq "sequence")
+	{
+		$items->{$item[0]} = "Sequence-$item[2]";
+	}
+	elsif($item[1] eq "dataset")
+	{
+		$items->{$item[0]} = "Dataset-$item[2]";
 	}
 	elsif($item[1] eq "record")
 	{
 		$items->{$item[0]} = "Record-$item[2]";
+	}
+	elsif($item[1] eq "fpc")
+	{
+		$items->{$item[0]} = "FPC-$item[2]";
+	}
+	elsif($item[1] eq "agp")
+	{
+		$items->{$item[0]} = "AGP-$item[2]";
 	}
 	elsif($item[1] eq "paclib")
 	{

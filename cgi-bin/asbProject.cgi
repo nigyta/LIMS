@@ -48,7 +48,7 @@ if ($asbProjectId)
 	unless($asbProjectContent)
 	{
 		$button .= "<p class='ui-state-error ui-corner-all' style='padding: .7em;'><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>
-			<strong>No Library in this Assembly Project.</strong></p>";
+			<strong>No content in this Assembly Project.</strong></p>";
 	}
 	$button .= "</div>";
 	print header(-cookie=>cookie(-name=>'asbProject',-value=>$asbProjectId));
