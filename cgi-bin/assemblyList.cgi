@@ -86,7 +86,7 @@ if ($assemblyId)
 				<li><a><span class='ui-icon ui-icon-wrench'></span>Assembly Tools</a>
 					<ul style='z-index: 1000;white-space: nowrap;'>
 						<li><a onclick='openDialog(\"assemblyEdit.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-pencil'></span>Edit This Assembly</a></li>
-						<li><a onclick='openDialog(\"assemblyValidation.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-search'></span>Validate This Assembly</a></li>
+						<li><a onclick='openDialog(\"assemblyValidation.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-search'></span>Assembly Validation</a></li>
 						<li><a onclick='openDialog(\"assemblyAssign.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-arrow-2-e-w'></span>Assign Ctg To Chromosome</a></li>
 						<li><a><span class='ui-icon ui-icon-disk'></span>Download</a>
 							<ul style='z-index: 1000;white-space: nowrap;'>";

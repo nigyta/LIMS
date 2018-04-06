@@ -578,7 +578,7 @@ if ($assemblyId && $chr)
 						);
 						$companionAssemblyChrSeqAlignment->polygon(
 							%$points,
-							id=>'aln'.$alignments[0],
+							id=>'companionAln'.$alignments[0],
 							onclick => "closeDialog();openDialog('assemblyAlignmentView.cgi?alignmentId=$alignments[0]')",
 							class=>'hasmenuForAlignment',
 							style=>{ stroke => 'red',

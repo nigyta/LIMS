@@ -13,32 +13,57 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 
 my $keyword = param("term");
 my $assemblyId =  param("assemblyId") || '';
+my $extra =  param("extra") || 0;
 my @results;
 print header('application/json');
 
 if($assemblyId)
 {
-	my $sth=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = $assemblyId AND name LIKE '%$keyword%' LIMIT 20");
-	$sth->execute();
-	while (my @sth = $sth->fetchrow_array())
+	if($extra)
 	{
-		my %hash;
-		$hash{'id'} = $sth[5];
-		$hash{'label'} = "$sth[2]($sth[5])";
-		$hash{'value'} = $sth[2];
-		push @results, \%hash;
+		my $asbGenome = $dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND matrix.id = link.child AND link.parent = $assemblyId");
+		$asbGenome->execute();
+		if ($asbGenome->rows > 0)
+		{
+			while (my @asbGenome=$asbGenome->fetchrow_array())
+			{
+				my $sequence=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $asbGenome[0] AND name LIKE '%$keyword%' LIMIT 20");
+				$sequence->execute();
+				while (my @sequence = $sequence->fetchrow_array())
+				{
+					my %hash;
+					$hash{'id'} = $sequence[0];
+					$hash{'label'} = "$asbGenome[2]:$sequence[2]($sequence[0])";
+					$hash{'value'} = $sequence[2];
+					push @results, \%hash;
+				}
+			}
+		}
+	}
+	else
+	{
+		my $sequence=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = $assemblyId AND name LIKE '%$keyword%' LIMIT 20");
+		$sequence->execute();
+		while (my @sequence = $sequence->fetchrow_array())
+		{
+			my %hash;
+			$hash{'id'} = $sequence[5];
+			$hash{'label'} = "$sequence[2]($sequence[5])";
+			$hash{'value'} = $sequence[2];
+			push @results, \%hash;
+		}
 	}
 }
 else
 {
-	my $sth=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND name LIKE '%$keyword%' LIMIT 20");
-	$sth->execute();
-	while (my @sth = $sth->fetchrow_array())
+	my $sequence=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND name LIKE '%$keyword%' LIMIT 20");
+	$sequence->execute();
+	while (my @sequence = $sequence->fetchrow_array())
 	{
 		my %hash;
-		$hash{'id'} = $sth[0];
-		$hash{'label'} = "$sth[2]($sth[0])";
-		$hash{'value'} = $sth[2];
+		$hash{'id'} = $sequence[0];
+		$hash{'label'} = "$sequence[2]($sequence[0])";
+		$hash{'value'} = $sequence[2];
 		push @results, \%hash;
 	}
 }

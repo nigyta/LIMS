@@ -27,10 +27,10 @@ my $assemblyChr = param ('assemblyChr') || '0';
 my $assemblyPosition = param ('assemblyPosition') || '0';
 $assemblyPosition =~ s/\D//g;
 my $assemblySeqs = param ('assemblySeqs') || '';
+my $insertSeq = param ('insertSeq') || '';
 my $appendCtg = param ('appendCtg') || '0';
 my $appendCtgNumber = param ('appendCtgNumber') || '';
 $appendCtgNumber =~ s/\D//g;
-
 my $flipCtg = param ('flipCtg') || '0';
 my $assemblyId = param ('assemblyId') || '';
 my $chr = param ('chr') || '0';
@@ -53,6 +53,16 @@ END
 	else
 	{
 		my @checkAssemblyCtg = $checkAssemblyCtg->fetchrow_array();
+		if($insertSeq)
+		{
+			my $getSequence = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$getSequence->execute($insertSeq);
+			my @getSequence = $getSequence->fetchrow_array();
+			my $insertAssemblySeq=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblySeq', ?, ?, 0, ?, ?, 1, ?, ?, NOW())");
+			$insertAssemblySeq->execute($getSequence[2],$checkAssemblyCtg[3],$getSequence[0],$getSequence[5],"1,$getSequence[5]",$userName);
+			my $assemblySeqId = $dbh->{mysql_insertid};
+			$assemblySeqs .= ",($assemblySeqId)";
+		}
 		my $updateAssemblyCtg=$dbh->prepare("UPDATE matrix SET name = ?, x = ?, z = ?, note = ? WHERE id = ?");
 		$updateAssemblyCtg->execute($assemblyCtgNumber,$assemblyChr,$assemblyPosition,$assemblySeqs,$assemblyCtgId);
 

@@ -68,7 +68,9 @@ if ($assemblyCtgId)
 	}
 	$html =~ s/\$assemblyNameCtg/$assemblyNameCtg/g;
 	my $autoAssemblyCtgSearchUrl = "autoAssemblyCtgSearch.cgi?assemblyId=$assemblyCtgList[3]";
+	my $autoSeqSearchUrl = "autoSeqSearch.cgi?assemblyId=$assemblyCtgList[3]&extra=1";
 	$html =~ s/\$autoAssemblyCtgSearchUrl/$autoAssemblyCtgSearchUrl/g;
+	$html =~ s/\$autoSeqSearchUrl/$autoSeqSearchUrl/g;
 	print header(-cookie=>cookie(-name=>'assemblyCtg',-value=>$assemblyCtgId));
 	print $html;
 }
@@ -87,7 +89,7 @@ __DATA__
 	<input name="scrollLeft" id="editAssemblyScrollLeft" type="hidden" value="$scrollLeft" />
 	<table>
 	<tr><td style='text-align:right'><label for="editAssemblyCtgNumber"><b>Contig</b></label></td>
-		<td><select class='ui-widget-content ui-corner-all' name="assemblyCtgNumber" id="editAssemblyCtgNumber"><option value='$assemblyCtg' selected>Ctg$assemblyCtg</option><optgroup label='Rename this contig as'>$assemblyNameCtg</optgroup></select></td>
+		<td colspan='2'><select class='ui-widget-content ui-corner-all' name="assemblyCtgNumber" id="editAssemblyCtgNumber"><option value='$assemblyCtg' selected>Ctg$assemblyCtg</option><optgroup label='Rename this contig as'>$assemblyNameCtg</optgroup></select></td>
 	</tr>
 	<tr><td style='text-align:right'><label for="editAssemblyChr"><b>Chromosome</b></label></td>
 		<td><input class='ui-widget-content ui-corner-all' name="assemblyChr" id="editAssemblyChr" size="4" type="text" maxlength="3" value="$assemblyChr" /></td>
@@ -100,6 +102,9 @@ __DATA__
 	</tr>
 	<tr><td style='text-align:right'><label for="editAssemblySeqs"><b>Sequences</b></label></td>
 		<td colspan='2'><ul id="sortable$$" style='white-space: nowrap;'>$assemblySeqList</ul></td>
+	</tr>
+	<tr><td style='text-align:right'><label for="assemblyInsertSeqLabel"><b>Insert Sequence</b></label></td>
+		<td colspan='2'><input name="insertSeqLabel" id="assemblyInsertSeqLabel" size="16" type="text" maxlength="32" VALUE="" placeholder="Insert Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="insertSeq" id="assemblyInsertSeq" type="text" placeholder="Insert SeqId" title="Insert SeqId" VALUE="" readonly="readonly"/></td>
 	</tr>
 	</table>	
 	</form>
@@ -121,6 +126,22 @@ $( "#editAssemblyAppendCtgNumber" ).autocomplete({
 	source: "$autoAssemblyCtgSearchUrl",
 	minLength: 1
 	});
-$('#dialog').dialog("option", "title", "GPM Editor: Ctg$assemblyCtg");
+$( "#assemblyInsertSeqLabel" ).autocomplete({
+	source: "$autoSeqSearchUrl",
+	minLength: 2,
+	focus: function( event, ui ) {
+    	$( "#assemblyInsertSeq" ).val( ui.item.id );
+    },
+    select: function( event, ui ) {
+    	$( "#assemblyInsertSeq" ).val( ui.item.id );
+    }
+});
+function checkSeqBlank(){
+	if($( "#assemblyInsertSeqLabel" ).val() == '')
+	{
+		$( "#assemblyInsertSeq" ).val( '' );
+	}
+}
+$('#dialog').dialog("option", "title", "GPM AssemblyCtg Editor: Ctg$assemblyCtg");
 $( "#dialog" ).dialog( "option", "buttons", [ { text: "Save", click: function() { submitForm('editAssemblyCtg$assemblyCtgId'); } }, { text: "Cancel", click: function() {closeDialog();} } ] );
 </script>
