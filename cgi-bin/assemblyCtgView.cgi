@@ -153,8 +153,8 @@ if ($assemblyCtgId)
 		'flip-url' => "assemblyCtgFlip.cgi?assemblyCtgId=$assemblyCtgId",
 		'filter-url' => "assemblyCtgOverlap.cgi?assemblyCtgId=$assemblyCtgId",
 		'reset-url' => "assemblyCtgReset.cgi?assemblyCtgId=$assemblyCtgId",
-		'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyCtg[3]",		
-		'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyCtg[3]"		
+		'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyCtg[3]",		
+		'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyCtg[3]"		
 	);
 
 	# use explicit element constructor to generate a group element
@@ -233,8 +233,8 @@ if ($assemblyCtgId)
 					'break-url'=> "assemblyCtgBreakForm.cgi?assemblyCtgId=$assemblyCtgId&assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 					'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$hiddenSeqBarX",
 					'delete-url' => "itemDelete.cgi?items=$currentSeq&scrollLeft=$hiddenSeqBarX",
-					'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
-					'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
+					'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
+					'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
 					'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}",
 					'colNumber'=> 0
 				);
@@ -256,8 +256,8 @@ if ($assemblyCtgId)
 				'break-url'=> "assemblyCtgBreakForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$hiddenSeqBarX",
 				'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$hiddenSeqBarX",
 				'delete-url' => "itemDelete.cgi?items=$currentSeq&scrollLeft=$hiddenSeqBarX",
-				'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
-				'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
+				'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
+				'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
 				'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}",
 				'colNumber'=> 0
 			)->cdata($assemblySeqOrder->{$currentSeq}. "." .$assemblySequenceName->{$currentSeq}."  FPC:".$assemblySeqFpcCtg->{$currentSeq});
@@ -382,8 +382,8 @@ if ($assemblyCtgId)
 				'break-url'=> "assemblyCtgBreakForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 				'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$seqBarX",
 				'delete-url' => "itemDelete.cgi?items=$currentSeq&scrollLeft=$seqBarX",
-				'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
-				'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
+				'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
+				'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
 				'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}",
 				'colNumber'=> $goodCol
 			);
@@ -405,8 +405,8 @@ if ($assemblyCtgId)
 			'break-url'=> "assemblyCtgBreakForm.cgi?assemblySeqId=$currentSeq&scrollLeft=$seqBarX",
 			'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$seqBarX",
 			'delete-url' => "itemDelete.cgi?items=$currentSeq&scrollLeft=$seqBarX",
-			'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
-			'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
+			'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",		
+			'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyCtg[3]&seqOne=$assemblySequenceId->{$currentSeq}",	
 			'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}",
 			'colNumber'=> $goodCol
 		)->cdata($assemblySeqOrder->{$currentSeq}. "." . $assemblySequenceName->{$currentSeq} . "(" .$assemblySeqOrient->{$currentSeq}.")  FPC:".$assemblySeqFpcCtg->{$currentSeq});

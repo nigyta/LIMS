@@ -83,8 +83,8 @@ if ($assemblyId && $chr)
 		y     => 0,
 		width => '$svgWidth',
 		height=> $svgHeight,
-		'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyId",
-		'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyId",
+		'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyId",
+		'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyId",
 		'fill-url' => "assemblyGapFillForm.cgi?assemblyId=$assemblyId"
 	);
 
@@ -378,8 +378,8 @@ if ($assemblyId && $chr)
 										fill => 'lightgrey',
 										opacity => 0.5
 										},
-							'blast-url' => "assemblyBlastForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
-							'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+							'blast-url' => "blastTwoseqForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+							'align-url' => "alignmentCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 							'view-url' => "seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}"
 						);
 					$scrollLeft = $companionAssemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
@@ -412,8 +412,8 @@ if ($assemblyId && $chr)
 						},
 						onclick => "closeDialog();openDialog('seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}')",
 						class   => 'hasmenuForSeq',
-						'blast-url' => "assemblyBlastForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
-						'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+						'blast-url' => "blastTwoseqForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+						'align-url' => "alignmentCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 						'view-url' => "seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}"
 					)->cdata($hiddenCompanionSeqLabel) if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit > $hiddenCompanionSeqLabelLength * $textFontWidth);
 					$hiddenSeqPosition[$hiddenRow] = $companionAssemblySeqLeftEnd->{$currentSeq} + $companionAssemblySeqLength->{$currentSeq} - 1;
@@ -512,8 +512,8 @@ if ($assemblyId && $chr)
 									fill => 'lightgrey',
 									'fill-opacity' =>  0.5
 							},
-						'blast-url' => "assemblyBlastForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
-						'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+						'blast-url' => "blastTwoseqForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+						'align-url' => "alignmentCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 						'view-url' => "seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}"
 					);
 				$scrollLeft = $companionAssemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
@@ -545,8 +545,8 @@ if ($assemblyId && $chr)
 					},
 					onclick => "closeDialog();openDialog('seqView.cgi?seqId=$companionAssemblySequenceId->{$currentSeq}')",
 					class   => 'hasmenuForSeq',
-					'blast-url' => "assemblyBlastForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
-					'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+					'blast-url' => "blastTwoseqForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
+					'align-url' => "alignmentCheckForm.cgi?assemblyId=$companionAssemblyId&seqOne=$companionAssemblySequenceId->{$currentSeq}",
 					'view-url' => "seqView.cgi?seqName=$currentSeq"
 				)->cdata($companionSeqLabel) if ($companionAssemblySeqLength->{$currentSeq} / $pixelUnit > $companionSeqLabelLength * $textFontWidth);
 
@@ -789,8 +789,8 @@ if ($assemblyId && $chr)
 									fill => 'lightgrey',
 									opacity => 0.5
 									},
-						'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
-						'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+						'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+						'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 						'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
 					);
 				$scrollLeft = $assemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
@@ -823,8 +823,8 @@ if ($assemblyId && $chr)
 					},
 					onclick => "closeDialog();openDialog('seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}')",
 					class   => 'hasmenuForSeq',
-					'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
-					'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+					'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+					'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 					'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
 				)->cdata($hiddenSeqLabel) if ($assemblySeqLength->{$currentSeq} / $pixelUnit > $hiddenSeqLabelLength * $textFontWidth);
 				$hiddenSeqPosition[$hiddenRow] = $assemblySeqLeftEnd->{$currentSeq} + $assemblySeqLength->{$currentSeq} - 1;
@@ -923,8 +923,8 @@ if ($assemblyId && $chr)
 								fill => 'lightgrey',
 								'fill-opacity' =>  0.5
 								},
-					'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
-					'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+					'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+					'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 					'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
 				);
 			$scrollLeft = $assemblySeqLeftEnd->{$currentSeq} / $pixelUnit if ($currentSeq eq $highlight);
@@ -955,8 +955,8 @@ if ($assemblyId && $chr)
 				},
 				onclick => "closeDialog();openDialog('seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}')",
 				class   => 'hasmenuForSeq',
-				'blast-url' => "assemblyBlastForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
-				'align-url' => "assemblyAlignCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+				'blast-url' => "blastTwoseqForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
+				'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 				'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
 			)->cdata($seqLabel) if ($assemblySeqLength->{$currentSeq} / $pixelUnit > $seqLabelLength * $textFontWidth);
 

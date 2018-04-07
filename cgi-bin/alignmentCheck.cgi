@@ -27,15 +27,15 @@ my $redo = param ('redo') || '0';
 my $hidden = param ('hidden') || '1';
 my $filter = param ('filter') || '0';
 
-my $assemblyAlignCheckFormUrl = "assemblyAlignCheckForm.cgi";
+my $alignmentCheckFormUrl = "alignmentCheckForm.cgi";
 if($assemblyId)
 {
-	$assemblyAlignCheckFormUrl .= "?assemblyId=$assemblyId";
+	$alignmentCheckFormUrl .= "?assemblyId=$assemblyId";
 }
-my $assemblyBlastFormUrl = "assemblyBlastForm.cgi";
+my $blastTwoseqFormUrl = "assemblyBlastForm.cgi";
 if($assemblyId)
 {
-	$assemblyBlastFormUrl .= "?assemblyId=$assemblyId";
+	$blastTwoseqFormUrl .= "?assemblyId=$assemblyId";
 }
 
 unless (-e $commoncfg->{TMPDIR})
@@ -118,13 +118,13 @@ END
 					<td>$getAlignment[11]</td>
 					</tr>";
 			}
-			$assemblyAlignCheckFormUrl .= "&seqOne=$seqOne&seqTwo=$seqTwo";
-			$assemblyBlastFormUrl .= "&seqOne=$seqOne&seqTwo=$seqTwo";
+			$alignmentCheckFormUrl .= "&seqOne=$seqOne&seqTwo=$seqTwo";
+			$blastTwoseqFormUrl .= "&seqOne=$seqOne&seqTwo=$seqTwo";
 			print ALN <<END;
 </tbody></table>
 <script>
 \$('#dialog').dialog("option", "title", "Alignment Between $getSequenceA[2]($seqOne) & $getSequenceB[2]($seqTwo)");
-\$( "#dialog" ).dialog( "option", "buttons", [ { text: "New Check", click: function() {  closeDialog();openDialog('$assemblyAlignCheckFormUrl'); } }, { text: "reRun BLAST", click: function() { closeDialog();openDialog('$assemblyBlastFormUrl'); } }, { text: "OK", click: function() {closeDialog(); } } ] );
+\$( "#dialog" ).dialog( "option", "buttons", [ { text: "New Check", click: function() {  closeDialog();openDialog('$alignmentCheckFormUrl'); } }, { text: "reRun BLAST", click: function() { closeDialog();openDialog('$blastTwoseqFormUrl'); } }, { text: "OK", click: function() {closeDialog(); } } ] );
 \$('#dialog').dialog("option", "width", 1000);
 \$( "#alignment$$" ).dataTable({
 	"scrollY": "400px",
@@ -195,19 +195,18 @@ END
 					<td>$getAlignment[11]</td>
 					</tr>";
 			}
-			$assemblyAlignCheckFormUrl .= "&seqOne=$querySeq";
-			$assemblyBlastFormUrl .= "&seqOne=$querySeq";
+			$alignmentCheckFormUrl .= "&seqOne=$querySeq";
+			$blastTwoseqFormUrl .= "&seqOne=$querySeq";
 			print ALN <<END;
 </tbody></table>
 <script>
 \$('#dialog').dialog("option", "title", "Alignment of $getSequenceA[2] ($querySeq)");
-\$( "#dialog" ).dialog( "option", "buttons", [ { text: "New Check", click: function() {  closeDialog();openDialog('$assemblyAlignCheckFormUrl'); } }, { text: "reRun BLAST", click: function() { closeDialog();openDialog('$assemblyBlastFormUrl'); } }, { text: "OK", click: function() {closeDialog(); } } ] );
+\$( "#dialog" ).dialog( "option", "buttons", [ { text: "New Check", click: function() {  closeDialog();openDialog('$alignmentCheckFormUrl'); } }, { text: "reRun BLAST", click: function() { closeDialog();openDialog('$blastTwoseqFormUrl'); } }, { text: "OK", click: function() {closeDialog(); } } ] );
 \$('#dialog').dialog("option", "width", 1000);
 \$( "#alignment$$" ).dataTable({
 	"scrollY": "400px",
 	"scrollCollapse": true,
-	"paging": false,
-	"searching": false
+	"paging": false
 });
 </script>
 END

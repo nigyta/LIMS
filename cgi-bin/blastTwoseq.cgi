@@ -37,10 +37,10 @@ my $checkGood = param ('checkGood') || '0';
 my $seqOne = param ('seqOne') || '';
 my $seqTwo = param ('seqTwo') || '';
 my $assemblyId = param ('assemblyId') || '';
-my $assemblyAlignCheckFormUrl = "assemblyAlignCheckForm.cgi";
+my $alignmentCheckFormUrl = "assemblyAlignCheckForm.cgi";
 if($assemblyId)
 {
-	$assemblyAlignCheckFormUrl .= "?assemblyId=$assemblyId";
+	$alignmentCheckFormUrl .= "?assemblyId=$assemblyId";
 }
 my $blastn = 'blast+/bin/blastn';
 
@@ -66,7 +66,7 @@ END
 <script>
 	parent.closeDialog();
 	parent.informationPop("It's running! This processing might take a while.");
-	parent.openDialog('$assemblyAlignCheckFormUrl&seqOne=$seqOne&seqTwo=$seqTwo');
+	parent.openDialog('$alignmentCheckFormUrl&seqOne=$seqOne&seqTwo=$seqTwo');
 </script>	
 END
 	}
@@ -189,7 +189,7 @@ END
 	<script>
 		parent.closeDialog();
 		parent.informationPop("It's running! This processing might take a while.");
-		parent.openDialog('$assemblyAlignCheckFormUrl&seqOne=$querySeq');
+		parent.openDialog('$alignmentCheckFormUrl&seqOne=$querySeq');
 	</script>	
 END
 		}

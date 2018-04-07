@@ -67,67 +67,67 @@ print header;
 print $html;
 
 __DATA__
-<form id="assemblyBlast" name="assemblyBlast" action="assemblyBlast.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
-	<input name="assemblyId" id="assemblyBlastAssemblyId" type="hidden" value="$assemblyId" />
+<form id="blastTwoseq" name="blastTwoseq" action="blastTwoseq.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+	<input name="assemblyId" id="blastTwoseqAssemblyId" type="hidden" value="$assemblyId" />
 	<table>
 	<tr>
-		<td colspan="3"><label for="assemblyBlastSeqOneLabel"><b>Sequence-1.</b></label><input name="seqOneLabel" id="assemblyBlastSeqOneLabel" size="16" type="text" maxlength="32" VALUE="$seqOneLabel" placeholder="First Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqOne" id="assemblyBlastSeqOne" type="text" placeholder="First SeqId" title="First SeqId" VALUE="$seqOne" readonly="readonly"/><br>
-		<label for="assemblyBlastSeqTwoLabel"><b>Sequence-2.</b></label><input name="seqTwoLabel" id="assemblyBlastSeqTwoLabel" size="16" type="text" maxlength="32" VALUE="$seqTwoLabel" placeholder="Second Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqTwo" id="assemblyBlastSeqTwo" type="text" placeholder="Second SeqId" title="Second SeqId" VALUE="$seqTwo" readonly="readonly" />
+		<td colspan="3"><label for="blastTwoseqSeqOneLabel"><b>Sequence-1.</b></label><input name="seqOneLabel" id="blastTwoseqSeqOneLabel" size="16" type="text" maxlength="32" VALUE="$seqOneLabel" placeholder="First Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqOne" id="blastTwoseqSeqOne" type="text" placeholder="First SeqId" title="First SeqId" VALUE="$seqOne" readonly="readonly"/><br>
+		<label for="blastTwoseqSeqTwoLabel"><b>Sequence-2.</b></label><input name="seqTwoLabel" id="blastTwoseqSeqTwoLabel" size="16" type="text" maxlength="32" VALUE="$seqTwoLabel" placeholder="Second Seq" onblur="checkSeqBlank()" /><input class='ui-state-highlight ui-corner-all' name="seqTwo" id="blastTwoseqSeqTwo" type="text" placeholder="Second SeqId" title="Second SeqId" VALUE="$seqTwo" readonly="readonly" />
 		</td>
 	</tr>
 	<tr><td><b>Alignment Settings:</b></td><td><input type="checkbox" id="assemblySpeedyMode" name="speedyMode" value="1"><label for="assemblySpeedyMode" title="This will skip 'Check End Match'">Speedy Mode</label><br><input type="checkbox" id="assemblyCheckGood" name="checkGood" value="1"><label for="assemblyCheckGood">Check End Match</label></td><td></td></tr>
-	<tr><td style='text-align:right'><input type="checkbox" id="megablastCheckbox" name="megablast" value="megablast" checked="checked"><label for="megablastCheckbox">Megablast</label></td><td style='text-align:right'><label for="assemblyBlastMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapBlast" id="assemblyBlastMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
-	<tr><td></td><td style='text-align:right'><label for="assemblyBlastIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityBlast" id="assemblyBlastIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
+	<tr><td style='text-align:right'><input type="checkbox" id="megablastCheckbox" name="megablast" value="megablast" checked="checked"><label for="megablastCheckbox">Megablast</label></td><td style='text-align:right'><label for="blastTwoseqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapBlast" id="blastTwoseqMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
+	<tr><td></td><td style='text-align:right'><label for="blastTwoseqIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityBlast" id="blastTwoseqIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
 	</table>
 </form>
 <script>
 $('#dialog').dialog("option", "title", "BLAST2SEQ Alignment");
-$( "#dialog" ).dialog( "option", "buttons", [{ text: "Run BLAST", click: function() { submitForm('assemblyBlast'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
-$( "#assemblyBlastMinOverlap" ).spinner({
+$( "#dialog" ).dialog( "option", "buttons", [{ text: "Run BLAST", click: function() { submitForm('blastTwoseq'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
+$( "#blastTwoseqMinOverlap" ).spinner({
 	min: 100,
 	max: 99999,
 	step: 100,
 	start: function( event, ui ) {
-		var current = $( "#assemblyBlastMinOverlap" ).spinner( "value" );
+		var current = $( "#blastTwoseqMinOverlap" ).spinner( "value" );
 		if(current >= 2000)
 		{
-			$( "#assemblyBlastMinOverlap" ).spinner( "option", "step", 500 );
+			$( "#blastTwoseqMinOverlap" ).spinner( "option", "step", 500 );
 		}
 		else
 		{
-			$( "#assemblyBlastMinOverlap" ).spinner( "option", "step", 100 );
+			$( "#blastTwoseqMinOverlap" ).spinner( "option", "step", 100 );
 		}
 	}
 });
-$( "#assemblyBlastIdentity" ).spinner({ min: 90, max: 100});
-$( "#assemblyBlastSeqOneLabel" ).autocomplete({
+$( "#blastTwoseqIdentity" ).spinner({ min: 90, max: 100});
+$( "#blastTwoseqSeqOneLabel" ).autocomplete({
 	source: "$autoSeqSearchUrl",
 	minLength: 2,
 	focus: function( event, ui ) {
-    	$( "#assemblyBlastSeqOne" ).val( ui.item.id );
+    	$( "#blastTwoseqSeqOne" ).val( ui.item.id );
     },
     select: function( event, ui ) {
-    	$( "#assemblyBlastSeqOne" ).val( ui.item.id );
+    	$( "#blastTwoseqSeqOne" ).val( ui.item.id );
     }
 });
-$( "#assemblyBlastSeqTwoLabel" ).autocomplete({
+$( "#blastTwoseqSeqTwoLabel" ).autocomplete({
 	source: "$autoSeqSearchUrl",
 	minLength: 2,
 	focus: function( event, ui ) {
-    	$( "#assemblyBlastSeqTwo" ).val( ui.item.id );
+    	$( "#blastTwoseqSeqTwo" ).val( ui.item.id );
     },
     select: function( event, ui ) {
-    	$( "#assemblyBlastSeqTwo" ).val( ui.item.id );
+    	$( "#blastTwoseqSeqTwo" ).val( ui.item.id );
     }
 });
 function checkSeqBlank(){
-	if($( "#assemblyBlastSeqOneLabel" ).val() == '')
+	if($( "#blastTwoseqSeqOneLabel" ).val() == '')
 	{
-		$( "#assemblyBlastSeqOne" ).val( '' );
+		$( "#blastTwoseqSeqOne" ).val( '' );
 	}
-	if($( "#assemblyBlastSeqTwoLabel" ).val() == '')
+	if($( "#blastTwoseqSeqTwoLabel" ).val() == '')
 	{
-		$( "#assemblyBlastSeqTwo" ).val( '' );
+		$( "#blastTwoseqSeqTwo" ).val( '' );
 	}
 }
 </script>
