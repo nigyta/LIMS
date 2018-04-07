@@ -31,8 +31,8 @@ my $makeblastdb = 'blast+/bin/makeblastdb';
 
 my $queryGenomeId = param ('queryGenomeId') || '';
 my $subjectGenomeId = param ('subjectGenomeId') || '';
-my $identityGenomeAlignment = param ('identityGenomeAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
-my $minOverlapGenomeAlignment = param ('minOverlapGenomeAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
+my $identityAlignment = param ('identityGenomeAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
+my $minOverlapAlignment = param ('minOverlapGenomeAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
 my $alignEngine = param ('alignEngine') || 'blastn';
 my $speedyMode = param ('speedyMode') || '0';
 my $checkGood = param ('checkGood') || '0';
@@ -177,23 +177,23 @@ END
 		{
 			if($softMasking)
 			{
-				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -db_soft_mask 30 -evalue 1e-200 -perc_identity $identityGenomeAlignment -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -db_soft_mask 30 -evalue 1e-200 -perc_identity $identityAlignment -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			else
 			{
-				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -evalue 1e-200 -perc_identity $identityGenomeAlignment -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -evalue 1e-200 -perc_identity $identityAlignment -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
 			}
 		}
 		else
 		{
-			open (CMD,"$alignEngineList->{$alignEngine} $subjectFile $queryFile -out=blast8 -minIdentity=$identityGenomeAlignment |") or die "can't open CMD: $!";
+			open (CMD,"$alignEngineList->{$alignEngine} $subjectFile $queryFile -out=blast8 -minIdentity=$identityAlignment |") or die "can't open CMD: $!";
 		}
 		while(<CMD>)
 		{
 			/^#/ and next;
 			my @hit = split("\t",$_);
 			next if($hit[0] eq $hit[1]);
-			next if($hit[3] < $minOverlapGenomeAlignment);
+			next if($hit[3] < $minOverlapAlignment);
 			if($speedyMode)
 			{
 
@@ -221,7 +221,7 @@ END
 				}
 
 				#write to alignment
-				my $insertAlignmentA=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityGenomeAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+				my $insertAlignmentA=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 				$insertAlignmentA->execute(@hit);
 
 				#switch query and subject
@@ -250,7 +250,7 @@ END
 					$hit[0] = $exchange;
 				}
 
-				my $insertAlignmentB=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityGenomeAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+				my $insertAlignmentB=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 				$insertAlignmentB->execute(@hit);
 			}
 			else
@@ -309,12 +309,12 @@ END
 					}
 					my @alignments;
 					my $goodOverlap = ($checkGood) ? 0 : 1;
-					open (CMDA,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$hit[0].$$.seq -subject $commoncfg->{TMPDIR}/$hit[1].$$.seq -dust no -evalue 1e-200 -perc_identity $identityGenomeAlignment -outfmt 6 |") or die "can't open CMD: $!";
+					open (CMDA,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$hit[0].$$.seq -subject $commoncfg->{TMPDIR}/$hit[1].$$.seq -dust no -evalue 1e-200 -perc_identity $identityAlignment -outfmt 6 |") or die "can't open CMD: $!";
 					while(<CMDA>)
 					{
 						/^#/ and next;
 						my @detailedHit = split("\t",$_);
-						if($detailedHit[3] >= $minOverlapGenomeAlignment)
+						if($detailedHit[3] >= $minOverlapAlignment)
 						{
 							push @alignments, $_;
 							if($detailedHit[6] == 1 || $detailedHit[7] == $sequenceLength->{$detailedHit[0]})
@@ -362,7 +362,7 @@ END
 						{
 							my @detailedHit = split("\t",$_);
 							#write to alignment
-							my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityGenomeAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+							my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 							$insertAlignment->execute(@detailedHit);
 						}
 					}
@@ -396,7 +396,7 @@ END
 				my $lastQend = 0;
 				my $lastAlignmentLength = 0;
 				my $lastAlignmentId = 0;
-				my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE program = '$alignEngine\_1e-200\_$identityGenomeAlignment\_$minOverlapGenomeAlignment' AND align_length < 5000 AND hidden = 0 ORDER BY query,q_start,q_end");
+				my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE program = '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment' AND align_length < 5000 AND hidden = 0 ORDER BY query,q_start,q_end");
 				$getAlignment->execute();
 				while (my @getAlignment = $getAlignment->fetchrow_array())
 				{

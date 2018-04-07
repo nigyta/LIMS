@@ -67,13 +67,13 @@ if ($assemblyId)
 		}
 	}
 	$queryGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentQuery"><b>Query Genome</b></label></td>
-	<td colspan='2'><input name="queryGenomeId" id="newGenomeAlignmentQuery" type="hidden" value="$assembly[4]" />$target[2] ($target[1])</td>
+	<tr><td style='text-align:right'><label for="newAlignmentQuery"><b>Query Genome</b></label></td>
+	<td colspan='2'><input name="queryGenomeId" id="newAlignmentQuery" type="hidden" value="$assembly[4]" />$target[2] ($target[1])</td>
 	</tr>	
 END
 	$subjectGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentSubject"><b>Subject Genome</b></label></td>
-	<td colspan='2'><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newGenomeAlignmentSubject">
+	<tr><td style='text-align:right'><label for="newAlignmentSubject"><b>Subject Genome</b></label></td>
+	<td colspan='2'><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newAlignmentSubject">
 	<option value='$assembly[4]' title='SeqToSeq Alignment'>[Self Alignment] $target[2]</option>
 	$extraGenomeId
 	$subjectGenomeId
@@ -95,13 +95,13 @@ else
 			"<option value='$genomeList[0]' title='$genomeList[8]'>$genomeList[2]</option>";
 	}
 	$queryGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentQuery"><b>Query Genome</b></label></td>
-	<td colspan='2'><select class='ui-widget-content ui-corner-all' name="queryGenomeId" id="newGenomeAlignmentQuery">$queryGenomeId</select></td>
+	<tr><td style='text-align:right'><label for="newAlignmentQuery"><b>Query Genome</b></label></td>
+	<td colspan='2'><select class='ui-widget-content ui-corner-all' name="queryGenomeId" id="newAlignmentQuery">$queryGenomeId</select></td>
 	</tr>	
 END
 	$subjectGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentSubject"><b>Subject Genome</b></label></td>
-	<td colspan='2'><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newGenomeAlignmentSubject">$subjectGenomeId</select></td>
+	<tr><td style='text-align:right'><label for="newAlignmentSubject"><b>Subject Genome</b></label></td>
+	<td colspan='2'><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newAlignmentSubject">$subjectGenomeId</select></td>
 	</tr>
 END
 }
@@ -124,7 +124,7 @@ END
 print $html;
 
 __DATA__
-<form id="newGenomeAlignment" name="newGenomeAlignment" action="genomeAlignment.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+<form id="newAlignment" name="newGenomeAlignment" action="alignment.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<table>
 	$queryGenomeId
 	$subjectGenomeId
@@ -132,31 +132,31 @@ __DATA__
 	<tr><td></td><td style='text-align:left' colspan='2'>
 		<input type="checkbox" id="newMegablastCheckbox" name="megablast" value="megablast" checked="checked"><label for="newMegablastCheckbox">Megablast</label><br>
 		<input type="checkbox" id="newSoftMaskingCheckbox" name="softMasking" value="1"><label for="newSoftMaskingCheckbox">Soft Masking (blastn only)</label><br>
-		<input type="checkbox" id="newGenomeAlignmentSpeedyMode" name="speedyMode" value="1" checked="checked"><label for="newGenomeAlignmentSpeedyMode" title="This will skip 'Check End Match'">Speedy Mode</label><br>
-		<input type="checkbox" id="newGenomeAlignmentCheckGood" name="checkGood" value="1"><label for="newGenomeAlignmentCheckGood">Check End Match for SeqToSeq</label><br>
+		<input type="checkbox" id="newAlignmentSpeedyMode" name="speedyMode" value="1" checked="checked"><label for="newGenomeAlignmentSpeedyMode" title="This will skip 'Check End Match'">Speedy Mode</label><br>
+		<input type="checkbox" id="newAlignmentCheckGood" name="checkGood" value="1"><label for="newGenomeAlignmentCheckGood">Check End Match for SeqToSeq</label><br>
 		<input type="checkbox" id="newMarkRepeatRegionCheckbox" name="markRepeatRegion" value="1" checked="checked"><label for="newMarkRepeatRegionCheckbox">Mark Repeat Region</label></td></tr>
-	<tr><td></td><td style='text-align:right'><label for="newGenomeAlignmentMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapGenomeAlignment" id="newGenomeAlignmentMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" /></td></tr>
-	<tr><td></td><td style='text-align:right'><label for="newGenomeAlignmentIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityGenomeAlignment" id="newGenomeAlignmentIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOGNMIDENTITY" /></td></tr>
+	<tr><td></td><td style='text-align:right'><label for="newAlignmentMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapGenomeAlignment" id="newGenomeAlignmentMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" /></td></tr>
+	<tr><td></td><td style='text-align:right'><label for="newAlignmentIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityGenomeAlignment" id="newGenomeAlignmentIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOGNMIDENTITY" /></td></tr>
 	</table>
 </form>
 <script>
 $('#dialog').dialog("option", "title", "Genome Alignment");
-$( "#dialog" ).dialog( "option", "buttons", [{ text: "Run Alignment", click: function() { submitForm('newGenomeAlignment'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
-$( "#newGenomeAlignmentMinOverlap" ).spinner({
+$( "#dialog" ).dialog( "option", "buttons", [{ text: "Run Alignment", click: function() { submitForm('newAlignment'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
+$( "#newAlignmentMinOverlap" ).spinner({
 	min: 500,
 	max: 99999,
 	step: 100,
 	start: function( event, ui ) {
-		var current = $( "#newGenomeAlignmentMinOverlap" ).spinner( "value" );
+		var current = $( "#newAlignmentMinOverlap" ).spinner( "value" );
 		if(current >= 2000)
 		{
-			$( "#newGenomeAlignmentMinOverlap" ).spinner( "option", "step", 500 );
+			$( "#newAlignmentMinOverlap" ).spinner( "option", "step", 500 );
 		}
 		else
 		{
-			$( "#newGenomeAlignmentMinOverlap" ).spinner( "option", "step", 100 );
+			$( "#newAlignmentMinOverlap" ).spinner( "option", "step", 100 );
 		}
 	}
 });
-$( "#newGenomeAlignmentIdentity" ).spinner({ min: 90, max: 100});
+$( "#newAlignmentIdentity" ).spinner({ min: 90, max: 100});
 </script>

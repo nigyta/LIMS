@@ -64,13 +64,13 @@ if ($assemblyId)
 		}
 	}
 	$queryGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentQuery"><b>Query Genome</b></label></td>
-	<td><input name="queryGenomeId" id="newGenomeAlignmentQuery" type="hidden" value="$assembly[4]" />$target[2] ($target[1])</td>
+	<tr><td style='text-align:right'><label for="newAlignmentQuery"><b>Query Genome</b></label></td>
+	<td><input name="queryGenomeId" id="newAlignmentQuery" type="hidden" value="$assembly[4]" />$target[2] ($target[1])</td>
 	</tr>	
 END
 	$subjectGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentSubject"><b>Subject Genome</b></label></td>
-	<td><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newGenomeAlignmentSubject">
+	<tr><td style='text-align:right'><label for="newAlignmentSubject"><b>Subject Genome</b></label></td>
+	<td><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newAlignmentSubject">
 	<option value='$assembly[4]' title='SeqToSeq Alignment'>[Self Alignment] $target[2]</option>
 	$extraGenomeId
 	$subjectGenomeId
@@ -92,13 +92,13 @@ else
 			"<option value='$genomeList[0]' title='$genomeList[8]'>$genomeList[2]</option>";
 	}
 	$queryGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentQuery"><b>Query Genome</b></label></td>
-	<td><select class='ui-widget-content ui-corner-all' name="queryGenomeId" id="newGenomeAlignmentQuery">$queryGenomeId</select></td>
+	<tr><td style='text-align:right'><label for="newAlignmentQuery"><b>Query Genome</b></label></td>
+	<td><select class='ui-widget-content ui-corner-all' name="queryGenomeId" id="newAlignmentQuery">$queryGenomeId</select></td>
 	</tr>	
 END
 	$subjectGenomeId = <<END;
-	<tr><td style='text-align:right'><label for="newGenomeAlignmentSubject"><b>Subject Genome</b></label></td>
-	<td><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newGenomeAlignmentSubject">$subjectGenomeId</select></td>
+	<tr><td style='text-align:right'><label for="newAlignmentSubject"><b>Subject Genome</b></label></td>
+	<td><select class='ui-widget-content ui-corner-all' name="subjectGenomeId" id="newAlignmentSubject">$subjectGenomeId</select></td>
 	</tr>
 END
 }
@@ -110,7 +110,7 @@ print header;
 print $html;
 
 __DATA__
-<form id="newAlignment" name="newAlignment" action="genomeAlignmentLoad.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+<form id="newAlignment" name="newAlignment" action="alignmentLoad.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
 	<table>
 	$queryGenomeId
 	$subjectGenomeId
