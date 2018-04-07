@@ -32,7 +32,7 @@ if($assemblyId)
 {
 	$alignmentCheckFormUrl .= "?assemblyId=$assemblyId";
 }
-my $blastTwoseqFormUrl = "assemblyBlastForm.cgi";
+my $blastTwoseqFormUrl = "blastTwoseqForm.cgi";
 if($assemblyId)
 {
 	$blastTwoseqFormUrl .= "?assemblyId=$assemblyId";

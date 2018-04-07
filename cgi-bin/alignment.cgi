@@ -31,8 +31,8 @@ my $makeblastdb = 'blast+/bin/makeblastdb';
 
 my $queryGenomeId = param ('queryGenomeId') || '';
 my $subjectGenomeId = param ('subjectGenomeId') || '';
-my $identityAlignment = param ('identityGenomeAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
-my $minOverlapAlignment = param ('minOverlapGenomeAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
+my $identityAlignment = param ('identityAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
+my $minOverlapAlignment = param ('minOverlapAlignment') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
 my $alignEngine = param ('alignEngine') || 'blastn';
 my $speedyMode = param ('speedyMode') || '0';
 my $checkGood = param ('checkGood') || '0';
@@ -221,7 +221,7 @@ END
 				}
 
 				#write to alignment
-				my $insertAlignmentA=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+				my $insertAlignmentA=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 				$insertAlignmentA->execute(@hit);
 
 				#switch query and subject
@@ -250,7 +250,7 @@ END
 					$hit[0] = $exchange;
 				}
 
-				my $insertAlignmentB=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+				my $insertAlignmentB=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 				$insertAlignmentB->execute(@hit);
 			}
 			else
@@ -362,7 +362,7 @@ END
 						{
 							my @detailedHit = split("\t",$_);
 							#write to alignment
-							my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+							my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapAlignment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 							$insertAlignment->execute(@detailedHit);
 						}
 					}
@@ -396,7 +396,7 @@ END
 				my $lastQend = 0;
 				my $lastAlignmentLength = 0;
 				my $lastAlignmentId = 0;
-				my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE program = '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapGenomeAlignment' AND align_length < 5000 AND hidden = 0 ORDER BY query,q_start,q_end");
+				my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE program = '$alignEngine\_1e-200\_$identityAlignment\_$minOverlapAlignment' AND align_length < 5000 AND hidden = 0 ORDER BY query,q_start,q_end");
 				$getAlignment->execute();
 				while (my @getAlignment = $getAlignment->fetchrow_array())
 				{
