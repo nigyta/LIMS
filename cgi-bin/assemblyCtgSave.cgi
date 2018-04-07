@@ -125,8 +125,9 @@ END
 		{
 			print <<END;
 <script>
-closeViewer();
-openViewer("assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&scrollLeft=$scrollLeft");
+parent.closeDialog();
+parent.closeViewer();
+parent.openViewer("assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&scrollLeft=$scrollLeft");
 </script>	
 END
 		}
