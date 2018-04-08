@@ -23,7 +23,7 @@ my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
 my @genomes = param ('genomes');
-my $genomeName = param ('genomeName') || '';
+my $mergedGenomeId = param ('mergedGenomeId') || '';
 
 my $config = new config;
 my $userPermission;
@@ -48,7 +48,7 @@ print header;
 for(@genomes)
 {
 	my $genomeId = $_;
-	unless($genomeId == $genomeName)
+	unless($genomeId == $mergedGenomeId)
 	{
 		my $genome = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$genome->execute($genomeId);
@@ -56,20 +56,20 @@ for(@genomes)
 		if($genome[9] eq $userName || exists $userPermission->{$userId}->{'genome'})
 		{
 			my $updateSequence=$dbh->do("UPDATE matrix SET
-				x = $genomeName
+				x = $mergedGenomeId
 				WHERE container LIKE 'sequence' AND x = $genomeId");
 			my $updateAGP=$dbh->do("UPDATE matrix SET
-				x = $genomeName
+				x = $mergedGenomeId
 				WHERE container LIKE 'agp' AND x = $genomeId");
 			my $updateAssemblySource=$dbh->do("UPDATE matrix SET
-				x = $genomeName
+				x = $mergedGenomeId
 				WHERE container LIKE 'assembly' AND x = $genomeId");
 			my $updateAssemblyRef=$dbh->do("UPDATE matrix SET
-				y = $genomeName
+				y = $mergedGenomeId
 				WHERE container LIKE 'assembly' AND y = $genomeId");
 
 			my $updateAsbProjectLink=$dbh->do("UPDATE link SET
-				child = $genomeName
+				child = $mergedGenomeId
 				WHERE type LIKE 'asbProject' AND child = $genomeId");
 			#remove duplicated asbProject
 			my $asbProject;
@@ -89,7 +89,7 @@ for(@genomes)
 			}
 
 			my $updateAsbGenomeLink=$dbh->do("UPDATE link SET
-				child = $genomeName
+				child = $mergedGenomeId
 				WHERE type LIKE 'asbGenome' AND child = $genomeId");
 			#remove duplicated asbGenome
 			my $asbGenome;
@@ -110,10 +110,10 @@ for(@genomes)
  			my $deleteGenome=$dbh->do("DELETE FROM matrix WHERE id = $genomeId");
 
 			my $seqNumber = 0;
-			my $countGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $genomeName");
+			my $countGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $mergedGenomeId");
 			$countGenomeSequence->execute();
 			$seqNumber = $countGenomeSequence->rows;
-			my $updateGenome = $dbh->prepare("UPDATE matrix SET o = $seqNumber, barcode = 1, note = CONCAT(note, ?),creationDate = NOW() WHERE id = $genomeName");
+			my $updateGenome = $dbh->prepare("UPDATE matrix SET o = $seqNumber, barcode = 1, note = CONCAT(note, ?),creationDate = NOW() WHERE id = $mergedGenomeId");
 			$updateGenome->execute($genome[8]);
 		}
 		else

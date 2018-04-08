@@ -122,8 +122,6 @@ __DATA__
 </form>
 <script>
 $( "#editGenomeReplace" ).buttonset();
-$( "#editGenomeForAssembly" ).buttonset();
-$( "#editGenomeAsReference" ).buttonset();
 $('#dialog').dialog("option", "title", "Edit Genome");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Save", click: function() { submitForm('editGenome'); } }, { text: "Delete", click: function() { deleteItem($genomeId); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 </script>

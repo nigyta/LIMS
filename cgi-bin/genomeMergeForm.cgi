@@ -34,7 +34,7 @@ $genomeList = checkbox_group(-name=>'genomes',
 -labels=>\%{$genomes},
 -columns=>3) if (keys %{$genomes});
 my $genomeNameList = '';
-$genomeNameList = scrolling_list(-name=>'genomeName',
+$genomeNameList = scrolling_list(-name=>'mergedGenomeId',
 -values=>[sort keys %{$genomes}],
 -size=>1,
 -labels=>\%{$genomes}) if (keys %{$genomes});
