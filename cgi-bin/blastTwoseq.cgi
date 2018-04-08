@@ -37,7 +37,7 @@ my $checkGood = param ('checkGood') || '0';
 my $seqOne = param ('seqOne') || '';
 my $seqTwo = param ('seqTwo') || '';
 my $assemblyId = param ('assemblyId') || '';
-my $alignmentCheckFormUrl = "assemblyAlignCheckForm.cgi";
+my $alignmentCheckFormUrl = "alignmentCheckForm.cgi";
 if($assemblyId)
 {
 	$alignmentCheckFormUrl .= "?assemblyId=$assemblyId";
