@@ -54,14 +54,12 @@ if($assemblyId)
 my $assemblyList = '';
 my $assemblySortableStyle = '';
 my $assemblySortableJs = '';
+my $lengthList;
+my $totalAssembled;
 my $totalLength;
-$totalLength->{'all'} = 0;
-my @lengthList;
 my $maxLength;
-$maxLength->{'all'} = 0;
 my $minLength;
-my $button;
-$minLength->{'all'} = 999999999;
+
 if ($assemblyId)
 {
 	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
@@ -138,7 +136,6 @@ if ($assemblyId)
 	my $assemblyCtgChrOrder;
 	my $assemblyCtgLength;
 	my $assemblyCtgSeqNumber;
-    my $totalAssembled = 0;
 	my $inCtgSeq;
 	my $assemblyCtgs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ?");
 	$assemblyCtgs->execute($assembly[0]);
@@ -149,10 +146,114 @@ if ($assemblyId)
 		$assemblyCtgChr->{$assemblyCtgs[0]} = $assemblyCtgs[4];
 		$assemblyCtgChrOrder->{$assemblyCtgs[0]} = ($assemblyCtgs[4]) ? $assemblyCtgs[5] : ($sortCtgByLength) ? "-$assemblyCtgs[7]" : $assemblyCtgs[2];
 		$assemblyCtgLength->{$assemblyCtgs[0]} = $assemblyCtgs[7];
-		$totalLength->{'all'} += $assemblyCtgs[7];
-		push @lengthList,$assemblyCtgs[7];
-		$maxLength->{'all'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'all'});
-		$minLength->{'all'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'all'});
+
+		unless (exists $totalLength->{'All'})
+		{
+			$totalAssembled->{'All'} = 0;
+			$totalLength->{'All'} = 0;
+			$maxLength->{'All'} = 0;
+			$minLength->{'All'} = 999999999;
+		}
+		push @{$lengthList->{'All'}},$assemblyCtgs[7];
+		$totalAssembled->{'All'}++;
+		$totalLength->{'All'} += $assemblyCtgs[7];
+		$maxLength->{'All'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'All'});
+		$minLength->{'All'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'All'});
+
+		if($assemblyCtgs[4])
+		{
+			unless (exists $totalLength->{'All Anchored'})
+			{
+				$totalAssembled->{'All Anchored'} = 0;
+				$totalLength->{'All Anchored'} = 0;
+				$maxLength->{'All Anchored'} = 0;
+				$minLength->{'All Anchored'} = 999999999;
+			}
+			push @{$lengthList->{'All Anchored'}},$assemblyCtgs[7];
+			$totalAssembled->{'All Anchored'}++;
+			$totalLength->{'All Anchored'} += $assemblyCtgs[7];
+			$maxLength->{'All Anchored'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'All Anchored'});
+			$minLength->{'All Anchored'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'All Anchored'});
+
+			if ($assemblyCtgs[4] % 100 == 98)
+			{
+				unless (exists $totalLength->{'Chloroplast'})
+				{
+					$totalAssembled->{'Chloroplast'} = 0;
+					$totalLength->{'Chloroplast'} = 0;
+					$maxLength->{'Chloroplast'} = 0;
+					$minLength->{'Chloroplast'} = 999999999;
+				}
+				push @{$lengthList->{'Chloroplast'}},$assemblyCtgs[7];
+				$totalAssembled->{'Chloroplast'}++;
+				$totalLength->{'Chloroplast'} += $assemblyCtgs[7];
+				$maxLength->{'Chloroplast'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'Chloroplast'});
+				$minLength->{'Chloroplast'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'Chloroplast'});
+			}
+			elsif($assemblyCtgs[4] % 100 == 99)
+			{
+				unless (exists $totalLength->{'Mitochondrion'})
+				{
+					$totalAssembled->{'Mitochondrion'} = 0;
+					$totalLength->{'Mitochondrion'} = 0;
+					$maxLength->{'Mitochondrion'} = 0;
+					$minLength->{'Mitochondrion'} = 999999999;
+				}
+				push @{$lengthList->{'Mitochondrion'}},$assemblyCtgs[7];
+				$totalAssembled->{'Mitochondrion'}++;
+				$totalLength->{'Mitochondrion'} += $assemblyCtgs[7];
+				$maxLength->{'Mitochondrion'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'Mitochondrion'});
+				$minLength->{'Mitochondrion'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'Mitochondrion'});
+			}
+			else
+			{
+				unless (exists $totalLength->{'All Chromosome'})
+				{
+					$totalAssembled->{'All Chromosome'} = 0;
+					$totalLength->{'All Chromosome'} = 0;
+					$maxLength->{'All Chromosome'} = 0;
+					$minLength->{'All Chromosome'} = 999999999;
+				}
+				push @{$lengthList->{'All Chromosome'}},$assemblyCtgs[7];
+				$totalAssembled->{'All Chromosome'}++;
+				$totalLength->{'All Chromosome'} += $assemblyCtgs[7];
+				$maxLength->{'All Chromosome'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'All Chromosome'});
+				$minLength->{'All Chromosome'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'All Chromosome'});
+				if($assemblyCtgs[4] > 100)
+				{
+					my $subGenomeNumber = substr ($assemblyCtgs[4], 0, -2);
+					my $subGenomeName = "Subgenome-$subGenomeNumber Chromosome";
+
+					unless (exists $totalLength->{$subGenomeName})
+					{
+						$totalAssembled->{$subGenomeName} = 0;
+						$totalLength->{$subGenomeName} = 0;
+						$maxLength->{$subGenomeName} = 0;
+						$minLength->{$subGenomeName} = 999999999;
+					}
+					push @{$lengthList->{$subGenomeName}},$assemblyCtgs[7];
+					$totalAssembled->{$subGenomeName}++;
+					$totalLength->{$subGenomeName} += $assemblyCtgs[7];
+					$maxLength->{$subGenomeName} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{$subGenomeName});
+					$minLength->{$subGenomeName} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{$subGenomeName});
+				}
+			}
+		}
+		else
+		{
+			unless (exists $totalLength->{'Unlocalized'})
+			{
+				$totalAssembled->{'Unlocalized'} = 0;
+				$totalLength->{'Unlocalized'} = 0;
+				$maxLength->{'Unlocalized'} = 0;
+				$minLength->{'Unlocalized'} = 999999999;
+			}
+			push @{$lengthList->{'Unlocalized'}},$assemblyCtgs[7];
+			$totalAssembled->{'Unlocalized'}++;
+			$totalLength->{'Unlocalized'} += $assemblyCtgs[7];
+			$maxLength->{'Unlocalized'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'Unlocalized'});
+			$minLength->{'Unlocalized'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'Unlocalized'});
+		}
 		my @seqs = split ",", $assemblyCtgs[8];
 		$assemblyCtgSeqNumber->{$assemblyCtgs[0]} = @seqs;
 		for (@seqs)
@@ -161,7 +262,6 @@ if ($assemblyId)
 			$_ =~ s/[^a-zA-Z0-9]//g;
 			$inCtgSeq->{$_} = 1;
 		}
-		$totalAssembled++;
 	}
 	my $assemblySeqs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ?");
 	$assemblySeqs->execute($assembly[0]);
@@ -170,163 +270,176 @@ if ($assemblyId)
 		$assemblySeq->{$assemblySeqs[5]} = $assemblySeqs[4];
 	}
 
-	@lengthList = sort {$b <=> $a} @lengthList;
-	my $median = int ($#lengthList/2);
-	my $medianLength = $lengthList[$median];
-	my $n50Length = 0;
-	my $subtotal = 0;
 	my $margin = 20;
 	my $chartWidth = 600;
 	my $chartHeight = 400;
 	my $svgWidth = $chartWidth + $margin*2;
 	my $svgHeight = $chartHeight + $margin*2;
-	my $widthUnit = int ($maxLength->{'all'}/ $chartWidth) || 1; 
-	my $heightUnit = ($totalAssembled > 0) ? $chartHeight/$totalAssembled : 0; 
-	my $assemblyCtgLengthCount;
-	foreach (@lengthList)
+	my $assemblyStats = '';
+	foreach my $contigType (sort keys %$totalAssembled)
 	{
-		$subtotal += $_;
-		if($subtotal > $totalLength->{'all'}/2 && $n50Length == 0)
+		@{$lengthList->{$contigType}} = sort {$b <=> $a} @{$lengthList->{$contigType}};
+		my $median = int ($#{$lengthList->{$contigType}}/2);
+		my $medianLength = $lengthList->{$contigType}[$median];
+		my $n50Length = 0;
+		my $subtotal = 0;
+		my $widthUnit = int ($maxLength->{$contigType}/ $chartWidth) || 1; 
+		my $heightUnit = ($totalAssembled->{$contigType} > 0) ? $chartHeight/$totalAssembled->{$contigType} : 0; 
+		my $assemblyCtgLengthCount;
+		foreach (@{$lengthList->{$contigType}})
 		{
-			$n50Length = $_;
-		}
-		for (my $i = 1; $i <= $_; $i += $widthUnit)
-		{
-			$assemblyCtgLengthCount->{$i} = 0 unless (exists $assemblyCtgLengthCount->{$i});
-			$assemblyCtgLengthCount->{$i}++;
-		}
+			$subtotal += $_;
+			if($subtotal > $totalLength->{$contigType}/2 && $n50Length == 0)
+			{
+				$n50Length = $_;
+			}
+			for (my $i = 1; $i <= $_; $i += $widthUnit)
+			{
+				$assemblyCtgLengthCount->{$i} = 0 unless (exists $assemblyCtgLengthCount->{$i});
+				$assemblyCtgLengthCount->{$i}++;
+			}
 		
-	}
-	my $graphic = '';
-	if ($totalLength->{'all'} > 0)
-	{
-		# create an SVG object
-		my $svg= SVG->new(width=>$svgWidth,height=>$svgHeight); # set width and height after knowing the size
-		# use explicit element constructor to generate a group element
-		my $length=$svg->group(
-			id    => 'length',
-			style => { stroke=>'black',
-				fill =>'white'
-			}
-		);
-		$length->rectangle(
-				x=> $margin, y=> $margin,
-				width=>$chartWidth, height=>$chartHeight,
-				id=>'rect_1'
-			);
-		my $stringOfContigNumber = ($#lengthList > 0) ? "Total ". commify($#lengthList + 1) ." contigs" : "Total ". commify($#lengthList + 1) ." contig";
-		my $lengthOfContigNumber = length ($stringOfContigNumber);
-		my $xPositionOfContigNumber = $margin - 5;
-		my $yPositionOfContigNumber = $lengthOfContigNumber * 7;
-		$length->text(
-				id      => 'totalContigs',
-				x       => $xPositionOfContigNumber,
-				y       => $yPositionOfContigNumber,
-				style=>{
-					stroke=>'black',
-				fill =>'black'
-				},
-				transform => "rotate(-90,$xPositionOfContigNumber,$yPositionOfContigNumber)"
-			)->cdata($stringOfContigNumber);
-
-		$length->text(
-				id      => 'minLength',
-				x       => 0,
-				y       => $svgHeight - 5,
-				style=>{
-					stroke=>'black',
-				fill =>'black'
-				}
-			)->cdata("Shortest: ". commify($minLength->{'all'}) . " bp");
-
-		my $lengthOfString = length ("Longest: ". commify($maxLength->{'all'}) . " bp");
-		$length->text(
-				id      => 'maxLength',
-				x       => $svgWidth - $lengthOfString * 8,
-				y       => $svgHeight - 5,
-				style=>{
-					stroke=>'black',
-				fill =>'black'
-				}
-			)->cdata("Longest: ". commify($maxLength->{'all'}) . " bp");
-
-		my $n50y = 0;
-		my $mediany = 0;
-		my @xvArray;
-		my @yvArray;
-		for (sort {$a <=> $b} keys %$assemblyCtgLengthCount)
-		{
-			push @xvArray, $_ / $widthUnit + $margin;
-			push @yvArray, $chartHeight - $heightUnit * $assemblyCtgLengthCount->{$_}  + $margin;
-			$n50y  = $chartHeight - $heightUnit * $assemblyCtgLengthCount->{$_}  + $margin if( $n50Length > $_);
-			$mediany  = $chartHeight - $heightUnit * $assemblyCtgLengthCount->{$_} + $margin if( $medianLength > $_);
 		}
-		my $xv = [@xvArray];
-		my $yv = [@yvArray];
-		my $points = $length->get_path(
-			x=>$xv, y=>$yv,
-			-type=>'polyline',
-			-closed=>'false' #specify that the polyline is closed.
-		);
-		$length->polyline (
-			%$points,
-			id=>'pline_1',
-			style=>{
-				'fill-opacity'=>0,
-				'stroke-color'=>'rgb(250,123,23)'
+		my $graphic = '';
+		if ($totalLength->{$contigType} > 0)
+		{
+			# create an SVG object
+			my $svg= SVG->new(width=>$svgWidth,height=>$svgHeight); # set width and height after knowing the size
+			# use explicit element constructor to generate a group element
+			my $length=$svg->group(
+				id    => 'length'.$contigType,
+				style => { stroke=>'black',
+					fill =>'white'
+				}
+			);
+			$length->rectangle(
+					x=> $margin, y=> $margin,
+					width=>$chartWidth, height=>$chartHeight,
+					id=>'rect_1'
+				);
+			my $stringOfContigNumber = ($#{$lengthList->{$contigType}} > 0) ? "Total ". commify($#{$lengthList->{$contigType}} + 1) ." contigs" : "Total ". commify($#{$lengthList->{$contigType}} + 1) ." contig";
+			my $lengthOfContigNumber = length ($stringOfContigNumber);
+			my $xPositionOfContigNumber = $margin - 5;
+			my $yPositionOfContigNumber = $lengthOfContigNumber * 7;
+			$length->text(
+					id      => 'totalContigs'.$contigType,
+					x       => $xPositionOfContigNumber,
+					y       => $yPositionOfContigNumber,
+					style=>{
+						stroke=>'black',
+					fill =>'black'
+					},
+					transform => "rotate(-90,$xPositionOfContigNumber,$yPositionOfContigNumber)"
+				)->cdata($stringOfContigNumber);
+
+			$length->text(
+					id      => 'minLength'.$contigType,
+					x       => 0,
+					y       => $svgHeight - 5,
+					style=>{
+						stroke=>'black',
+					fill =>'black'
+					}
+				)->cdata("Shortest: ". commify($minLength->{$contigType}) . " bp");
+
+			my $lengthOfString = length ("Longest: ". commify($maxLength->{$contigType}) . " bp");
+			$length->text(
+					id      => 'maxLength'.$contigType,
+					x       => $svgWidth - $lengthOfString * 8,
+					y       => $svgHeight - 5,
+					style=>{
+						stroke=>'black',
+					fill =>'black'
+					}
+				)->cdata("Longest: ". commify($maxLength->{$contigType}) . " bp");
+
+			my $n50y = 0;
+			my $mediany = 0;
+			my @xvArray;
+			my @yvArray;
+			for (sort {$a <=> $b} keys %$assemblyCtgLengthCount)
+			{
+				push @xvArray, $_ / $widthUnit + $margin;
+				push @yvArray, $chartHeight - $heightUnit * $assemblyCtgLengthCount->{$_}  + $margin;
+				$n50y  = $chartHeight - $heightUnit * $assemblyCtgLengthCount->{$_}  + $margin if( $n50Length > $_);
+				$mediany  = $chartHeight - $heightUnit * $assemblyCtgLengthCount->{$_} + $margin if( $medianLength > $_);
 			}
-		);
-
-		$length->line(
-				id=>'mediana',
-				style => {
-					stroke=> 'lightgrey',
-					'stroke-dasharray' => '3,3'
-					},
-				x1=>$medianLength / $widthUnit  + $margin, y1=>$mediany,
-				x2=>$medianLength / $widthUnit  + $margin, y2=>$chartHeight + $margin
+			my $xv = [@xvArray];
+			my $yv = [@yvArray];
+			my $points = $length->get_path(
+				x=>$xv, y=>$yv,
+				-type=>'polyline',
+				-closed=>'false' #specify that the polyline is closed.
 			);
-# 		$length->line(
-# 				id=>'medianb',
-# 				x1=> $margin, y1=>$mediany,
-# 				x2=>$medianLength / $widthUnit + $margin, y2=>$mediany
-# 			);
-		$length->text(
-				id      => 'mediantext',
-				x       => $medianLength / $widthUnit  + $margin,
-				y       => $mediany,
+			$length->polyline (
+				%$points,
+				id=>'pline'.$contigType,
 				style=>{
-					stroke=>'black',
-				fill =>'black'
+					'fill-opacity'=>0,
+					'stroke-color'=>'rgb(250,123,23)'
 				}
-			)->cdata("Median: ". commify($medianLength) . " bp");
-
-		$length->line(
-				id=>'n50a',
-				style => {
-					stroke=> 'lightgrey',
-					'stroke-dasharray' => '3,3'
-					},
-				x1=>$n50Length / $widthUnit + $margin, y1=>$n50y,
-				x2=>$n50Length / $widthUnit + $margin, y2=>$chartHeight + $margin
 			);
-# 		$length->line(
-# 				id=>'n50b',
-# 				x1=> $margin, y1=>$n50y,
-# 				x2=>$n50Length / $widthUnit + $margin, y2=>$n50y
-# 			);
-		$length->text(
-				id      => 'n50text',
-				x       => $n50Length / $widthUnit + $margin,
-				y       => $n50y,
-				style=>{
-					stroke=>'black',
-				fill =>'black'
-				}
-			)->cdata("N50: ". commify($n50Length) . " bp");
 
-		# now render the SVG object, implicitly use svg namespace
-		$graphic = $svg->xmlify;
+			$length->line(
+					id=>'mediana'.$contigType,
+					style => {
+						stroke=> 'lightgrey',
+						'stroke-dasharray' => '3,3'
+						},
+					x1=>$medianLength / $widthUnit  + $margin, y1=>$mediany,
+					x2=>$medianLength / $widthUnit  + $margin, y2=>$chartHeight + $margin
+				);
+	# 		$length->line(
+	# 				id=>'medianb'.$contigType,
+	# 				x1=> $margin, y1=>$mediany,
+	# 				x2=>$medianLength / $widthUnit + $margin, y2=>$mediany
+	# 			);
+			$length->text(
+					id      => 'mediantext'.$contigType,
+					x       => $medianLength / $widthUnit  + $margin,
+					y       => $mediany,
+					style=>{
+						stroke=>'black',
+					fill =>'black'
+					}
+				)->cdata("Median: ". commify($medianLength) . " bp");
+
+			$length->line(
+					id=>'n50a'.$contigType,
+					style => {
+						stroke=> 'lightgrey',
+						'stroke-dasharray' => '3,3'
+						},
+					x1=>$n50Length / $widthUnit + $margin, y1=>$n50y,
+					x2=>$n50Length / $widthUnit + $margin, y2=>$chartHeight + $margin
+				);
+	# 		$length->line(
+	# 				id=>'n50b'.$contigType,
+	# 				x1=> $margin, y1=>$n50y,
+	# 				x2=>$n50Length / $widthUnit + $margin, y2=>$n50y
+	# 			);
+			$length->text(
+					id      => 'n50text'.$contigType,
+					x       => $n50Length / $widthUnit + $margin,
+					y       => $n50y,
+					style=>{
+						stroke=>'black',
+					fill =>'black'
+					}
+				)->cdata("N50: ". commify($n50Length) . " bp");
+
+			# now render the SVG object, implicitly use svg namespace
+			$graphic = $svg->xmlify;
+		}
+
+		if ($assemblyStats)
+		{
+			$assemblyStats .= ($totalAssembled->{$contigType} > 0) ? "<hr style='page-break-before: always;'><h3>$contigType Contigs</h3>Total length: " . commify($totalLength->{$contigType}). " bp, N50 length: " . commify($n50Length). " bp, Median length: " . commify($medianLength). " bp.<br>Longest: " . commify($maxLength->{$contigType}). " bp, Shortest: " . commify($minLength->{$contigType}). " bp.<br>$graphic" : "";
+		}
+		else
+		{
+			$assemblyStats = ($totalAssembled->{$contigType} > 0) ? "<h3>$contigType Contigs</h3>Total length: " . commify($totalLength->{$contigType}). " bp, N50 length: " . commify($n50Length). " bp, Median length: " . commify($medianLength). " bp.<br>Longest: " . commify($maxLength->{'All'}). " bp, Shortest: " . commify($minLength->{$contigType}). " bp.<br>$graphic" : "";
+		}
 	}
 
 	my @assemblyCtg = sort { $assemblyCtgChrOrder->{$a} <=> $assemblyCtgChrOrder->{$b} } keys %$assemblyCtgChrOrder;
@@ -428,15 +541,16 @@ END
 		$assemblySortableStyle .= $assemblySortableStyleByChr->{$_};
 		$assemblySortableJs .= $assemblySortableJsByChr->{$_};
     }
-	my $assembledCtg = ($totalAssembled > 0) ? "<div id='tabs-assembled$assemblyId$$'>Total length: " . commify($totalLength->{'all'}). " bp, N50 length: " . commify($n50Length). " bp, Median length: " . commify($medianLength). " bp.<br>Longest: " . commify($maxLength->{'all'}). " bp, Shortest: " . commify($minLength->{'all'}). " bp.<br>$graphic $assembledCtgDetails</div>"
-			: "<div id='tabs-assembled$assemblyId$$'>No assembly! Please run assembly!</div>";
 
+	my $assembledCtg = ($totalAssembled->{'All'} > 0) ? "<div id='tabs-assembled$assemblyId$$'>$assembledCtgDetails</div><div id='tabs-assemblyStats$assemblyId$$'>$assemblyStats</div>"
+			: "<div id='tabs-assembled$assemblyId$$'>No assembly! Please run assembly!</div>";
 
 	my $totalInAssembly = keys %$assemblySeq;
 	$assemblyList .= "<div id='assemblyTab$assemblyId$$'><ul>";
-	$assemblyList .= ($totalAssembled > 1) ? "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled Contigs)" : "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled Contig)";
+	$assemblyList .= ($totalAssembled->{'All'} > 1) ? "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contigs)" : "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contig)";
 	$assemblyList .= ($totalInAssembly > 1) ? " - $totalInAssembly Sequences</a></li>" : " - $totalInAssembly Sequence</a></li>";
-	$assemblyList .= ($totalAssembled > 0) ? "<li><a href='assemblyCtgList.cgi?assemblyId=$assemblyId'>Contig List</a></li>" : "";
+	$assemblyList .= ($totalAssembled->{'All'} > 0) ? "<li><a href='assemblyCtgList.cgi?assemblyId=$assemblyId'>Contig List</a></li>" : "";
+	$assemblyList .= ($totalAssembled->{'All'} > 0) ? "<li><a href='#tabs-assemblyStats$assemblyId$$'>Stats</a></li>" : "";
 
 	if($assemblyDetails->{'autoCheckNewSeq'})
 	{

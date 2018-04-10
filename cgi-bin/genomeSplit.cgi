@@ -68,7 +68,7 @@ END
 		exit;
 	}
 
-	if($#seqIds == $genome[3])
+	if(scalar(@seqIds) == $genome[3])
 	{
 		print <<END;
 <script>
@@ -79,7 +79,7 @@ END
 	}
 	else
 	{
-		if($#seqIds > 0)
+		if(scalar(@seqIds) > 0)
 		{
 			if($genomeName)
 			{

@@ -28,6 +28,7 @@ $alignEngineList->{'blastn'} = "blast+/bin/blastn";
 $alignEngineList->{'BLAT'} = "blat";
 my $windowmasker = 'blast+/bin/windowmasker';
 my $makeblastdb = 'blast+/bin/makeblastdb';
+my $numThreads = 16;
 
 my $queryGenomeId = param ('queryGenomeId') || '';
 my $subjectGenomeId = param ('subjectGenomeId') || '';
@@ -39,7 +40,6 @@ my $checkGood = param ('checkGood') || '0';
 my $task = param ('megablast') || 'blastn';
 my $softMasking = param ('softMasking') || '0';
 my $markRepeatRegion = param ('markRepeatRegion') || '0';
-
 print header;
 
 if($queryGenomeId && $subjectGenomeId)
@@ -177,11 +177,11 @@ END
 		{
 			if($softMasking)
 			{
-				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -db_soft_mask 30 -evalue 1e-200 -perc_identity $identityAlignment -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -db_soft_mask 30 -evalue 1e-200 -perc_identity $identityAlignment -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			else
 			{
-				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -evalue 1e-200 -perc_identity $identityAlignment -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{$alignEngine} -query $queryFile -task $task -db $subjectFile -evalue 1e-200 -perc_identity $identityAlignment -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 			}
 		}
 		else

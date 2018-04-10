@@ -510,7 +510,7 @@ elsif(param ('assemblyCtgId'))
 			$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 			$sequenceDetails->{'sequence'} =~ s/[^a-zA-Z0-9]//g;
 			$sequenceDetails->{'sequence'} = multiLineSeq($sequenceDetails->{'sequence'},80);
-			print "$assemblySequence[2].$assemblySequence[0] $assemblySequence[4]-$seqType{$assemblySequence[3]} $assemblySequence[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
+			print ">$assemblySequence[2].$assemblySequence[0] $assemblySequence[4]-$seqType{$assemblySequence[3]} $assemblySequence[5] bp $sequenceDetails->{'id'} $sequenceDetails->{'description'}\n$sequenceDetails->{'sequence'}";
 		}
 	}
 }
