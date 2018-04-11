@@ -516,7 +516,7 @@ END
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
 		my $headerByChr;
-		my $formattedChr = ($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
+		my $formattedChr = ($_ % 100 == 98) ? "Chloroplast" : ($_ % 100 == 99) ? "Mitochondrion" : ($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
 		$headerByChr->{$_} = ($_ > 0 && $assembly[5] > 0) ?
 			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>$formattedChr</a>"
 			: "<h3>$formattedChr";
