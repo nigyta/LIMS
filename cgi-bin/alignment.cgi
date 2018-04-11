@@ -8,6 +8,7 @@ use lib "lib/";
 use lib "lib/pangu";
 use pangu;
 use user;
+use config;
 use userConfig;
 use userCookie;
 
@@ -15,13 +16,18 @@ my $userCookie = new userCookie;
 my $userId = (cookie('cid')) ? $userCookie->checkCookie(cookie('cid')) : 0;
 exit if (!$userId);
 
-my $user = new user;
-my $userDetail = $user->getAllFieldsWithUserId($userId);
-my $userName = $userDetail->{"userName"};
-
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
+
+my $user = new user;
+my $config = new config;
 my $userConfig = new userConfig;
+my $author = $config->getFieldValueWithFieldName('AUTHOR');
+my $siteName = $config->getFieldValueWithFieldName("SITENAME");
+my $userDetail = $user->getAllFieldsWithUserId($userId);
+my $userName = $userDetail->{"userName"};
+my $userEmail = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"email") if ($userId);
+my $userFullName = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"firstName")." ".$userConfig->getFieldValueWithUserIdAndFieldName($userId,"lastName") if ($userId);
 
 my $alignEngineList;
 $alignEngineList->{'blastn'} = "blast+/bin/blastn";
@@ -105,6 +111,9 @@ END
 		}
 		close(SEQALL);
 
+		my $subjectGenome=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+		$subjectGenome->execute($subjectGenomeId);
+		my @subjectGenome = $subjectGenome->fetchrow_array();
 		my $subjectFile = "";
 		if($queryGenomeId eq $subjectGenomeId)
 		{
@@ -113,9 +122,6 @@ END
 		else
 		{
 			$subjectFile = "$commoncfg->{TMPDIR}/$subjectGenomeId.$$.seq";
-			my $subjectGenome=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-			$subjectGenome->execute($subjectGenomeId);
-			my @subjectGenome = $subjectGenome->fetchrow_array();
 
 			open (SEQALL,">$subjectFile") or die "can't open file: $subjectFile";
 			if($subjectGenome[1] eq 'library')
@@ -424,6 +430,23 @@ END
 				}
 			} while($todo);
 		}
+		
+		#email to user after alignment finishes.
+		open(MAIL,"|/usr/sbin/sendmail -t -oi");
+		print MAIL "To: $userEmail\n";
+		print MAIL "From: webmaster\n";
+		print MAIL "Subject: Alignment Successfully Completed\n\n";
+		print MAIL <<eof;
+Dear $userFullName ($userName),
+
+Your analysis job has successfully completed.
+
+$queryGenome[2] vs $subjectGenome[2] (-minOverlap $minOverlapAlignment -perc_identity $identityAlignment)
+
+Best regards,
+Dev Team
+$siteName
+eof
 	}
 	else{
 		die "couldn't fork: $!\n";
