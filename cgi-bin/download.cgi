@@ -793,22 +793,46 @@ elsif(param ('assemblyId'))
 			}
 			else
 			{
-				if ($preChr ne $assemblyCtg[4])
+				my $chrName = "";
+				if ($assemblyCtg[4] % 100 == 98)
 				{
-					my $chrNumber = sprintf "%0*d", 2, $assemblyCtg[4];
-					$chrSequence->{$preChr} = multiLineSeq($chrSequence->{$preChr},80);
-					print ")\n$chrSequence->{$preChr}" if ($preChr ne 'na');
-					print ">Chr$chrNumber (";
-					$chrSequence->{$assemblyCtg[4]} = '';
-					$lastComponentTypeOnChr->{$assemblyCtg[4]} = '';
-					$preChr = $assemblyCtg[4];
+					$chrName = "Chloroplast";
+				}
+				elsif($assemblyCtg[4] % 100 == 99)
+				{
+					$chrName = "Mitochondrion";
 				}
 				else
 				{
-					$chrSequence->{$assemblyCtg[4]} .= 'N'x$gapLength if ($lastComponentTypeOnChr->{$assemblyCtg[4]} ne 'U');  #100 Ns between contigs
-					$lastComponentTypeOnChr->{$assemblyCtg[4]} = 'U';
+					if($assemblyCtg[4] > 100)
+					{
+						my $subGenomeNumber = substr ($assemblyCtg[4], 0, -2);
+						my $subChrNumber = sprintf "%0*d", 2, substr ($assemblyCtg[4], -2);
+
+						$chrName = "Subgenome$subGenomeNumber-Chr$subChrNumber";
+					}
+					else
+					{
+						my $chrNumber = sprintf "%0*d", 2, $assemblyCtg[4];
+						$chrName = "Chr$chrNumber";
+					}
 				}
-				if(length ($chrSequence->{$assemblyCtg[4]}) > $gapLength)
+
+				if ($preChr ne $chrName)
+				{
+					$chrSequence->{$preChr} = multiLineSeq($chrSequence->{$preChr},80);
+					print ")\n$chrSequence->{$preChr}" if ($preChr ne 'na');
+					print ">$chrName (";
+					$chrSequence->{$chrName} = '';
+					$lastComponentTypeOnChr->{$chrName} = '';
+					$preChr = $chrName;
+				}
+				else
+				{
+					$chrSequence->{$chrName} .= 'N'x$gapLength if ($lastComponentTypeOnChr->{$chrName} ne 'U');  #100 Ns between contigs
+					$lastComponentTypeOnChr->{$chrName} = 'U';
+				}
+				if(length ($chrSequence->{$chrName}) > $gapLength)
 				{
 					print ";Ctg$assemblyCtg[2]-";
 				}
@@ -858,8 +882,8 @@ elsif(param ('assemblyId'))
 
 					if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
 					{
-						$ctgSequence .= 'N'x$gapLength if ($lastComponentTypeOnChr->{$assemblyCtg[4]} ne 'U');
-						$lastComponentTypeOnChr->{$assemblyCtg[4]} = 'U';
+						$ctgSequence .= 'N'x$gapLength if ($lastComponentTypeOnChr->{$chrName} ne 'U');
+						$lastComponentTypeOnChr->{$chrName} = 'U';
 					}
 
 					if ($sequenceDetails->{'filter'})
@@ -904,7 +928,7 @@ elsif(param ('assemblyId'))
 							my $sequence = substr($sequenceDetails->{'sequence'}, $position->[0] - 1, $position->[1] - $position->[0] + 1);		
 							$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
 							$ctgSequence .= $sequence;
-							$lastComponentTypeOnChr->{$assemblyCtg[4]} = 'D';
+							$lastComponentTypeOnChr->{$chrName} = 'D';
 						}
 					}
 					else
@@ -912,16 +936,16 @@ elsif(param ('assemblyId'))
 						my $sequence = substr($sequenceDetails->{'sequence'}, $assemblySeqStart - 1, $assemblySeqEnd - $assemblySeqStart + 1);		
 						$sequence = reverseComplement($sequence) if($assemblySeq[7] < 0);
 						$ctgSequence .= $sequence;
-						$lastComponentTypeOnChr->{$assemblyCtg[4]} = 'D';
+						$lastComponentTypeOnChr->{$chrName} = 'D';
 					}
 
 					if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 3' 100 Ns
 					{
-						$ctgSequence .= 'N'x$gapLength if ($lastComponentTypeOnChr->{$assemblyCtg[4]} ne 'U');
-						$lastComponentTypeOnChr->{$assemblyCtg[4]} = 'U';
+						$ctgSequence .= 'N'x$gapLength if ($lastComponentTypeOnChr->{$chrName} ne 'U');
+						$lastComponentTypeOnChr->{$chrName} = 'U';
 					}
 				}
-				$chrSequence->{$assemblyCtg[4]} .= $ctgSequence;
+				$chrSequence->{$chrName} .= $ctgSequence;
 			}
 		}
 		$chrSequence->{$preChr} = multiLineSeq($chrSequence->{$preChr},80);
@@ -1215,21 +1239,45 @@ elsif(param ('assemblyIdForAgp'))
 			}
 			else
 			{
-				my $chrNumber = sprintf "%0*d", 2, $assemblyCtg[4];
-				if ($chrNumber eq $preChr && $lastComponentType->{$chrNumber} ne 'U')
+				my $chrName = "";
+				if ($assemblyCtg[4] % 100 == 98)
 				{
-					#right gap
-					print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\tcontig\tno\tna\n";
-					$begin->{$chrNumber} += $gapLength;
-					$num->{$chrNumber}++;
-					$lastComponentType->{$chrNumber} = 'U';
+					$chrName = "Chloroplast";
+				}
+				elsif($assemblyCtg[4] % 100 == 99)
+				{
+					$chrName = "Mitochondrion";
 				}
 				else
 				{
-					$preChr = $chrNumber;
-					$begin->{$chrNumber} = 1;
-					$num->{$chrNumber} = 1;
-					$lastComponentType->{$chrNumber} = '';
+					if($assemblyCtg[4] > 100)
+					{
+						my $subGenomeNumber = substr ($assemblyCtg[4], 0, -2);
+						my $subChrNumber = sprintf "%0*d", 2, substr ($assemblyCtg[4], -2);
+
+						$chrName = "Subgenome$subGenomeNumber-Chr$subChrNumber";
+					}
+					else
+					{
+						my $chrNumber = sprintf "%0*d", 2, $assemblyCtg[4];
+						$chrName = "Chr$chrNumber";
+					}
+				}
+
+				if ($chrName eq $preChr && $lastComponentType->{$chrName} ne 'U')
+				{
+					#right gap
+					print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\tcontig\tno\tna\n";
+					$begin->{$chrName} += $gapLength;
+					$num->{$chrName}++;
+					$lastComponentType->{$chrName} = 'U';
+				}
+				else
+				{
+					$preChr = $chrName;
+					$begin->{$chrName} = 1;
+					$num->{$chrName} = 1;
+					$lastComponentType->{$chrName} = '';
 				}
 
 				#sequence
@@ -1250,22 +1298,22 @@ elsif(param ('assemblyIdForAgp'))
 						$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
 						my $orient = ($assemblySeq[7] =~ /^-/) ? '-' : '+';
 
-						if($lastComponentType->{$chrNumber} ne 'U')
+						if($lastComponentType->{$chrName} ne 'U')
 						{
 							if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 8) # add 5' 100 Ns
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\tcontig\tno\tna\n";
-								$begin->{$chrNumber} += $gapLength;
-								$num->{$chrNumber}++;
-								$lastComponentType->{$chrNumber} = 'U';
+								print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\tcontig\tno\tna\n";
+								$begin->{$chrName} += $gapLength;
+								$num->{$chrName}++;
+								$lastComponentType->{$chrName} = 'U';
 							}
 
 							if ($assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7) # add 5' 100 Ns
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\ttelomere\tno\tna\n";
-								$begin->{$chrNumber} += $gapLength;
-								$num->{$chrNumber}++;
-								$lastComponentType->{$chrNumber} = 'U';
+								print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\ttelomere\tno\tna\n";
+								$begin->{$chrName} += $gapLength;
+								$num->{$chrName}++;
+								$lastComponentType->{$chrName} = 'U';
 							}
 						}
 						if ($sequenceDetails->{'filter'})
@@ -1311,46 +1359,46 @@ elsif(param ('assemblyIdForAgp'))
 								$seqLength=$position->[1]-$position->[0]+1;
 								if($sequence[3] > 50) #not BAC sequence
 								{
-									print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$seqLength-1,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$seqLength-1,"\t$num->{$chrName}\tW\t$assemblySeq[2]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
 								else
 								{
-									print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$seqLength-1,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
+									print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$seqLength-1,"\t$num->{$chrName}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$position->[0]\t$position->[1]\t$orient\n";
 								}
-								$begin->{$chrNumber} += $seqLength;
-								$num->{$chrNumber}++;
-								$lastComponentType->{$chrNumber} = 'D';
+								$begin->{$chrName} += $seqLength;
+								$num->{$chrName}++;
+								$lastComponentType->{$chrName} = 'D';
 							}
 						}
 						else
 						{
 							if($sequence[3] > 50) #not BAC sequence
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrName}\tW\t$assemblySeq[2]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
 							else
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrNumber}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
+								print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$assemblySeqEnd-$assemblySeqStart,"\t$num->{$chrName}\tW\t$assemblySeq[2]\.$assemblySeq[5]\t$assemblySeqStart\t$assemblySeqEnd\t$orient\n";
 							}
-							$begin->{$chrNumber} += $assemblySeqEnd-$assemblySeqStart+1;
-							$num->{$chrNumber}++;
-							$lastComponentType->{$chrNumber} = 'D';
+							$begin->{$chrName} += $assemblySeqEnd-$assemblySeqStart+1;
+							$num->{$chrName}++;
+							$lastComponentType->{$chrName} = 'D';
 						}
-						if ($lastComponentType->{$chrNumber} ne 'U')
+						if ($lastComponentType->{$chrName} ne 'U')
 						{
 							if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 7) # add 3' 100 Ns
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\tcontig\tno\tna\n";
-								$begin->{$chrNumber} += $gapLength;
-								$num->{$chrNumber}++;
-								$lastComponentType->{$chrNumber} = 'U';
+								print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\tcontig\tno\tna\n";
+								$begin->{$chrName} += $gapLength;
+								$num->{$chrName}++;
+								$lastComponentType->{$chrName} = 'U';
 							}
 							if ($assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 8) # add 3' 100 Ns
 							{
-								print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\ttelomere\tno\tna\n";
-								$begin->{$chrNumber} += $gapLength;
-								$num->{$chrNumber}++;
-								$lastComponentType->{$chrNumber} = 'U';
+								print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\ttelomere\tno\tna\n";
+								$begin->{$chrName} += $gapLength;
+								$num->{$chrName}++;
+								$lastComponentType->{$chrName} = 'U';
 							}
 						}
 					}
@@ -1371,49 +1419,49 @@ elsif(param ('assemblyIdForAgp'))
 					my $assemblySeqStart = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 					$assemblySeqStart->execute($startAssemblySeq);
 					my @assemblySeqStart = $assemblySeqStart->fetchrow_array();
-					if($lastComponentType->{$chrNumber} ne 'U')
+					if($lastComponentType->{$chrName} ne 'U')
 					{
 						if ($assemblySeqStart[4] eq 1 || $assemblySeqStart[4] eq 3 || $assemblySeqStart[4] eq 8) # add 5' 100 Ns
 						{
-							print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\tcontig\tno\tna\n";
-							$begin->{$chrNumber} += $gapLength;
-							$num->{$chrNumber}++;
-							$lastComponentType->{$chrNumber} = 'U';
+							print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\tcontig\tno\tna\n";
+							$begin->{$chrName} += $gapLength;
+							$num->{$chrName}++;
+							$lastComponentType->{$chrName} = 'U';
 						}
 
 						if ($assemblySeqStart[4] eq 4 || $assemblySeqStart[4] eq 6 || $assemblySeqStart[4] eq 7) # add 5' 100 Ns
 						{
-							print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\ttelomere\tno\tna\n";
-							$begin->{$chrNumber} += $gapLength;
-							$num->{$chrNumber}++;
-							$lastComponentType->{$chrNumber} = 'U';
+							print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\ttelomere\tno\tna\n";
+							$begin->{$chrName} += $gapLength;
+							$num->{$chrName}++;
+							$lastComponentType->{$chrName} = 'U';
 						}
 					}
 
-					print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$assemblyCtg[7]-1,"\t$num->{$chrNumber}\tW\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
-					$begin->{$chrNumber} += $assemblyCtg[7];
-					$num->{$chrNumber}++;
-					$lastComponentType->{$chrNumber} = 'D';
+					print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$assemblyCtg[7]-1,"\t$num->{$chrName}\tW\tCtg$assemblyCtg[2]\t1\t$assemblyCtg[7]\t+\n";
+					$begin->{$chrName} += $assemblyCtg[7];
+					$num->{$chrName}++;
+					$lastComponentType->{$chrName} = 'D';
 					#check right end;
 					my $assemblySeqEnd = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 					$assemblySeqEnd->execute($lastAssemblySeq);
 					my @assemblySeqEnd = $assemblySeqEnd->fetchrow_array();
 
-					if($lastComponentType->{$chrNumber} ne 'U')
+					if($lastComponentType->{$chrName} ne 'U')
 					{
 						if ($assemblySeqEnd[4] eq 2 || $assemblySeqEnd[4] eq 3 || $assemblySeqEnd[4] eq 7) # add 3' 100 Ns
 						{
-							print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\tcontig\tno\tna\n";
-							$begin->{$chrNumber} += $gapLength;
-							$num->{$chrNumber}++;
-							$lastComponentType->{$chrNumber} = 'U';
+							print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\tcontig\tno\tna\n";
+							$begin->{$chrName} += $gapLength;
+							$num->{$chrName}++;
+							$lastComponentType->{$chrName} = 'U';
 						}
 						if ($assemblySeqEnd[4] eq 5 || $assemblySeqEnd[4] eq 6 || $assemblySeqEnd[4] eq 8) # add 3' 100 Ns
 						{
-							print "Chr$chrNumber\t$begin->{$chrNumber}\t",$begin->{$chrNumber}+$gapLength-1,"\t$num->{$chrNumber}\tU\t$gapLength\ttelomere\tno\tna\n";
-							$begin->{$chrNumber} += $gapLength;
-							$num->{$chrNumber}++;
-							$lastComponentType->{$chrNumber} = 'U';
+							print "$chrName\t$begin->{$chrName}\t",$begin->{$chrName}+$gapLength-1,"\t$num->{$chrName}\tU\t$gapLength\ttelomere\tno\tna\n";
+							$begin->{$chrName} += $gapLength;
+							$num->{$chrName}++;
+							$lastComponentType->{$chrName} = 'U';
 						}
 					}
 				}
