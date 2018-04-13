@@ -221,6 +221,7 @@ __DATA__
 		</div>
 	</td>
 	</tr>
+	<tr><td></td><td style='text-align:left' colspan='2'><input type="checkbox" id="newEmailNotificationCheckbox" name="emailNotification" value="1" checked="checked"><label for="newEmailNotificationCheckbox">Email a notification after assembly is done.</label></td></tr>
 	</table>
 </form>
 <script>

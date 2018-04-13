@@ -8,6 +8,7 @@ use lib "lib/";
 use lib "lib/pangu";
 use pangu;
 use user;
+use config;
 use userConfig;
 use userCookie;
 
@@ -15,19 +16,25 @@ my $userCookie = new userCookie;
 my $userId = (cookie('cid')) ? $userCookie->checkCookie(cookie('cid')) : 0;
 exit if (!$userId);
 
-my $user = new user;
-my $userDetail = $user->getAllFieldsWithUserId($userId);
-my $userName = $userDetail->{"userName"};
-
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
+
+my $user = new user;
+my $config = new config;
 my $userConfig = new userConfig;
+my $author = $config->getFieldValueWithFieldName('AUTHOR');
+my $siteName = $config->getFieldValueWithFieldName("SITENAME");
+my $userDetail = $user->getAllFieldsWithUserId($userId);
+my $userName = $userDetail->{"userName"};
+my $userEmail = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"email") if ($userId);
+my $userFullName = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"firstName")." ".$userConfig->getFieldValueWithUserIdAndFieldName($userId,"lastName") if ($userId);
 
 my $alignEngineList;
 $alignEngineList->{'blastn'} = "blast+/bin/blastn";
 $alignEngineList->{'BLAT'} = "blat";
 my $windowmasker = 'blast+/bin/windowmasker';
 my $makeblastdb = 'blast+/bin/makeblastdb';
+my $numThreads = 16;
 
 my $assemblyId = param ('assemblyId') || '';
 my $replace = param ('replace') || '0';
@@ -59,6 +66,7 @@ my $redundancySeq = 0;
 my $redundancyFilterOverlap = param ('redundancyFilterOverlap') || '0';
 my $orientSeqs = param ('orientSeqs') || '0';
 my $renumber = param ('renumber') || '0';
+my $emailNotification = param ('emailNotification') || '0';
 my $gapLength = 100;
 print header;
 
@@ -313,11 +321,11 @@ END
 			my $goodSequenceId;
 			if($redoAllSeqToSeq)
 			{
-				open (CMD,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $seqToSeqTask -db $commoncfg->{TMPDIR}/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 10 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $seqToSeqTask -db $commoncfg->{TMPDIR}/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 10 -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			else
 			{
-				open (CMD,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $seqToSeqTask -db $commoncfg->{TMPDIR}/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 10 -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+				open (CMD,"$alignEngineList->{'blastn'} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $seqToSeqTask -db $commoncfg->{TMPDIR}/$assembly[4].$$.seq -dust no -evalue 1e-200 -perc_identity $identitySeqToSeq -max_target_seqs 10 -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 			}
 			while(<CMD>)
 			{
@@ -801,11 +809,11 @@ END
 					{
 						if($softMasking)
 						{
-							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 						}
 						else
 						{
-							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 						}
 					}
 					else
@@ -819,11 +827,11 @@ END
 					{
 						if($softMasking)
 						{
-							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -db_soft_mask 30 -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 						}
 						else
 						{
-							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads 8 -outfmt 6 |") or die "can't open CMD: $!";
+							open (CMD,"$alignEngineList->{$alignEngine} -query $commoncfg->{TMPDIR}/$assembly[4].$$.new.seq -task $task -db $commoncfg->{TMPDIR}/$refGenomeId.$$.genome -evalue 1e-200 -perc_identity $identitySeqToGenome -num_threads $numThreads -outfmt 6 |") or die "can't open CMD: $!";
 						}
 					}
 					else
@@ -2121,6 +2129,23 @@ END
 		$assemblyDetails = $json->encode($assemblyDetails);
 		my $updateAssemblyToWork=$dbh->prepare("UPDATE matrix SET barcode = '1', note = ? WHERE id = ?");
 		$updateAssemblyToWork->execute($assemblyDetails,$assemblyId);
+		if($emailNotification)
+		{
+			#email to user after alignment finishes.
+			open(MAIL,"|/usr/sbin/sendmail -t -oi");
+			print MAIL "To: $userEmail\n";
+			print MAIL "From: $author\n";
+			print MAIL "Subject: Assembly Successfully Completed\n\n";
+			print MAIL <<eof;
+Dear $userFullName ($userName),
+
+Your assembly '$assembly[2]' job has successfully completed.
+
+Best regards,
+Dev Team
+$siteName
+eof
+		}
 	}
 	else{
 		die "couldn't fork: $!\n";

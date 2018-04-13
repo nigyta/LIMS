@@ -46,6 +46,8 @@ my $checkGood = param ('checkGood') || '0';
 my $task = param ('megablast') || 'blastn';
 my $softMasking = param ('softMasking') || '0';
 my $markRepeatRegion = param ('markRepeatRegion') || '0';
+my $emailNotification = param ('emailNotification') || '0';
+
 print header;
 
 if($queryGenomeId && $subjectGenomeId)
@@ -431,15 +433,17 @@ END
 			} while($todo);
 		}
 		
-		#email to user after alignment finishes.
-		open(MAIL,"|/usr/sbin/sendmail -t -oi");
-		print MAIL "To: $userEmail\n";
-		print MAIL "From: $author\n";
-		print MAIL "Subject: Alignment Successfully Completed\n\n";
-		print MAIL <<eof;
+		if($emailNotification)
+		{
+			#email to user after alignment finishes.
+			open(MAIL,"|/usr/sbin/sendmail -t -oi");
+			print MAIL "To: $userEmail\n";
+			print MAIL "From: $author\n";
+			print MAIL "Subject: Alignment Successfully Completed\n\n";
+			print MAIL <<eof;
 Dear $userFullName ($userName),
 
-Your analysis job has successfully completed.
+Your alignment job has successfully completed.
 
 $queryGenome[2] vs $subjectGenome[2] (-minOverlap $minOverlapAlignment -perc_identity $identityAlignment)
 
@@ -447,6 +451,7 @@ Best regards,
 Dev Team
 $siteName
 eof
+		}
 	}
 	else{
 		die "couldn't fork: $!\n";
