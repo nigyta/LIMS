@@ -48,6 +48,19 @@ END
 	exit;
 }
 
+my $checkRunningAssembly=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND barcode < 0 ");
+$checkRunningAssembly->execute();
+if ($checkRunningAssembly->rows > 0)
+{
+	print <<END;
+<script>
+	closeDialog();
+	errorPop("There is another running assembly. Please try again later!");
+</script>	
+END
+	exit;
+}
+
 my $target=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 $target->execute($assembly[4]);
 my @target = $target->fetchrow_array();

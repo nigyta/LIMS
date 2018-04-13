@@ -83,6 +83,19 @@ END
 	elsif($pid == 0){
 		#connect to the mysql server
 		my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
+
+		my $checkRunningAssembly=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND barcode < 0 ");
+		$checkRunningAssembly->execute();
+		if ($checkRunningAssembly->rows > 0)
+		{
+			print <<END;
+<script>
+	parent.errorPop("Assembly stopped due to another running assembly. Please try again later!");
+</script>	
+END
+			exit;
+		}
+
 		my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$assembly->execute($assemblyId);
 		my @assembly = $assembly->fetchrow_array();
