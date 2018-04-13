@@ -434,7 +434,7 @@ END
 		#email to user after alignment finishes.
 		open(MAIL,"|/usr/sbin/sendmail -t -oi");
 		print MAIL "To: $userEmail\n";
-		print MAIL "From: webmaster\n";
+		print MAIL "From: $author\n";
 		print MAIL "Subject: Alignment Successfully Completed\n\n";
 		print MAIL <<eof;
 Dear $userFullName ($userName),

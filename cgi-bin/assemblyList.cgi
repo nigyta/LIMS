@@ -241,18 +241,18 @@ if ($assemblyId)
 		}
 		else
 		{
-			unless (exists $totalLength->{'Unlocalized'})
+			unless (exists $totalLength->{'Unplaced'})
 			{
-				$totalAssembled->{'Unlocalized'} = 0;
-				$totalLength->{'Unlocalized'} = 0;
-				$maxLength->{'Unlocalized'} = 0;
-				$minLength->{'Unlocalized'} = 999999999;
+				$totalAssembled->{'Unplaced'} = 0;
+				$totalLength->{'Unplaced'} = 0;
+				$maxLength->{'Unplaced'} = 0;
+				$minLength->{'Unplaced'} = 999999999;
 			}
-			push @{$lengthList->{'Unlocalized'}},$assemblyCtgs[7];
-			$totalAssembled->{'Unlocalized'}++;
-			$totalLength->{'Unlocalized'} += $assemblyCtgs[7];
-			$maxLength->{'Unlocalized'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'Unlocalized'});
-			$minLength->{'Unlocalized'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'Unlocalized'});
+			push @{$lengthList->{'Unplaced'}},$assemblyCtgs[7];
+			$totalAssembled->{'Unplaced'}++;
+			$totalLength->{'Unplaced'} += $assemblyCtgs[7];
+			$maxLength->{'Unplaced'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'Unplaced'});
+			$minLength->{'Unplaced'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'Unplaced'});
 		}
 		my @seqs = split ",", $assemblyCtgs[8];
 		$assemblyCtgSeqNumber->{$assemblyCtgs[0]} = @seqs;
@@ -516,7 +516,7 @@ END
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
 		my $headerByChr;
-		my $formattedChr = ($_ % 100 == 98) ? "Chloroplast" : ($_ % 100 == 99) ? "Mitochondrion" : ($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
+		my $formattedChr = ($_ % 100 == 0) ? "Unplaced" : ($_ % 100 == 98) ? "Chloroplast" : ($_ % 100 == 99) ? "Mitochondrion" : ($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
 		$headerByChr->{$_} = ($_ > 0 && $assembly[5] > 0) ?
 			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>$formattedChr</a>"
 			: "<h3>$formattedChr";
@@ -535,7 +535,7 @@ END
 
 		$headerByChr->{$_} .= ($_ > 0) ?
 			"<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='100 Ns will be added to connect two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame' title='100 Ns will be added to connect two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='100 Ns will be added to connect seqeunces at edges of two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li></ul></li></ul></sup></h3>"
-			: "<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li></ul></li><li><a class='ui-state-error-text' onclick='deleteItem($assemblyId,\"chrZeroOnly\")' title='Delete Chr0 Contigs'><span class='ui-icon ui-icon-bullet'></span>Delete Chr0 Ctgs</a></li></ul></sup></h3>";
+			: "<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li></ul></li><li><a class='ui-state-error-text' onclick='deleteItem($assemblyId,\"chrZeroOnly\")' title='Delete Unplaced Contigs'><span class='ui-icon ui-icon-trash'></span>Delete Ctgs</a></li></ul></sup></h3>";
 
 		$assembledCtgDetails = ($_ > 0) ? $headerByChr->{$_}.$assembledCtgByChr->{$_}.$assembledCtgDetails : $assembledCtgDetails.$headerByChr->{$_}.$assembledCtgByChr->{$_}; #list chromosome-assigned first.
 		$assemblySortableStyle .= $assemblySortableStyleByChr->{$_};
