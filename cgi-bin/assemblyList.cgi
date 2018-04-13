@@ -279,26 +279,30 @@ if ($assemblyId)
 	foreach my $contigType (sort keys %$totalAssembled)
 	{
 		@{$lengthList->{$contigType}} = sort {$b <=> $a} @{$lengthList->{$contigType}};
-		my $median = int ($#{$lengthList->{$contigType}}/2);
+		my $meanLength = int ($totalLength->{$contigType}/$totalAssembled->{$contigType});
+		my $median = int ($totalAssembled->{$contigType}/2);
 		my $medianLength = $lengthList->{$contigType}[$median];
 		my $n50Length = 0;
 		my $subtotal = 0;
 		my $widthUnit = int ($maxLength->{$contigType}/ $chartWidth) || 1; 
 		my $heightUnit = ($totalAssembled->{$contigType} > 0) ? $chartHeight/$totalAssembled->{$contigType} : 0; 
 		my $assemblyCtgLengthCount;
+		my $lFifty=0;
+		my $lFiftyCounter=0;
 		foreach (@{$lengthList->{$contigType}})
 		{
 			$subtotal += $_;
+			$lFiftyCounter++;
 			if($subtotal > $totalLength->{$contigType}/2 && $n50Length == 0)
 			{
 				$n50Length = $_;
+				$lFifty = $lFiftyCounter;
 			}
 			for (my $i = 1; $i <= $_; $i += $widthUnit)
 			{
 				$assemblyCtgLengthCount->{$i} = 0 unless (exists $assemblyCtgLengthCount->{$i});
 				$assemblyCtgLengthCount->{$i}++;
 			}
-		
 		}
 		my $graphic = '';
 		if ($totalLength->{$contigType} > 0)
@@ -317,7 +321,7 @@ if ($assemblyId)
 					width=>$chartWidth, height=>$chartHeight,
 					id=>'rect_1'
 				);
-			my $stringOfContigNumber = ($#{$lengthList->{$contigType}} > 0) ? "Total ". commify($#{$lengthList->{$contigType}} + 1) ." contigs" : "Total ". commify($#{$lengthList->{$contigType}} + 1) ." contig";
+			my $stringOfContigNumber = ($totalAssembled->{$contigType} > 0) ? "Total ". commify($totalAssembled->{$contigType}) ." contigs" : "Total ". commify($totalAssembled->{$contigType}) ." contig";
 			my $lengthOfContigNumber = length ($stringOfContigNumber);
 			my $xPositionOfContigNumber = $margin - 5;
 			my $yPositionOfContigNumber = $lengthOfContigNumber * 7;
@@ -434,11 +438,11 @@ if ($assemblyId)
 
 		if ($assemblyStats)
 		{
-			$assemblyStats .= ($totalAssembled->{$contigType} > 0) ? "<hr style='page-break-before: always;'><h3>$contigType Contigs</h3>Total length: " . commify($totalLength->{$contigType}). " bp, N50 length: " . commify($n50Length). " bp, Median length: " . commify($medianLength). " bp.<br>Longest: " . commify($maxLength->{$contigType}). " bp, Shortest: " . commify($minLength->{$contigType}). " bp.<br>$graphic" : "";
+			$assemblyStats .= ($totalAssembled->{$contigType} > 0) ? "<hr style='page-break-before: always;'><h3>$contigType Contigs</h3><table><tr><td>$graphic</td><td>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>Longest sequence: " . commify($maxLength->{$contigType}). " bp.<br>Shortest sequence: " . commify($minLength->{$contigType}). " bp.<br> Mean sequence size: " . commify($meanLength). " bp.<br> Median sequence size: " . commify($medianLength). " bp.<br> N50 sequence length: " . commify($n50Length). " bp.<br> L50 sequence count: " . commify($lFifty). ".</td></tr></table>" : "";
 		}
 		else
 		{
-			$assemblyStats = ($totalAssembled->{$contigType} > 0) ? "<h3>$contigType Contigs</h3>Total length: " . commify($totalLength->{$contigType}). " bp, N50 length: " . commify($n50Length). " bp, Median length: " . commify($medianLength). " bp.<br>Longest: " . commify($maxLength->{'All'}). " bp, Shortest: " . commify($minLength->{$contigType}). " bp.<br>$graphic" : "";
+			$assemblyStats = ($totalAssembled->{$contigType} > 0) ? "<h3>$contigType Contigs</h3><table><tr><td>$graphic</td><td>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>Longest sequence: " . commify($maxLength->{$contigType}). " bp.<br>Shortest sequence: " . commify($minLength->{$contigType}). " bp.<br> Mean sequence size: " . commify($meanLength). " bp.<br> Median sequence size: " . commify($medianLength). " bp.<br> N50 sequence length: " . commify($n50Length). " bp.<br> L50 sequence count: " . commify($lFifty). ".</td></tr></table>" : "";
 		}
 	}
 
