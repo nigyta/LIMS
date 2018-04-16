@@ -192,7 +192,7 @@ eof
 					<td><select name="user$fieldName" onchange="updateUserConfig($configId, this.value)">
 eof
 					my @inputOptions = split(/,/, $inputOptions);
-					foreach my $optionValue (sort {$a <=> $b} @inputOptions){
+					foreach my $optionValue (sort {$a cmp $b} @inputOptions){
 						if($optionValue eq $userConfig{$fieldName}){
 							$settingDetails .= <<eof;
 							<option value="$optionValue" selected="selected">$optionValue</option>
@@ -207,7 +207,7 @@ eof
 					</select></td>
 					<td><select name="system$fieldName" onchange="updateSystemConfig($configId, this.value)">
 eof
-					foreach my $optionValue (sort {$a <=> $b} @inputOptions){
+					foreach my $optionValue (sort {$a cmp $b} @inputOptions){
 						if($optionValue eq $fieldValue){
 							$settingDetails .= <<eof;
 							<option value="$optionValue" selected="selected">$optionValue</option>

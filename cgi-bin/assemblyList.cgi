@@ -280,8 +280,17 @@ if ($assemblyId)
 	{
 		@{$lengthList->{$contigType}} = sort {$b <=> $a} @{$lengthList->{$contigType}};
 		my $meanLength = int ($totalLength->{$contigType}/$totalAssembled->{$contigType});
-		my $median = int ($totalAssembled->{$contigType}/2);
-		my $medianLength = $lengthList->{$contigType}[$median];
+		my $medianLength = 0;
+		if($totalAssembled->{$contigType} % 2 == 0)
+		{
+			my $median = $totalAssembled->{$contigType}/2;
+			$medianLength = ($lengthList->{$contigType}[$median]+$lengthList->{$contigType}[$median-1])/2;
+		}
+		else
+		{
+			my $median = int ($totalAssembled->{$contigType}/2);
+			$medianLength = $lengthList->{$contigType}[$median];
+		}
 		my $n50Length = 0;
 		my $subtotal = 0;
 		my $widthUnit = int ($maxLength->{$contigType}/ $chartWidth) || 1; 
@@ -575,7 +584,7 @@ END
 			$getClones->execute($assembly[4]);
 			while(my @getClones= $getClones->fetchrow_array())
 			{
-				my $getSeqs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ? ORDER BY id");
+				my $getSeqs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ?");
 				$getSeqs->execute($getClones[1]);
 				while(my @getSeqs = $getSeqs->fetchrow_array())
 				{
@@ -587,7 +596,7 @@ END
 		}
 		if($target[1] eq 'genome')
 		{
-			my $getSeqs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ? ORDER BY name");
+			my $getSeqs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
 			$getSeqs->execute($assembly[4]);
 			while(my @getSeqs = $getSeqs->fetchrow_array())
 			{

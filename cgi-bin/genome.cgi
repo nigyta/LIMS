@@ -50,6 +50,12 @@ while (my @allGenome = $allGenome->fetchrow_array())
 	
 		$relatedAssemblies .= (length $relatedAssembly[2] > 12) ? "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . substr($relatedAssembly[2],0,10 )."...</a></li>" : "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . $relatedAssembly[2] ."</a></li>";
 	}
+	my $relatedAssemblyByExtra=$dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND link.parent = matrix.id AND link.child = ?");
+	$relatedAssemblyByExtra->execute($allGenome[0]);
+	while (my @relatedAssemblyByExtra = $relatedAssemblyByExtra->fetchrow_array())
+	{
+		$relatedAssemblies .= (length $relatedAssemblyByExtra[2] > 12) ? "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . substr($relatedAssemblyByExtra[2],0,10 )."...</a></li>" : "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . $relatedAssemblyByExtra[2] ."</a></li>";
+	}
 
 	my $relatedLibraries = '';
 	if ($allGenome[6])
@@ -61,7 +67,7 @@ while (my @allGenome = $allGenome->fetchrow_array())
 	}
 	
 	my $agpAvailable = "";
-	my $agpList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'agp' AND x = ? ORDER BY o");
+	my $agpList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'agp' AND x = ?");# ORDER BY o
 	$agpList->execute($allGenome[0]);
 	while (my @agpList = $agpList->fetchrow_array())
 	{
@@ -90,7 +96,7 @@ while (my @allGenome = $allGenome->fetchrow_array())
 	$genomes .= "<tr>
 		<td style='text-align:center;'><input type='checkbox' id='genomeList$allGenome[0]$$' name='itemId' value='$allGenome[0]'></td>
 		<td title='Genome'><a id='genomeId$allGenome[0]$$' onclick='openDialog(\"genomeView.cgi?genomeId=$allGenome[0]\")' title='View'>$allGenome[2]</a></td>
-		<td title='Click to download $allGenome[3] Sequences'><a href='download.cgi?genomeId=$allGenome[0]' target='hiddenFrame'>$allGenome[3]</a></td>
+		<td title='Click to download $allGenome[3] Sequences'><a href='download.cgi?genomeId=$allGenome[0]' target='hiddenFrame'>$allGenome[3]<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-disk'></span></a></td>
 		<td>$yesOrNo{$allGenome[4]}. $agpAvailable</td>
 		<td title='As a reference for assembly'>$yesOrNo{$allGenome[5]}</td>
 		<td title='Related Library'>$relatedLibraries</td>

@@ -50,7 +50,7 @@ my @sequenceLength = ();
 my $totalLength = 0;
 my $totalGaps = 0;
 my $gapCount;
-my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ? ORDER BY y DESC");
+my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
 $getSequences->execute($genomeId);
 while (my @getSequences =  $getSequences->fetchrow_array())
 {
@@ -84,8 +84,18 @@ while (my @getSequences =  $getSequences->fetchrow_array())
 	$sequences .= "<tr><td style='white-space: nowrap;'><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequences[0]\")' title='View $getSequences[2]'>$getSequences[2]</a><br><sup>$sequenceDetails->{'description'}</sup></td><td><div id='seqChr$getSequences[0]' style='position: relative;'><a id='seqChr$getSequences[0]$$' onmouseover='editIconShow(\"seqChr$getSequences[0]$$\")' onmouseout='editIconHide(\"seqChr$getSequences[0]$$\")' onclick='loaddiv(\"seqChr$getSequences[0]\",\"seqChrEdit.cgi?seqId=$getSequences[0]\")' title='Edit this chromosome number'>$getSequences[6]</a></div></td><td>$getSequences[5]</td><td>$gaps</td><td><a style='float: right;' onclick='closeDialog();closeViewer();openViewer(\"seqBrowse.cgi?seqId=$getSequences[0]\")'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-image' title='Browse'></span></a></td></tr>";
 }
 
-my $median = int ($#sequenceLength/2);
-my $medianLength = $sequenceLength[$median];
+@sequenceLength = sort {$b <=> $a} @sequenceLength;
+my $medianLength = 0;
+if($#sequenceLength % 2 == 1)
+{
+	my $median = int ($#sequenceLength/2);
+	$medianLength = ($sequenceLength[$median]+$sequenceLength[$median+1])/2;
+}
+else
+{
+	my $median = $#sequenceLength/2;
+	$medianLength = $sequenceLength[$median];
+}
 my $n50Length = 0;
 my $subtotal = 0;
 my $assemblyCtgLengthCount;
@@ -181,8 +191,8 @@ __DATA__
 	<tr><td style='text-align:right;white-space: nowrap;'>$sequences</td><td>For Reassembly? $genomeForGPM. $agpAvailable 
 		As Reference? $genomeAsReference. <br>
 		Total: $totalLength bp;
-		N50: $n50Length bp;
-		Median: $medianLength bp<br>
+		Median: $medianLength bp;
+		N50: $n50Length bp;<br>
 		$gapStats<br><b>Description:</b> $genomeDescription</td></tr>
 </table>
 <script>

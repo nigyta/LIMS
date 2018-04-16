@@ -403,8 +403,19 @@ if ($seqId)
 
 
 	@lengthList = sort {$b <=> $a} @lengthList;
-	my $median = int ($#lengthList/2);
-	my $medianLength = $lengthList[$median];
+
+	my $medianLength = 0;
+	if($#lengthlist % 2 == 1)
+	{
+		my $median = int ($#lengthlist/2);
+		$medianLength = ($lengthlist[$median]+$lengthlist[$median+1])/2;
+	}
+	else
+	{
+		my $median = $#lengthlist/2;
+		$medianLength = $lengthlist[$median];
+	}
+
 	my $n50Length = 0;
 	my $subtotal = 0;
 	foreach (@lengthList)

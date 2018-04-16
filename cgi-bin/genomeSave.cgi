@@ -257,7 +257,9 @@ END
 								}
 							}					
 						}
-						unlink ($genomeInfile) if (!$genomeFilePath);
+						unlink ($genomeInfile);
+						unlink ($agpInfile);
+
 						my $seqNumber = 0;
 						my $countGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $genomeId");
 						$countGenomeSequence->execute();
@@ -355,7 +357,6 @@ END
 					}		
 					`perl -p -i -e 's/\r/\n/g' $genomeInfile`; #convert CR line terminators (MAC OS) into LF line terminators (Unix)
 					#loading sequence
-					my $seqNumber = 0;
 					my $in = Bio::SeqIO->new(-file => $genomeInfile,
 											-format => 'Fasta');
 					while ( my $seq = $in->next_seq() )
@@ -414,11 +415,15 @@ END
 								$pieceNumber++;
 							}
 						}
-						$seqNumber++;
 					}
 					unlink ($genomeInfile);
 					unlink ($agpInfile);
-					my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1, creationDate = NOW() WHERE id = $genomeId");
+
+					my $seqNumber = 0;
+					my $countGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $genomeId");
+					$countGenomeSequence->execute();
+					$seqNumber = $countGenomeSequence->rows;
+					my $updateGenomeToLoaded = $dbh->do("UPDATE matrix SET o = $seqNumber, barcode = 1, creationDate = NOW() WHERE id = $genomeId");			
 					exit 0;
 				}
 				else{

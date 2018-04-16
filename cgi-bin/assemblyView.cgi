@@ -52,11 +52,28 @@ if($assembly[5])
 	$refGenomeId = "<tr><td style='text-align:right'><b>Reference Genome</b></td><td title='$genomeList[8]'>$genomeList[2]</td></tr>";
 }
 
+my $assemblyExtraIds = "<tr><td style='text-align:right'><b>Extra Genome</b></td><td>";
+my $checkAsbGenome = $dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND link.child = matrix.id AND link.parent = ?");
+$checkAsbGenome->execute($assemblyId);
+if ($checkAsbGenome->rows > 0)
+{
+	while(my @checkAsbGenome=$checkAsbGenome->fetchrow_array())
+	{
+		$assemblyExtraIds .= "<a onclick='closeDialog();openDialog(\"genomeView.cgi?genomeId=$checkAsbGenome[0]\")' title='$checkAsbGenome[8]'>$checkAsbGenome[2]<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-arrow-1-ne'></span></a><br>";
+	}
+	$assemblyExtraIds .= "</td></tr>";
+}
+else
+{
+	$assemblyExtraIds .= "None.</td></tr>";
+}
+
 $html =~ s/\$assemblyId/$assemblyId/g;
 $html =~ s/\$assemblyName/$assembly[2]/g;
 $html =~ s/\$assemblyVersion/$assembly[3]/g;
 $html =~ s/\$fpcOrAgpId/$fpcOrAgpId/g;
 $html =~ s/\$refGenomeId/$refGenomeId/g;
+$html =~ s/\$assemblyExtraIds/$assemblyExtraIds/g;
 
 my $assemblyDetails = decode_json $assembly[8];
 $assemblyDetails->{'description'} = '' if (!exists $assemblyDetails->{'description'});
@@ -72,6 +89,7 @@ __DATA__
 	<tr><td style='text-align:right'><b>Assembly Name</b></td><td>$assemblyName<br>Version $assemblyVersion <sup class='ui-state-disabled'>by $assemblyCreator on $assemblyCreationDate</sup></td></tr>
 	$fpcOrAgpId
 	$refGenomeId
+	$assemblyExtraIds
 	<tr><td style='text-align:right'><b>Description</b></td><td><textarea class='ui-widget-content ui-corner-all' name="description" id="viewAssemblyDescription" cols="50" rows="10" placeholder="Give some information about this assembly. Or you may do it later." readonly="readonly">$assemblyDescription</textarea></td></tr>
 </table>
 <script>

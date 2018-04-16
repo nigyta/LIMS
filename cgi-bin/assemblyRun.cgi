@@ -712,6 +712,14 @@ END
 									($agpLine[0] =~ /^ChrUN/) and next;
 									($agpLine[0] =~ /^Ctg/) and next;
 									my $chrNumber = ($agpLine[0] =~ /(\d+)/) ? $1 : 0;
+									if ($agpLine[0] =~ /Chloroplast/)
+									{
+										$chrNumber = 98;
+									}
+									if ($agpLine[0] =~ /Mitochondrion/)
+									{
+										$chrNumber = 99;
+									}
 									my $updatedAssemblyCtg = $dbh->prepare("UPDATE matrix SET x = ?, z = ? WHERE id = ?");
 									$updatedAssemblyCtg->execute($chrNumber,$agpLine[1],$assemblySeqCtgId->{$assemblySeqByName[5]});
 								}
@@ -962,8 +970,8 @@ END
 					{
 						my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
 						sort {$a <=> $b} @assignedPositionCandidates;
-						my $median = int ($#assignedPositionCandidates/2);
-						$assignedPosition = $assignedPositionCandidates[$median];
+						my $estimatedMedian = int ($#assignedPositionCandidates/2);
+						$assignedPosition = $assignedPositionCandidates[$estimatedMedian];
 					}
 					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
 				}
