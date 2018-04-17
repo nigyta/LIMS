@@ -91,7 +91,8 @@ if($assemblyId)
 			{
 				my $assemblySeqId = $_;
 				$assemblySeqId =~ /(\d+)/;
-				$assemblySeqId =~ s/$1/$assemblySeqOldToNew->{$1}/g;
+				my $newAssemblySeqId = $assemblySeqOldToNew->{$1};
+				$assemblySeqId =~ s/$1/$newAssemblySeqId/g;
 				push @assemblySeqList, $assemblySeqId;
 			}
 			my $assemblySeqList = join ",", @assemblySeqList;
