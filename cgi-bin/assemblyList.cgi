@@ -84,8 +84,27 @@ if ($assemblyId)
 				<li><a><span class='ui-icon ui-icon-wrench'></span>Assembly Tools</a>
 					<ul style='z-index: 1000;white-space: nowrap;'>
 						<li><a onclick='openDialog(\"assemblyEdit.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-pencil'></span>Edit This Assembly</a></li>
-						<li><a onclick='openDialog(\"assemblyValidation.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-search'></span>Assembly Validation</a></li>
+						<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-copy'></span>Copy This Assembly</a></li>
+						<li><a onclick='openDialog(\"assemblyRunForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-shuffle'></span>Run Assembly</a></li>
+						<li><a><span class='ui-icon ui-icon-transfer-e-w'></span>Alignment</a>
+							<ul style='z-index: 1000;white-space: nowrap;'>
+								<li><a onclick='openDialog(\"alignmentForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>New Alignment</a></li>
+								<li><a onclick='openDialog(\"alignmentLoadForm.cgi?assemblyId=$assemblyId\")' title='BLAST Tabular Format'><span class='ui-icon ui-icon-bullet'></span>Load Alignment in Tabular</a></li>";
+	$assemblyList .= ($target[1] eq 'library') ? "<li><a onclick='openDialog(\"besToSeqForm.cgi?libraryId=$assembly[4]&targetId=$assembly[5]\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li>" 
+						: ($target[6] > 0) ? "<li><a onclick='openDialog(\"besToSeqForm.cgi?libraryId=$target[6]&targetId=$assembly[5]\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li>" 
+						: "";
+	$assemblyList .= "</ul>
+						</li>
 						<li><a onclick='openDialog(\"assemblyAssign.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-arrow-2-e-w'></span>Assign Ctg To Chromosome</a></li>
+						<li><a onclick='openDialog(\"assemblyCtgResetForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Reset Redundancy</a></li>
+						<li><a onclick='openDialog(\"assemblyValidation.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-search'></span>Assembly Validation</a></li>
+						<li><a><span class='ui-icon ui-icon-link'></span>Gap Filler</a>
+							<ul style='z-index: 1000;white-space: nowrap;'>
+								<li><a onclick='openDialog(\"assemblyGapFillForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Run</a></li>
+								$gapFillerViewer
+								$gapFillerDownload
+							</ul>
+						</li>
 						<li><a><span class='ui-icon ui-icon-disk'></span>Download</a>
 							<ul style='z-index: 1000;white-space: nowrap;'>";
 	$assemblyList .= ($target[1] eq 'library') ? "<li><a href='download.cgi?libraryId=$assembly[4]' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>BAC Sequence</a></li>
@@ -97,24 +116,6 @@ if ($assemblyId)
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=all' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=all&unit=chr&element=ctg' target='hiddenFrame' title='100 Ns will be added to connect two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li>
 						<li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=all&unit=chr' target='hiddenFrame' title='100 Ns will be added to connect seqeunces at edges of two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li>
-							</ul>
-						</li>
-						<li><a><span class='ui-icon ui-icon-transfer-e-w'></span>Alignment</a>
-							<ul style='z-index: 1000;white-space: nowrap;'>
-								<li><a onclick='openDialog(\"alignmentForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>New Alignment</a></li>
-								<li><a onclick='openDialog(\"alignmentLoadForm.cgi?assemblyId=$assemblyId\")' title='BLAST Tabular Format'><span class='ui-icon ui-icon-bullet'></span>Load Alignment in Tabular</a></li>";
-	$assemblyList .= ($target[1] eq 'library') ? "<li><a onclick='openDialog(\"besToSeqForm.cgi?libraryId=$assembly[4]&targetId=$assembly[5]\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li>" 
-						: ($target[6] > 0) ? "<li><a onclick='openDialog(\"besToSeqForm.cgi?libraryId=$target[6]&targetId=$assembly[5]\")'><span class='ui-icon ui-icon-bullet'></span>BES to Seq</a></li>" 
-						: "";
-	$assemblyList .= "</ul>
-						</li>
-						<li><a onclick='openDialog(\"assemblyRunForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-shuffle'></span>Run Assembly</a></li>
-						<li><a onclick='openDialog(\"assemblyCtgResetForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Reset Redundancy</a></li>
-						<li><a><span class='ui-icon ui-icon-link'></span>Gap Filler</a>
-							<ul style='z-index: 1000;white-space: nowrap;'>
-								<li><a onclick='openDialog(\"assemblyGapFillForm.cgi?assemblyId=$assemblyId\")'><span class='ui-icon ui-icon-bullet'></span>Run</a></li>
-								$gapFillerViewer
-								$gapFillerDownload
 							</ul>
 						</li>
 						<li><a onclick='printDiv(\"assemblyTab$assemblyId$$\")'><span class='ui-icon ui-icon-print'></span>Print</a></li>

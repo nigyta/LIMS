@@ -34,6 +34,37 @@ if ($assemblyId)
 	{
 		my @seq=split",",$assemblyCtg[8];
 		my $num=@seq;
+		my $chrName= '';
+		if($assemblyCtg[4] == 0)
+		{
+			$chrName = "$assemblyCtg[4] = Unplaced";		
+		}
+		else
+		{
+			if ($assemblyCtg[4] % 100 == 98)
+			{
+				$chrName = "$assemblyCtg[4] = Chloroplast";
+			}
+			elsif($assemblyCtg[4] % 100 == 99)
+			{
+				$chrName = "$assemblyCtg[4] = Mitochondrion";
+			}
+			else
+			{
+				if($assemblyCtg[4] > 100)
+				{
+					my $subGenomeNumber = substr ($assemblyCtg[4], 0, -2);
+					my $subChrNumber = sprintf "%0*d", 2, substr ($assemblyCtg[4], -2);
+					$chrName = "$assemblyCtg[4] = Subgenome$subGenomeNumber-Chr$subChrNumber";
+				}
+				else
+				{
+					my $chrNumber = sprintf "%0*d", 2, $assemblyCtg[4];
+					$chrName = "$assemblyCtg[4] = Chr$chrNumber";
+				}
+			}
+		}
+
 		my $commentDescription;
 		my $comment = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'comment' AND o = ?");
 		$comment->execute($assemblyCtg[0]);
@@ -42,11 +73,11 @@ if ($assemblyId)
 		{
 			$commentDetails = decode_json $comment[8];
 			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$assemblyCtg[4]</td><td>".commify($assemblyCtg[7])." </td><td>$commentDetails->{'description'}</td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td>$commentDetails->{'description'}</td></tr>" ;
 		}
 		else
 		{
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$assemblyCtg[4]</td><td>".commify($assemblyCtg[7])." </td><td></td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td></td></tr>" ;
 		}
 	}
 	

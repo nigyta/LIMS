@@ -91,8 +91,14 @@ __DATA__
 	$refGenomeId
 	$assemblyExtraIds
 	<tr><td style='text-align:right'><b>Description</b></td><td><textarea class='ui-widget-content ui-corner-all' name="description" id="viewAssemblyDescription" cols="50" rows="10" placeholder="Give some information about this assembly. Or you may do it later." readonly="readonly">$assemblyDescription</textarea></td></tr>
+	<tr><td style='text-align:right'></td><td>
+		<form id="copyAssembly" name="copyAssembly" action="assemblyCopy.cgi" enctype="multipart/form-data" method="post" target="hiddenFrame">
+			<input type="checkbox" name="assemblyId" id="copyAssemblyIdCheckbox" value="$assemblyId" /><b><label for="copyAssemblyIdCheckbox">Make a copy of this assembly</label></b>
+			<input type="hidden" name="action" value="copy">
+		</form>
+	</td></tr>
 </table>
 <script>
 $('#dialog').dialog("option", "title", "View Assembly $assemblyName");
-$( "#dialog" ).dialog( "option", "buttons", [{ text: "OK", click: function() {closeDialog(); } } ] );
+$( "#dialog" ).dialog( "option", "buttons", [{ text: "Copy Assembly", click: function() { submitForm('copyAssembly'); } }, { text: "OK", click: function() {closeDialog(); } } ] );
 </script>
