@@ -461,7 +461,7 @@ __DATA__
 		var HTMLdata= $("#"+divId).html();
 		var mywindow = window.open('', 'new div', 'height=400,width=600');
 		mywindow.document.write('<html><head><title>Printing...</title>');
-		mywindow.document.write('<link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/smoothness/jquery-ui-1.10.4.custom.min.css" /><link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/dataTables.jqueryui.css" /><link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/pac.css" />');
+		mywindow.document.write('<link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/smoothness/jquery-ui-1.10.4.custom.min.css" /><link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/dataTables.jqueryui.css" /><link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/lims.css" />');
 		mywindow.document.write('</head><body >');
 		mywindow.document.write(HTMLdata);
 		mywindow.document.write('</body></html>');

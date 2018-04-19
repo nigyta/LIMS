@@ -456,13 +456,10 @@ if ($assemblyId)
 			$graphic = $svg->xmlify;
 		}
 
-		if ($assemblyStats)
+		if ($totalAssembled->{$contigType} > 0)
 		{
-			$assemblyStats .= ($totalAssembled->{$contigType} > 0) ? "<hr style='page-break-before: always;'><h3>$contigType Contigs</h3><table><tr><td>$graphic</td><td>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>Longest sequence: " . commify($maxLength->{$contigType}). " bp.<br>Shortest sequence: " . commify($minLength->{$contigType}). " bp.<br>Number of sequences > 500 nt: $countByLength{'halfK'}.<br>Number of sequences > 1k nt: $countByLength{'oneK'}.<br>Number of sequences > 10k nt: $countByLength{'tenK'}.<br>Number of sequences > 100k nt: $countByLength{'hundredK'}.<br>Number of sequences > 1M nt: $countByLength{'oneM'}.<br>Mean sequence size: " . commify($meanLength). " bp.<br>Median sequence size: " . commify($medianLength). " bp.<br>N50 sequence length: " . commify($n50Length). " bp.<br>L50 sequence count: " . commify($lFifty). ".</td></tr></table>" : "";
-		}
-		else
-		{
-			$assemblyStats = ($totalAssembled->{$contigType} > 0) ? "<h3>$contigType Contigs</h3><table><tr><td>$graphic</td><td>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>Longest sequence: " . commify($maxLength->{$contigType}). " bp.<br>Shortest sequence: " . commify($minLength->{$contigType}). " bp.<br>Number of sequences > 500 nt: $countByLength{'halfK'}.<br>Number of sequences > 1k nt: $countByLength{'oneK'}.<br>Number of sequences > 10k nt: $countByLength{'tenK'}.<br>Number of sequences > 100k nt: $countByLength{'hundredK'}.<br>Number of sequences > 1M nt: $countByLength{'oneM'}.<br>Mean sequence size: " . commify($meanLength). " bp.<br>Median sequence size: " . commify($medianLength). " bp.<br>N50 sequence length: " . commify($n50Length). " bp.<br>L50 sequence count: " . commify($lFifty). ".</td></tr></table>" : "";
+			$assemblyStats .= ($assemblyStats) ? "<hr style='page-break-before: always;'>" : "";
+			$assemblyStats .= "<div><h3>$contigType Contigs</h3><div style='display:inline-block;'>$graphic</div><div style='display:inline-block;'>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>Longest sequence: " . commify($maxLength->{$contigType}). " bp.<br>Shortest sequence: " . commify($minLength->{$contigType}). " bp.<br>Number of sequences > 500 nt: $countByLength{'halfK'}.<br>Number of sequences > 1k nt: $countByLength{'oneK'}.<br>Number of sequences > 10k nt: $countByLength{'tenK'}.<br>Number of sequences > 100k nt: $countByLength{'hundredK'}.<br>Number of sequences > 1M nt: $countByLength{'oneM'}.<br>Mean sequence size: " . commify($meanLength). " bp.<br>Median sequence size: " . commify($medianLength). " bp.<br>N50 sequence length: " . commify($n50Length). " bp.<br>L50 sequence count: " . commify($lFifty). ".</div></div>";
 		}
 	}
 

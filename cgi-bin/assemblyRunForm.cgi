@@ -31,6 +31,8 @@ $objectComponent->{2} = "Ctg-Seq";
 undef $/;# enable slurp mode
 my $html = <DATA>;
 
+print header;
+
 my $assemblyId = param ('assemblyId') || '';
 my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 $assembly->execute($assemblyId);
@@ -38,7 +40,6 @@ my @assembly = $assembly->fetchrow_array();
 
 unless ($assembly[7] == 1 || $assembly[7] == 0) # exit if for frozen or running assembly
 {
-	print header;
 	print <<END;
 <script>
 	closeDialog();
@@ -126,7 +127,6 @@ $html =~ s/\$SEQTOGNMIDENTITY/$SEQTOGNMIDENTITY/g;
 $html =~ s/\$ENDTOENDMINOVERLAP/$ENDTOENDMINOVERLAP/g;
 $html =~ s/\$ENDTOENDIDENTITY/$ENDTOENDIDENTITY/g;
 
-print header;
 print $html;
 
 __DATA__
