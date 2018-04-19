@@ -452,6 +452,19 @@ END
 					exit;
 				}
 
+				my $genomeForAsbProject = $dbh->prepare("SELECT * FROM link WHERE child = $itemId AND type LIKE 'asbProject");
+				$genomeForAsbProject->execute();
+				if($genomeForAsbProject->rows > 0)
+				{
+					print <<END;
+	<script>
+		parent.closeDialog();
+		parent.errorPop("Please unlink from all assembly projects first!");
+	</script>	
+END
+					exit;
+				}
+
 				my $genomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND (o = 99 OR o = 97) AND x = $itemId");
 				$genomeSequence->execute();
 				while(my @genomeSequence = $genomeSequence->fetchrow_array())

@@ -134,6 +134,22 @@ elsif($pid == 0){
 # 			$updateToAssembly->execute($assemblyDetails,$getAssembly[0]);
 # 		}
 # 	}
+# 	my $sequenceNameToId;
+# 	my $genomeId = '3039246';
+# 	my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
+# 	$getSequences->execute($genomeId);
+# 	while (my @getSequences =  $getSequences->fetchrow_array())
+# 	{
+# 		$sequenceNameToId->{$getSequences[2]} = $getSequences[0];
+# 	}
+# 	my $assemblyId = '3037999';
+# 	my $getAssemblySequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ?");
+# 	$getAssemblySequences->execute($assemblyId);
+# 	while (my @getAssemblySequences =  $getAssemblySequences->fetchrow_array())
+# 	{
+# 		my $updateAssemblySeq = $dbh->prepare("UPDATE matrix SET y = ? WHERE id = ?");
+# 		$updateAssemblySeq->execute($sequenceNameToId->{$getAssemblySequences[2]},$getAssemblySequences[0]);
+# 	}
 	exit 0;
 }
 else{
