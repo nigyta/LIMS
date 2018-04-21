@@ -55,25 +55,6 @@ else
 	$fpcOrAgpId = "<option class='ui-state-error-text' value='0'>No reference available</option>".$fpcOrAgpId;
 }
 
-my $refGenomeId = '';
-my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");
-$genomeList->execute();
-while (my @genomeList = $genomeList->fetchrow_array())
-{
-	next if ($genomeList[0] eq $targetId);
-	next if ($genomeList[5] < 1); #remove not for reference
-	$refGenomeId .= "<option value='$genomeList[0]' title='$genomeList[8]'>$genomeList[2]</option>";
-}
-if($refGenomeId)
-{
-	$refGenomeId = "<option class='ui-state-error-text' value='0'>Please select a genome</option>".$refGenomeId;
-}
-else
-{
-	$refGenomeId = "<option class='ui-state-error-text' value='0'>No reference genome available</option>".$refGenomeId;
-}
-
-
 my $col = 3;
 my $colCount=0;
 my $assemblyExtraIds = "<table id='assemblyExtraIds$$' class='display'><thead style='display:none;'><tr>" . "<th></th>" x $col . "</tr></thead><tbody>";
@@ -97,25 +78,40 @@ while (my @library=$library->fetchrow_array())
 	$colCount++;
 }
 
+my $refGenomeId = '';
 my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome' ORDER BY name");
 $genome->execute();
 while (my @genome=$genome->fetchrow_array())
 {
 	next if ($genome[0] eq $targetId);
-	next if ($genome[4] < 1);
-	if($colCount % $col == 0)
+	if ($genome[4] > 0) # for assembly
 	{
-		$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+		if($colCount % $col == 0)
+		{
+			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+		}
+		elsif($colCount % $col ==  $col - 1)
+		{
+			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+		}
+		else
+		{
+			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+		}
+		$colCount++;
 	}
-	elsif($colCount % $col ==  $col - 1)
+	if ($genome[5] > 0) # as reference
 	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+		$refGenomeId .= "<option value='$genome[0]' title='$genome[8]'>$genome[2]</option>";
 	}
-	else
-	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
-	}
-	$colCount++;
+}
+if($refGenomeId)
+{
+	$refGenomeId = "<option class='ui-state-error-text' value='0'>Please select a genome</option>".$refGenomeId;
+}
+else
+{
+	$refGenomeId = "<option class='ui-state-error-text' value='0'>No reference genome available</option>".$refGenomeId;
 }
 
 my $toBeFilled = $col - ( $colCount % $col);
@@ -137,7 +133,7 @@ __DATA__
 	<tr><td style='text-align:right'><label for="newAssemblyName"><b>Assembly Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="newAssemblyName" size="40" type="text" maxlength="32" value="$assemblyName"/> <input type="checkbox" id="newAssemblyAutoCheckNewSeq" name="autoCheckNewSeq" value="1"><label for="newAssemblyAutoCheckNewSeq">AutoCheck New Sequences</label></td></tr>
 	<tr><td style='text-align:right'><label for='newAssemblyFpcOrAgp'><b>Physical Reference</b></label></td><td><select class='ui-widget-content ui-corner-all' name='fpcOrAgpId' id='newAssemblyFpcOrAgp'>$fpcOrAgpId</select></td></tr>
 	<tr><td style='text-align:right'><label for='newAssemblyRefGenome'><b>Reference Genome</b></label></td><td><select class='ui-widget-content ui-corner-all' name='refGenomeId' id='newAssemblyRefGenome'>$refGenomeId</select></td></tr>
-	<tr><td style='text-align:right'><label for='newAssemblyExtraGenome'><b>Extra Genome</b></label><br><sup class='ui-state-disabled'>(used as gap fillers)</sup></td><td>$assemblyExtraIds</td></tr>
+	<tr><td style='text-align:right'><label for='newAssemblyExtraGenome'><b>Extra Genome</b></label><br><sup class='ui-state-disabled'>(Gap fillers)</sup></td><td>$assemblyExtraIds</td></tr>
 	<tr><td style='text-align:right'><label for="newAssemblyDescription"><b>Description</b></label></td><td><textarea class='ui-widget-content ui-corner-all' name="description" id="newAssemblyDescription" cols="60" rows="10" placeholder="Give some information about this assembly. Or you may do it later."></textarea></td></tr>
 	<tr><td></td><td><INPUT TYPE="button" VALUE="Save" onclick="submitForm('newAssembly$targetId');"></td></tr>
 	</table>

@@ -31,7 +31,7 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookieRoom = cookie('room') || '';
 
 my $rooms = '';
@@ -41,8 +41,8 @@ while (my @room = $room->fetchrow_array())
 {
 	$room[2] = "Room Name N/A!" unless($room[2]);
 	$rooms .= "<li><a href='room.cgi?roomId=$room[0]'>$room[2]</a></li>\n";
-	$active = $acitveDetector if ($cookieRoom eq $room[0]);
-	$acitveDetector++;
+	$active = $activeDetector if ($cookieRoom eq $room[0]);
+	$activeDetector++;
 }
 $html =~ s/\$rooms/$rooms/g;
 $html =~ s/\$active/$active/g;

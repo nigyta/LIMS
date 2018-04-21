@@ -30,7 +30,7 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookieProject = cookie('project') || '';
 
 my $projects = '';
@@ -40,8 +40,8 @@ while (my @project = $project->fetchrow_array())
 {
 	$project[2] = "Project: Name N/A, please edit!" unless($project[2]);
 	$projects .= "<li><a href='project.cgi?projectId=$project[0]'>$project[2]</a></li>\n";
-	$active = $acitveDetector if ($cookieProject eq $project[0]);
-	$acitveDetector++;
+	$active = $activeDetector if ($cookieProject eq $project[0]);
+	$activeDetector++;
 }
 
 $html =~ s/\$projects/$projects/;

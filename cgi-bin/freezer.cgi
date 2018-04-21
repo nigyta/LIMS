@@ -19,7 +19,7 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookieBox = cookie('box') || '';
 
 my $freezerId = param ('freezerId') || '';
@@ -33,8 +33,8 @@ if ($freezerId)
 	{
 		$boxes = "<div id='boxesInFreezer$freezerId$$'><ul>\n" unless($boxes);
 		$boxes .= "<li><a href='box.cgi?boxId=$boxInFreezer[0]'>Box: $boxInFreezer[2]</a></li>\n";
-		$active = $acitveDetector if ($cookieBox eq $boxInFreezer[0]);
-		$acitveDetector++;
+		$active = $activeDetector if ($cookieBox eq $boxInFreezer[0]);
+		$activeDetector++;
 	}
 	my $engaged = $boxInFreezer->rows;
 	my $freezer=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");

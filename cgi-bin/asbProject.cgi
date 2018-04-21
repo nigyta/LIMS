@@ -19,7 +19,7 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookieAsbProjectContent = cookie('asbProjectContent') || '';
 
 my $asbProjectId = param ('asbProjectId') || '';
@@ -33,8 +33,8 @@ if ($asbProjectId)
 	{
 		$asbProjectContent = "<div id='asbProjectContentInAsbProject$asbProjectId$$'><ul>\n" unless($asbProjectContent);
 		$asbProjectContent .= "<li><a href='assembly.cgi?targetId=$targetInAsbProject[0]' title ='$targetInAsbProject[2]'>$targetInAsbProject[2]</a></li>\n";
-		$active = $acitveDetector if ($cookieAsbProjectContent eq $targetInAsbProject[0]);
-		$acitveDetector++;
+		$active = $activeDetector if ($cookieAsbProjectContent eq $targetInAsbProject[0]);
+		$activeDetector++;
 	}
 	my $asbProject=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$asbProject->execute($asbProjectId);

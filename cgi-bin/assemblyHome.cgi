@@ -31,7 +31,7 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookieAsbProject = cookie('asbProject') || '';
 
 my $asbProjects = '';
@@ -41,8 +41,8 @@ while (my @asbProject = $asbProject->fetchrow_array())
 {
 	$asbProject[2] = "AsbProject: Name N/A, please edit!" unless($asbProject[2]);
 	$asbProjects .= "<li><a href='asbProject.cgi?asbProjectId=$asbProject[0]'>$asbProject[2]</a></li>\n";
-	$active = $acitveDetector if ($cookieAsbProject eq $asbProject[0]);
-	$acitveDetector++;
+	$active = $activeDetector if ($cookieAsbProject eq $asbProject[0]);
+	$activeDetector++;
 }
 
 $html =~ s/\$asbProjects/$asbProjects/;

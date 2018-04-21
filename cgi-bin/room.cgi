@@ -19,7 +19,7 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookieFreezer = cookie('freezer') || '';
 
 my $roomId = param ('roomId') || '';
@@ -33,8 +33,8 @@ if ($roomId)
 	{
 		$freezers = "<div id='freezersInRoom$roomId$$'><ul>\n" unless($freezers);
 		$freezers .= "<li><a href='freezer.cgi?freezerId=$freezerInRoom[0]'>Freezer: $freezerInRoom[2]</a></li>\n";
-		$active = $acitveDetector if ($cookieFreezer eq $freezerInRoom[0]);
-		$acitveDetector++;
+		$active = $activeDetector if ($cookieFreezer eq $freezerInRoom[0]);
+		$activeDetector++;
 	}
 	$freezers .= "</ul></div>\n" if($freezers);
 	my $engaged = $freezerInRoom->rows;

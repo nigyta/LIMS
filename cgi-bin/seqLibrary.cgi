@@ -28,7 +28,7 @@ my $html = <DATA>;
 
 my $libraryId = param ('libraryId') || '';
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookiePlate = cookie('plate') || '';
 my $config = new config;
 my $userConfig = new userConfig;
@@ -64,8 +64,8 @@ if ($libraryId)
 		$plates = "
 		<div id='platesInLibrary$libraryId$$'><ul>\n" unless($plates);
 		$plates .= "<li><a href='plateClone.cgi?plate=$_&libraryId=$libraryId'>$_</a></li>\n";
-		$active = $acitveDetector if ($cookiePlate eq $libraryId.$_);
-		$acitveDetector++;
+		$active = $activeDetector if ($cookiePlate eq $libraryId.$_);
+		$activeDetector++;
 	}
 	$plates .= "</ul></div>\n" if ($plates);
 	unless($plates)

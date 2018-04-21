@@ -22,7 +22,7 @@ my $targetId = param ('targetId') || '';
 my $cookieAssembly = cookie('assembly') || '';
 my $asbProjectContent = '';
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $assemblyList = '';
 if($targetId)
 {
@@ -31,8 +31,8 @@ if($targetId)
 	while(my @assembly = $assembly->fetchrow_array())
 	{
 		$assemblyList .= "<h2><a href='$commoncfg->{CGIBIN}/assemblyList.cgi?assemblyId=$assembly[0]'>$assembly[2] Version $assembly[3] ($assembly[10])</a></h2><div><img src='$commoncfg->{HTDOCS}/css/images/loading.gif'>Loading...</div>";
-		$active = $acitveDetector if ($assembly[0] eq $cookieAssembly);
-		$acitveDetector++;
+		$active = $activeDetector if ($assembly[0] eq $cookieAssembly);
+		$activeDetector++;
 	}
 	$assemblyList .= "<h2><a href='$commoncfg->{CGIBIN}/assemblyNew.cgi?targetId=$targetId'>Create a new assembly</a></h2><div><img src='$commoncfg->{HTDOCS}/css/images/loading.gif'>Loading...</div>";
 	$asbProjectContent = $targetId;
@@ -42,7 +42,7 @@ else
 	print header(-type=>'text/html',-status=>'402 Invalid operation');
 	exit;
 }
-my $collapsible = ($acitveDetector > 1) ? 'true' : 'false'; 
+my $collapsible = ($activeDetector > 1) ? 'true' : 'false'; 
 
 $html =~ s/\$assemblyList/$assemblyList/g;
 $html =~ s/\$asbProjectContent/$asbProjectContent/g;

@@ -20,7 +20,7 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 
 my $active = 0;
-my $acitveDetector = 0;
+my $activeDetector = 0;
 my $cookieLibrary = cookie('library') || '';
 my $cookieGenebank = cookie('genebank') || '';
 my $cookieService = cookie('service') || '';
@@ -38,8 +38,8 @@ if ($projectId)
 		$serviceInProject[2] = "Unknown service!" unless($serviceInProject[2]);
 		$project = "<div id='inProject$projectId$$'><ul>\n" unless($project);
 		$project .= "<li style='white-space: nowrap;'><a href='service.cgi?serviceId=$serviceInProject[0]' title ='Service: $serviceInProject[0]'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-document-b'></span>$serviceInProject[2]</a></li>\n";
-		$active = $acitveDetector if ($cookieService eq $serviceInProject[0]);
-		$acitveDetector++;
+		$active = $activeDetector if ($cookieService eq $serviceInProject[0]);
+		$activeDetector++;
 	}
 	my $libraryInProject=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' AND z = $projectId ORDER BY name");
 	$libraryInProject->execute();
@@ -49,8 +49,8 @@ if ($projectId)
 
 		$project = "<div id='inProject$projectId$$'><ul>\n" unless($project);
 		$project .= "<li style='white-space: nowrap;'><a href='library.cgi?libraryId=$libraryInProject[0]' title ='Library: $libraryDetails->{'nickname'}'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-folder-collapsed'></span>$libraryInProject[2]</a></li>\n";
-		$active = $acitveDetector if ($cookieLibrary eq $libraryInProject[0]);
-		$acitveDetector++;
+		$active = $activeDetector if ($cookieLibrary eq $libraryInProject[0]);
+		$activeDetector++;
 	}
 	my $genebankInProject=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' AND z = $projectId ORDER BY name");
 	$genebankInProject->execute();
@@ -60,8 +60,8 @@ if ($projectId)
 
 		$project = "<div id='inProject$projectId$$'><ul>\n" unless($project);
 		$project .= "<li style='white-space: nowrap;'><a href='genebank.cgi?genebankId=$genebankInProject[0]' title ='Genebank: $genebankInProject[2]'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-folder-collapsed'></span>$genebankInProject[2]</a></li>\n";
-		$active = $acitveDetector if ($cookieGenebank eq $genebankInProject[0]);
-		$acitveDetector++;
+		$active = $activeDetector if ($cookieGenebank eq $genebankInProject[0]);
+		$activeDetector++;
 	}
 	my $project=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$project->execute($projectId);

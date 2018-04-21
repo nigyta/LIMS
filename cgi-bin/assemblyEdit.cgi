@@ -65,26 +65,6 @@ else
 	$fpcOrAgpId = "<option class='ui-state-error-text' value='0'>No reference available</option>".$fpcOrAgpId;
 }
 
-my $doNotChangeGenome = ($assembly[7] != 0 && $assembly[5] > 0) ? '<sup class="ui-state-error ui-corner-all">Do NOT Change Unless You Plan To Re-Run Assembly!</sup><br>' : '';
-my $refGenomeId = '';
-my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");
-$genomeList->execute();
-while (my @genomeList = $genomeList->fetchrow_array())
-{
-	next if ($genomeList[0] eq $assembly[4]);
-	next if ($genomeList[5] < 1); #remove not for reference
-	$refGenomeId .= ($genomeList[0] eq $assembly[5] ) ?
-		"<option value='$genomeList[0]' selected>$genomeList[2]</option>" :
-		"<option value='$genomeList[0]'>$genomeList[2]</option>";
-}
-if($refGenomeId)
-{
-	$refGenomeId = "<option class='ui-state-error-text' value='0'>Please select a genome</option>".$refGenomeId;
-}
-else
-{
-	$refGenomeId = "<option class='ui-state-error-text' value='0'>No reference genome available</option>".$refGenomeId;
-}
 
 my $checkAsbGenome = $dbh->prepare("SELECT child FROM link WHERE parent = ? AND type LIKE 'asbGenome'");
 $checkAsbGenome->execute($assemblyId);
@@ -117,27 +97,44 @@ while (my @library=$library->fetchrow_array())
 	}
 	$colCount++;
 }
-
+my $doNotChangeGenome = ($assembly[7] != 0 && $assembly[5] > 0) ? '<sup class="ui-state-error ui-corner-all">Do NOT Change Unless You Plan To Re-Run Assembly!</sup><br>' : '';
+my $refGenomeId = '';
 my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome' ORDER BY name");
 $genome->execute();
 while (my @genome=$genome->fetchrow_array())
 {
 	next if ($genome[0] eq $assembly[4]);
-	next if ($genome[4] < 1);
-	my $checked = (exists $checkedExtraId->{$genome[0]}) ? "checked='checked'" : "";
-	if($colCount % $col == 0)
+	if ($genome[4] > 0) #for assembly
 	{
-		$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+		my $checked = (exists $checkedExtraId->{$genome[0]}) ? "checked='checked'" : "";
+		if($colCount % $col == 0)
+		{
+			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+		}
+		elsif($colCount % $col ==  $col - 1)
+		{
+			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+		}
+		else
+		{
+			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+		}
+		$colCount++;
 	}
-	elsif($colCount % $col ==  $col - 1)
+	if ($genome[5] > 0) #as reference
 	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+		$refGenomeId .= ($genome[0] eq $assembly[5] ) ?
+			"<option value='$genome[0]' selected>$genome[2]</option>" :
+			"<option value='$genome[0]'>$genome[2]</option>";
 	}
-	else
-	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
-	}
-	$colCount++;
+}
+if($refGenomeId)
+{
+	$refGenomeId = "<option class='ui-state-error-text' value='0'>Please select a genome</option>".$refGenomeId;
+}
+else
+{
+	$refGenomeId = "<option class='ui-state-error-text' value='0'>No reference genome available</option>".$refGenomeId;
 }
 
 my $toBeFilled = $col - ( $colCount % $col);
@@ -177,7 +174,7 @@ __DATA__
 	</td></tr>
 	<tr><td style='text-align:right'><label for='editAssemblyFpcOrAgp'><b>Physical Reference</b></label></td><td>$doNotChangeFpc<select class='ui-widget-content ui-corner-all' name='fpcOrAgpId' id='editAssemblyFpcOrAgp'>$fpcOrAgpId</select></td></tr>
 	<tr><td style='text-align:right'><label for='editAssemblyRefGenome'><b>Reference Genome</b></label></td><td>$doNotChangeGenome<select class='ui-widget-content ui-corner-all' name='refGenomeId' id='editAssemblyRefGenome'>$refGenomeId</select></td></tr>
-	<tr><td style='text-align:right'><label for='editAssemblyExtraGenome'><b>Extra Genome</b></label><br><sup class='ui-state-disabled'>(used as gap fillers)</sup></td><td>$assemblyExtraIds</td></tr>
+	<tr><td style='text-align:right'><label for='editAssemblyExtraGenome'><b>Extra Genome</b></label><br><sup class='ui-state-disabled'>(Gap fillers)</sup></td><td>$assemblyExtraIds</td></tr>
 	<tr><td style='text-align:right'><label for="editAssemblyDescription"><b>Description</b></label></td><td><textarea class='ui-widget-content ui-corner-all' name="description" id="editAssemblyDescription" cols="50" rows="10" placeholder="Give some information about this assembly. Or you may do it later.">$assemblyDescription</textarea></td></tr>
 	</table>
 	</form>
