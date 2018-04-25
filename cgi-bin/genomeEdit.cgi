@@ -55,7 +55,7 @@ else
 }
 
 my $libraryId = "<option class='ui-state-error-text' value='0'>None</option>";
-my $libraryList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' ORDER BY name");
+my $libraryList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");
 $libraryList->execute();
 while (my @libraryList = $libraryList->fetchrow_array())
 {

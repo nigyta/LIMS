@@ -16,6 +16,23 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 
+my $assemblyStatus;
+$assemblyStatus->{2} = "Frozen";
+$assemblyStatus->{1} = "Assembled";
+$assemblyStatus->{0} = "Initialized";
+$assemblyStatus->{-1} = "Assembling...";
+$assemblyStatus->{-2} = "SeqToSeq Aligning...";
+$assemblyStatus->{-3} = "Physical Reference-based Assembling...";
+$assemblyStatus->{-4} = "SeqToGenome Aligning...";
+$assemblyStatus->{-5} = "Assigning Chr#...";
+$assemblyStatus->{-6} = "Filtering Seqs...";
+$assemblyStatus->{-7} = "Orienting Seqs...";
+$assemblyStatus->{-8} = "Orienting Contigs...";
+$assemblyStatus->{-9} = "EndToEnd Merging...";
+$assemblyStatus->{-10} = "Filtering Overlaps...";
+$assemblyStatus->{-11} = "Estimating Length...";
+$assemblyStatus->{-12} = "BesToSeq Aligning...";
+
 my $objectComponent;
 $objectComponent->{0} = "Unknown";
 $objectComponent->{1} = "Chr-Seq";
@@ -161,6 +178,32 @@ else
 	$html =~ s/\$autoCheck//g;
 }
 $html =~ s/\$assemblyCreator/$assembly[9]/g;
+my $assemblyStatusRadios = <<END;
+		<div id="editAssemblyStatus">
+			<input type="radio" id="editAssemblyStatusRadio1" name="status" value="0" checked="checked"><label for="editAssemblyStatusRadio1">$assemblyStatus->{$assembly[7]} (no change)</label>
+			<input type="radio" id="editAssemblyStatusRadio2" name="status" value="1"><label for="editAssemblyStatusRadio2">$assemblyStatus->{1}</label>
+			<input type="radio" id="editAssemblyStatusRadio3" name="status" value="2"><label for="editAssemblyStatusRadio3">$assemblyStatus->{2}</label>
+		</div>
+END
+if ($assembly[7] == 1)
+{
+	$assemblyStatusRadios = <<END;
+		<div id="editAssemblyStatus">
+			<input type="radio" id="editAssemblyStatusRadio2" name="status" value="1" checked="checked"><label for="editAssemblyStatusRadio2">$assemblyStatus->{1}</label>
+			<input type="radio" id="editAssemblyStatusRadio3" name="status" value="2"><label for="editAssemblyStatusRadio3">$assemblyStatus->{2}</label>
+		</div>
+END
+}
+elsif ($assembly[7] == 2)
+{
+	$assemblyStatusRadios = <<END;
+		<div id="editAssemblyStatus">
+			<input type="radio" id="editAssemblyStatusRadio2" name="status" value="1"><label for="editAssemblyStatusRadio2">$assemblyStatus->{1}</label>
+			<input type="radio" id="editAssemblyStatusRadio3" name="status" value="2" checked="checked"><label for="editAssemblyStatusRadio3">$assemblyStatus->{2}</label>
+		</div>
+END
+}
+$html =~ s/\$assemblyStatus/$assemblyStatusRadios/g;
 $html =~ s/\$assemblyCreationDate/$assembly[10]/g;
 print header;
 print $html;
@@ -172,6 +215,9 @@ __DATA__
 	<tr><td style='text-align:right'><label for="editAssemblyName"><b>Assembly Name</b></label></td><td><input class='ui-widget-content ui-corner-all' name="name" id="editAssemblyName" size="30" type="text" maxlength="32" value="$assemblyName"/><br>Version $assemblyVersion <sup class='ui-state-disabled'>by $assemblyCreator on $assemblyCreationDate</sup><br>
 	<input type="checkbox" id="editAssemblyAutoCheckNewSeq" name="autoCheckNewSeq" value="1"$autoCheck><label for="editAssemblyAutoCheckNewSeq">AutoCheck New Sequences</label>
 	</td></tr>
+	<tr><td style='text-align:right'><label for="editAssemblyStatus"><b>Status</b></label></td><td>
+$assemblyStatus
+	</td></tr>
 	<tr><td style='text-align:right'><label for='editAssemblyFpcOrAgp'><b>Physical Reference</b></label></td><td>$doNotChangeFpc<select class='ui-widget-content ui-corner-all' name='fpcOrAgpId' id='editAssemblyFpcOrAgp'>$fpcOrAgpId</select></td></tr>
 	<tr><td style='text-align:right'><label for='editAssemblyRefGenome'><b>Reference Genome</b></label></td><td>$doNotChangeGenome<select class='ui-widget-content ui-corner-all' name='refGenomeId' id='editAssemblyRefGenome'>$refGenomeId</select></td></tr>
 	<tr><td style='text-align:right'><label for='editAssemblyExtraGenome'><b>Extra Genome</b></label><br><sup class='ui-state-disabled'>(Gap fillers)</sup></td><td>$assemblyExtraIds</td></tr>
@@ -181,4 +227,5 @@ __DATA__
 <script>
 $('#dialog').dialog("option", "title", "Edit Assembly");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Save", click: function() { submitForm('editAssembly$assemblyId'); } }, { text: "Delete", click: function() { deleteItem($assemblyId); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
+$( "#editAssemblyStatus" ).buttonset();
 </script>

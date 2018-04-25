@@ -24,6 +24,7 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 
 my $assemblyId = param ('assemblyId') || '';
 my $assemblyName = param ('name') || '';
+my $assemblyStatus = param ('status') || '';
 my $targetId = param ('targetId') || '';
 my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
 my $refGenomeId = param ('refGenomeId') || '0';
@@ -61,8 +62,9 @@ if($assemblyName)
 			$assemblyDetails->{'description'} =  param('description') || '';
 			my $json = JSON::XS->new->allow_nonref;
 			$assemblyDetails = $json->encode($assemblyDetails);
-			my $updateAssembly=$dbh->prepare("UPDATE matrix SET name = ?, y = ?, z = ?, note = ? WHERE id = ?");
-			$updateAssembly->execute($assemblyName,$refGenomeId,$fpcOrAgpId,$assemblyDetails,$assemblyId);
+			$checkCreator[7] = $assemblyStatus if ($assemblyStatus);
+			my $updateAssembly=$dbh->prepare("UPDATE matrix SET name = ?, y = ?, z = ?, barcode = ?, note = ? WHERE id = ?");
+			$updateAssembly->execute($assemblyName,$refGenomeId,$fpcOrAgpId,$checkCreator[7],$assemblyDetails,$assemblyId);
 			my $deleteAsbGenomeLink = $dbh->do("DELETE FROM link WHERE parent = $assemblyId AND type LIKE 'asbGenome'");
 			foreach(@extraId)
 			{
