@@ -86,13 +86,13 @@ if($alignmentId)
 		open (ALN,">$commoncfg->{TMPDIR}/$alignmentId.aln.html") or die "can't open file: $commoncfg->{TMPDIR}/$alignmentId.aln.html";
 		print ALN <<END;
 	<table id='alignment$alignmentId$$' class='display'>
-	<thead><tr><th></th><th>Seqs</th><th>Length</th><th>Identity %</th><th>Alignment Length</th><th>Start</th><th></th><th>End</th></tr></thead>
+	<thead><tr><th></th><th>Seqs</th><th>Length</th><th>Identity</th><th>Alignment Length</th><th>Start</th><th></th><th>End</th></tr></thead>
 	<tbody>
 		<tr>
 			<td><b>Query</b></td>
 			<td>$getSequenceA[2] <sup onclick='closeDialog();openDialog("seqView.cgi?seqId=$getSequenceA[0]")' title='View this sequence'>$seqType{$getSequenceA[3]}</sup> $bacAssignType{$getSequenceA[7]}</td>
 			<td>$getSequenceA[5]</td>
-			<td rowspan='2'><a title='E-value:$getAlignment[12] \nBit-score:$getAlignment[13]'>$getAlignment[4]</a></td>
+			<td rowspan='2'><a title='E-value:$getAlignment[12] \nBit-score:$getAlignment[13]'>$getAlignment[4]%</a></td>
 			<td rowspan='2'>$getAlignment[5]</td>
 			<td>$getAlignment[8]</td>
 			<td>$queryDirection</td>

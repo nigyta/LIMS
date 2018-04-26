@@ -465,7 +465,7 @@ if ($assemblyCtgId)
 				$assemblyCtgSeqAlignment->polygon(
 					%$points,
 					id=>$alignments[0],
-					onclick => "closeDialog();openDialog('assemblyAlignmentView.cgi?alignmentId=$alignments[0]')",
+					onclick => "closeDialog();openDialog('alignmentView.cgi?alignmentId=$alignments[0]')",
 					class=>'hasmenuForAlignment',
 					style=>{ stroke => 'red',
 						fill => 'yellow',
@@ -473,7 +473,7 @@ if ($assemblyCtgId)
 						},
 					'overlap-url' => "assemblyCtgOverlap.cgi?assemblyCtgId=$assemblyCtgId&alignmentId=$alignments[0]&scrollLeft=$preXOne",
 					'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyCtgId=$assemblyCtgId&scrollLeft=$preXOne",
-					'view-url' => "assemblyAlignmentView.cgi?alignmentId=$alignments[0]",
+					'view-url' => "alignmentView.cgi?alignmentId=$alignments[0]",
 					'move-url' => "assemblyCtgEdit.cgi?assemblyCtgId=$assemblyCtgId&scrollLeft=$preXOne"
 				);
 			}

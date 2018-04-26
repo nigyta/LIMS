@@ -579,14 +579,14 @@ if ($assemblyId && $chr)
 						$companionAssemblyChrSeqAlignment->polygon(
 							%$points,
 							id=>'companionAln'.$alignments[0],
-							onclick => "closeDialog();openDialog('assemblyAlignmentView.cgi?alignmentId=$alignments[0]')",
+							onclick => "closeDialog();openDialog('alignmentView.cgi?alignmentId=$alignments[0]')",
 							class=>'hasmenuForAlignment',
 							style=>{ stroke => 'red',
 								fill => 'yellow',
 								opacity => 0.5
 								},
 							'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyId=$companionAssemblyId&openAssemblyId=$assemblyId&chr=$chr&scrollLeft=$seqXOne",
-							'view-url' => "assemblyAlignmentView.cgi?alignmentId=$alignments[0]"
+							'view-url' => "alignmentView.cgi?alignmentId=$alignments[0]"
 						);
 				}
 				$preSeq = $currentSeq;
@@ -989,14 +989,14 @@ if ($assemblyId && $chr)
 					$assemblyChrSeqAlignment->polygon(
 						%$points,
 						id=>'aln'.$alignments[0],
-						onclick => "closeDialog();openDialog('assemblyAlignmentView.cgi?alignmentId=$alignments[0]')",
+						onclick => "closeDialog();openDialog('alignmentView.cgi?alignmentId=$alignments[0]')",
 						class=>'hasmenuForAlignment',
 						style=>{ stroke => 'red',
 							fill => 'yellow',
 							opacity => 0.5
 							},
 						'hide-url' => "assemblyAlignmentHide.cgi?alignmentId=$alignments[0]&assemblyId=$assemblyId&chr=$chr&scrollLeft=$seqXOne",
-						'view-url' => "assemblyAlignmentView.cgi?alignmentId=$alignments[0]"
+						'view-url' => "alignmentView.cgi?alignmentId=$alignments[0]"
 					);
 			}
  			$preSeq = $currentSeq;
