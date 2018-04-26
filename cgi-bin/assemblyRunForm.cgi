@@ -16,10 +16,6 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 my $userConfig = new userConfig;
-my $SEQTOSEQMINOVERLAP = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQMINOVERLAP");
-my $SEQTOSEQIDENTITY = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOSEQIDENTITY");
-my $SEQTOGNMMINOVERLAP = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
-my $SEQTOGNMIDENTITY = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMIDENTITY");
 my $ENDTOENDMINOVERLAP = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"ENDTOENDMINOVERLAP");
 my $ENDTOENDIDENTITY = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"ENDTOENDIDENTITY");
 
@@ -120,10 +116,6 @@ $html =~ s/\$assemblyId/$assemblyId/g;
 $html =~ s/\$assemblyName/$assembly[2]/g;
 $html =~ s/\$fpcOrAgpId/$fpcOrAgpId/g;
 $html =~ s/\$refGenomeId/$refGenomeId/g;
-$html =~ s/\$SEQTOSEQMINOVERLAP/$SEQTOSEQMINOVERLAP/g;
-$html =~ s/\$SEQTOSEQIDENTITY/$SEQTOSEQIDENTITY/g;
-$html =~ s/\$SEQTOGNMMINOVERLAP/$SEQTOGNMMINOVERLAP/g;
-$html =~ s/\$SEQTOGNMIDENTITY/$SEQTOGNMIDENTITY/g;
 $html =~ s/\$ENDTOENDMINOVERLAP/$ENDTOENDMINOVERLAP/g;
 $html =~ s/\$ENDTOENDIDENTITY/$ENDTOENDIDENTITY/g;
 
@@ -156,39 +148,6 @@ __DATA__
 			<input type="checkbox" id="newAssemblyOrientContigsCheckbox" name="orientContigs" value="1" checked="checked"><label for="newAssemblyOrientContigsCheckbox">Orient contigs based-on reference genome</label>
 	</td>
 	</tr>
-	</table>
-	<hr>
-	<table>
-	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="3"><label for="newAssemblySeqToSeq"><b>Seq-to-Seq Alignment</b></label>
-		<div id="newAssemblySeqToSeq">
-			<input type="radio" id="newAssemblySeqToSeqRadio2" name="seqToSeq" value="1"><label for="newAssemblySeqToSeqRadio2">Yes</label>
-			<input type="radio" id="newAssemblySeqToSeqRadio1" name="seqToSeq" value="0" checked="checked"><label for="newAssemblySeqToSeqRadio1">No</label>
-		</div>
-			<input type="checkbox" id="newAssemblyRedoAllSeqToSeqCheckbox" name="redoAllSeqToSeq" value="1"><label for="newAssemblyRedoAllSeqToSeqCheckbox">For All Sequences</label><br>
-			<input type="checkbox" id="newAssemblySeqToSeqSpeedyMode" name="speedyMode" value="1" checked="checked"><label for="newAssemblySeqToSeqSpeedyMode" title="This will skip 'Check End Match'">Speedy Mode</label><br>
-			<input type="checkbox" id="newAssemblySeqToSeqCheckGood" name="checkGood" value="1"><label for="newAssemblySeqToSeqCheckGood">Check End Match</label>
-	</td><td style='text-align:right'><label for="newAssemblySeqToSeqMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToSeq" id="newAssemblySeqToSeqMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOSEQMINOVERLAP" /></td></tr>
-	<tr><td style='text-align:right'><label for="newAssemblySeqToSeqIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToSeq" id="newAssemblySeqToSeqIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOSEQIDENTITY" /></td></tr>
-	<tr><td style='text-align:right'><input type="checkbox" id="newAssemblySeqToSeqMegablastCheckbox" name="seqToSeqMegablast" value="megablast" checked="checked"></td>
-	<td style='text-align:left'><label for="newAssemblySeqToSeqMegablastCheckbox">Megablast</label></td></tr>
-	</table>
-	<hr>
-	<table>
-	<tr><td style='text-align:left' class='ui-state-highlight ui-corner-all' rowspan="5"><label for="newAssemblySeqToGenome"><b>Seq-to-Genome Alignment</b></label>
-		<div id="newAssemblySeqToGenome">
-			<input type="radio" id="newAssemblySeqToGenomeRadio2" name="seqToGenome" value="1"><label for="newAssemblySeqToGenomeRadio2">Yes</label>
-			<input type="radio" id="newAssemblySeqToGenomeRadio1" name="seqToGenome" value="0" checked="checked"><label for="newAssemblySeqToGenomeRadio1">No</label>
-		</div>
-			<input type="checkbox" id="newAssemblyRedoAllSeqToGenomeCheckbox" name="redoAllSeqToGenome" value="1"><label for="newAssemblyRedoAllSeqToGenomeCheckbox">For All Sequences</label><br>
-			<input type="checkbox" id="newAssemblyMarkRepeatRegionCheckbox" name="markRepeatRegion" value="1" checked="checked"><label for="newAssemblyMarkRepeatRegionCheckbox">Mark Repeat Region</label>
-	</td>
-		<td style='text-align:right'><label for="newAssemblyAlignEngine"><b>Engine</b></label></td>
-		<td><select class='ui-widget-content ui-corner-all' name="alignEngine" id="newAssemblyAlignEngine"><option value="blastn">blastn</option><option value="BLAT">BLAT</option></select></td>
-	</tr>
-	<tr><td style='text-align:right'><label for="newAssemblySeqToGenomeMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapSeqToGenome" id="newAssemblySeqToGenomeMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" /></td></tr>
-	<tr><td style='text-align:right'><label for="newAssemblySeqToGenomeIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identitySeqToGenome" id="newAssemblySeqToGenomeIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOGNMIDENTITY" /></td></tr>
-	<tr><td style='text-align:left'><input type="checkbox" id="newAssemblyMegablastCheckbox" name="megablast" value="megablast" checked="checked"><label for="newAssemblyMegablastCheckbox">Megablast</label></td>
-	<td style='text-align:left'><input type="checkbox" id="newAssemblySoftMaskingCheckbox" name="softMasking" value="1"><label for="newAssemblySoftMaskingCheckbox">Soft Masking (blastn only)</label></td></tr>
 	</table>
 	<hr>
 	<table>
@@ -241,11 +200,6 @@ __DATA__
 $('#dialog').dialog("option", "title", "Run Assembly ($assemblyName)");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Run Assembly", click: function() { submitForm('newAssembly'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 $( "#newAssemblyReplace" ).buttonset();
-$( "#newAssemblySeqToSeq" ).buttonset();
-$( "#newAssemblySeqToGenome" ).buttonset();
-$( "#newAssemblyEndToEnd" ).buttonset();
-$( "#newAssemblyOrientSeqs" ).buttonset();
-$( "#newAssemblyRenumber" ).buttonset();
 $( "#newAssemblySeqMinLength" ).spinner({
 	min: 0,
 	max: 10000,
@@ -262,40 +216,7 @@ $( "#newAssemblySeqMinLength" ).spinner({
 		}
 	}
 });
-$( "#newAssemblySeqToSeqMinOverlap" ).spinner({
-	min: 500,
-	max: 99999,
-	step: 100,
-	start: function( event, ui ) {
-		var current = $( "#newAssemblySeqToSeqMinOverlap" ).spinner( "value" );
-		if(current >= 2000)
-		{
-			$( "#newAssemblySeqToSeqMinOverlap" ).spinner( "option", "step", 500 );
-		}
-		else
-		{
-			$( "#newAssemblySeqToSeqMinOverlap" ).spinner( "option", "step", 100 );
-		}
-	}
-});
-$( "#newAssemblySeqToSeqIdentity" ).spinner({ min: 90, max: 100});
-$( "#newAssemblySeqToGenomeMinOverlap" ).spinner({
-	min: 500,
-	max: 99999,
-	step: 100,
-	start: function( event, ui ) {
-		var current = $( "#newAssemblySeqToGenomeMinOverlap" ).spinner( "value" );
-		if(current >= 2000)
-		{
-			$( "#newAssemblySeqToGenomeMinOverlap" ).spinner( "option", "step", 500 );
-		}
-		else
-		{
-			$( "#newAssemblySeqToGenomeMinOverlap" ).spinner( "option", "step", 100 );
-		}
-	}
-});
-$( "#newAssemblySeqToGenomeIdentity" ).spinner({ min: 90, max: 100});
+$( "#newAssemblyEndToEnd" ).buttonset();
 $( "#newAssemblyEndToEndMinOverlap" ).spinner({
 	min: 500,
 	max: 99999,
@@ -313,4 +234,6 @@ $( "#newAssemblyEndToEndMinOverlap" ).spinner({
 	}
 });
 $( "#newAssemblyEndToEndIdentity" ).spinner({ min: 90, max: 100});
+$( "#newAssemblyOrientSeqs" ).buttonset();
+$( "#newAssemblyRenumber" ).buttonset();
 </script>
