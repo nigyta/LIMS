@@ -343,7 +343,7 @@ END
 							if($assemblySeqCtg->{$preSeq} ne $assemblySeqCtg->{$eachFpcSeq})
 							{
 								#4 check overlap, if not overlapped, do nothing; if yes, go to 5
-								my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE perc_indentity >= $identitySeqToSeq AND align_length >= $minOverlapSeqToSeq AND query = ? AND subject = ?");
+								my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ?");
 								$getAlignment->execute($preSeq,$eachFpcSeq);
 								if($getAlignment->rows > 0)
 								{
@@ -462,86 +462,6 @@ END
 				}
 			}
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
-		}
-
-		if($refGenomeId)
-		{
-			my $updateAssemblyGenomeId=$dbh->do("UPDATE matrix SET y = $refGenomeId WHERE id = $assemblyId");
-
-			my $hasAlignmentSequenceId;
-			my $sequenceInRefGenome;
-			open (GENOME,">$commoncfg->{TMPDIR}/$refGenomeId.$$.genome") or die "can't open file: $commoncfg->{TMPDIR}/$refGenomeId.$$.genome";
-			my $getGenome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
-			$getGenome->execute($refGenomeId);
-			while(my @getGenome = $getGenome->fetchrow_array())
-			{
-				$sequenceInRefGenome->{$getGenome[0]} = $getGenome[6];
-				my $sequenceDetails = decode_json $getGenome[8];
-				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
-				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
-				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
-				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
-				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
-				print GENOME ">$getGenome[0]\n$sequenceDetails->{'sequence'}\n";
-				my $alignmentChecker = $dbh->prepare("SELECT query FROM alignment WHERE subject = ? GROUP BY query");
-				$alignmentChecker->execute($getGenome[0]);
-				while(my @alignmentChecker = $alignmentChecker->fetchrow_array())
-				{
-					$hasAlignmentSequenceId->{$alignmentChecker[0]} = 1;
-				}
-			}
-			close(GENOME);
-			
-			if($assignChr)
-			{
-				my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
-				#assign ctg to genome chr
-				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND x = 0 AND o = ?");
-				$assemblyAllCtgList->execute($assemblyId);
-				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
-				{
-					my $chrNumber;
-					my $chrPosition;
-					my $ctgAllSeqLength = 0;
-					for (split ",", $assemblyAllCtgList[8])
-					{
-						next unless ($_);
-						/^-/ and next;
-						$_ =~ s/[^a-zA-Z0-9]//g;
-						my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
-						$getAlignment->execute($assemblySequenceId->{$_});
-						while (my @getAlignment = $getAlignment->fetchrow_array())
-						{
-							next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
-							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
-							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
-							my $estimatedPosition = $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength;
-							if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
-							{
-								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
-							}
-							else
-							{
-								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
-							}
-						}
-						$ctgAllSeqLength += $assemblySequenceLength->{$_};
-					}
-					my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
-					my $assignedChr = (@assignedChr) ? shift @assignedChr : 0;
-					my $assignedPosition = 0;
-					
-					if($assignedChr)
-					{
-						my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
-						sort {$a <=> $b} @assignedPositionCandidates;
-						my $estimatedMedian = int ($#assignedPositionCandidates/2);
-						$assignedPosition = $assignedPositionCandidates[$estimatedMedian];
-					}
-					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
-				}
-				my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
-			}
 		}
 
 		if($redundancyFilterSeq)
@@ -742,65 +662,146 @@ END
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		}
 
- 		if ($refGenomeId && $orientContigs)
- 		{
-			my $updateAssemblyToOrientingContigs=$dbh->do("UPDATE matrix SET barcode = '-8' WHERE id = $assemblyId");
-			my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
-			$assemblyAllCtgList->execute($assemblyId);
-			while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
+		if($refGenomeId)
+		{
+			my $updateAssemblyGenomeId=$dbh->do("UPDATE matrix SET y = $refGenomeId WHERE id = $assemblyId");
+
+			my $hasAlignmentSequenceId;
+			my $sequenceInRefGenome;
+			open (GENOME,">$commoncfg->{TMPDIR}/$refGenomeId.$$.genome") or die "can't open file: $commoncfg->{TMPDIR}/$refGenomeId.$$.genome";
+			my $getGenome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
+			$getGenome->execute($refGenomeId);
+			while(my @getGenome = $getGenome->fetchrow_array())
 			{
-				my $toBeFlipped = 0;
-				for (split ",", $assemblyAllCtgList[8])
+				$sequenceInRefGenome->{$getGenome[0]} = $getGenome[6];
+				my $sequenceDetails = decode_json $getGenome[8];
+				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
+				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
+				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
+				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
+				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
+				print GENOME ">$getGenome[0]\n$sequenceDetails->{'sequence'}\n";
+				my $alignmentChecker = $dbh->prepare("SELECT query FROM alignment WHERE subject = ? GROUP BY query");
+				$alignmentChecker->execute($getGenome[0]);
+				while(my @alignmentChecker = $alignmentChecker->fetchrow_array())
 				{
-					next unless ($_);
-					/^-/ and next;
-					$_ =~ s/[^a-zA-Z0-9]//g;						
-					my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-					$assemblySeq->execute($_);
-					my @assemblySeq = $assemblySeq->fetchrow_array();
-					my $alignmentToGenome = $dbh->prepare("SELECT * FROM matrix,alignment WHERE alignment.query = ? AND alignment.subject = matrix.id AND matrix.container LIKE 'sequence' AND matrix.o = 99 AND matrix.x = ? AND matrix.z = ? ORDER BY alignment.id");
-					$alignmentToGenome->execute($assemblySeq[5],$refGenomeId,$assemblyAllCtgList[4]);
-					while (my @alignmentToGenome = $alignmentToGenome->fetchrow_array())
-					{
-						if($assemblySeq[7] > 0)
-						{
-							if ($alignmentToGenome[21] > $alignmentToGenome[22])
-							{
-								$toBeFlipped += $alignmentToGenome[16];
-							}
-							else
-							{
-								$toBeFlipped -= $alignmentToGenome[16];
-							}
-						}
-						else
-						{
-							if ($alignmentToGenome[21] < $alignmentToGenome[22])
-							{
-								$toBeFlipped += $alignmentToGenome[16];
-							}
-							else
-							{
-								$toBeFlipped -= $alignmentToGenome[16];
-							}
-						}
-					}
-				}
-				if ($toBeFlipped > 0)
-				{
-					$assemblyAllCtgList[8] = join ",", (reverse split ",", $assemblyAllCtgList[8]);
-					foreach (split ",", $assemblyAllCtgList[8])
-					{
-						next unless ($_);
-						$_ =~ s/[^a-zA-Z0-9]//g;
-						my $updateAssemblySeq=$dbh->do("UPDATE matrix SET barcode = barcode * (-1) WHERE id = $_");
-					}
-					my $updateAssemblyCtg=$dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
-					$updateAssemblyCtg->execute($assemblyAllCtgList[8],$assemblyAllCtgList[0]);
+					$hasAlignmentSequenceId->{$alignmentChecker[0]} = 1;
 				}
 			}
-			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
- 	 	}
+			close(GENOME);
+			
+			if($assignChr)
+			{
+				my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
+				#assign ctg to genome chr
+				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND x = 0 AND o = ?");
+				$assemblyAllCtgList->execute($assemblyId);
+				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
+				{
+					my $chrNumber;
+					my $chrPosition;
+					my $ctgAllSeqLength = 0;
+					for (split ",", $assemblyAllCtgList[8])
+					{
+						next unless ($_);
+						/^-/ and next;
+						$_ =~ s/[^a-zA-Z0-9]//g;
+						my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
+						$getAlignment->execute($assemblySequenceId->{$_});
+						while (my @getAlignment = $getAlignment->fetchrow_array())
+						{
+							next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
+							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
+							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
+							my $estimatedPosition = $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength;
+							if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
+							{
+								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
+							}
+							else
+							{
+								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
+							}
+						}
+						$ctgAllSeqLength += $assemblySequenceLength->{$_};
+					}
+					my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
+					my $assignedChr = (@assignedChr) ? shift @assignedChr : 0;
+					my $assignedPosition = 0;
+					
+					if($assignedChr)
+					{
+						my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
+						sort {$a <=> $b} @assignedPositionCandidates;
+						my $estimatedMedian = int ($#assignedPositionCandidates/2);
+						$assignedPosition = $assignedPositionCandidates[$estimatedMedian];
+					}
+					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
+				}
+				my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
+			}
+
+			if($orientContigs)
+			{
+				my $updateAssemblyToOrientingContigs=$dbh->do("UPDATE matrix SET barcode = '-8' WHERE id = $assemblyId");
+				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
+				$assemblyAllCtgList->execute($assemblyId);
+				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
+				{
+					my $toBeFlipped = 0;
+					for (split ",", $assemblyAllCtgList[8])
+					{
+						next unless ($_);
+						/^-/ and next;
+						$_ =~ s/[^a-zA-Z0-9]//g;						
+						my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+						$assemblySeq->execute($_);
+						my @assemblySeq = $assemblySeq->fetchrow_array();
+						my $alignmentToGenome = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ?");
+						$alignmentToGenome->execute($assemblySeq[5]);
+						while (my @alignmentToGenome = $alignmentToGenome->fetchrow_array())
+						{
+							next unless (exists $sequenceInRefGenome->{$alignmentToGenome[3]});
+							if($assemblySeq[7] > 0)
+							{
+								if ($alignmentToGenome[10] > $alignmentToGenome[11])
+								{
+									$toBeFlipped += $alignmentToGenome[5];
+								}
+								else
+								{
+									$toBeFlipped -= $alignmentToGenome[5];
+								}
+							}
+							else
+							{
+								if ($alignmentToGenome[10] < $alignmentToGenome[11])
+								{
+									$toBeFlipped += $alignmentToGenome[5];
+								}
+								else
+								{
+									$toBeFlipped -= $alignmentToGenome[5];
+								}
+							}
+						}
+					}
+					if ($toBeFlipped > 0)
+					{
+						$assemblyAllCtgList[8] = join ",", (reverse split ",", $assemblyAllCtgList[8]);
+						foreach (split ",", $assemblyAllCtgList[8])
+						{
+							next unless ($_);
+							$_ =~ s/[^a-zA-Z0-9]//g;
+							my $updateAssemblySeq=$dbh->do("UPDATE matrix SET barcode = barcode * (-1) WHERE id = $_");
+						}
+						my $updateAssemblyCtg=$dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
+						$updateAssemblyCtg->execute($assemblyAllCtgList[8],$assemblyAllCtgList[0]);
+					}
+				}
+				my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
+ 	 		}
+		}
 
 		# end-to-end merge
 		if($endToEnd)
