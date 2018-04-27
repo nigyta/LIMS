@@ -71,6 +71,9 @@ else
 $html =~ s/\$assemblyId/$assemblyId/g;
 $html =~ s/\$assemblyName/$assembly[2]/g;
 $html =~ s/\$assemblyVersion/$assembly[3]/g;
+$target[1] = ucfirst ($target[1]);
+$html =~ s/\$sourceType/$target[1]/g;
+$html =~ s/\$sourceName/$target[2]/g;
 $html =~ s/\$fpcOrAgpId/$fpcOrAgpId/g;
 $html =~ s/\$refGenomeId/$refGenomeId/g;
 $html =~ s/\$assemblyExtraIds/$assemblyExtraIds/g;
@@ -87,6 +90,7 @@ print $html;
 __DATA__
 <table>
 	<tr><td style='text-align:right'><b>Assembly Name</b></td><td>$assemblyName<br>Version $assemblyVersion <sup class='ui-state-disabled'>by $assemblyCreator on $assemblyCreationDate</sup></td></tr>
+	<tr><td style='text-align:right'><b>Source $sourceType</b></td><td>$sourceName</td></tr>
 	$fpcOrAgpId
 	$refGenomeId
 	$assemblyExtraIds

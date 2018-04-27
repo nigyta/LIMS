@@ -91,58 +91,76 @@ while(my @checkAsbGenome=$checkAsbGenome->fetchrow_array())
 	$checkedExtraId->{$checkAsbGenome[0]} = 1;
 }
 
-my $col = 3;
+my $col = 2;
 my $colCount=0;
 my $assemblyExtraIds = "<table id='assemblyExtraIds$$' class='display'><thead style='display:none;'><tr>" . "<th></th>" x $col . "</tr></thead><tbody>";
-my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' ORDER BY name");
+my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");# ORDER BY name
 $library->execute();
-while (my @library=$library->fetchrow_array())
+if ($library->rows > 0)
 {
-	next if ($library[0] eq $assembly[4]);
-	my $checked = (exists $checkedExtraId->{$library[0]}) ? "checked='checked'" : "";
-	if($colCount % $col == 0)
+	my $libraryResult;
+	while (my @library=$library->fetchrow_array())
 	{
-		$assemblyExtraIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
+		next if ($library[0] eq $assembly[4]);
+		@{$libraryResult->{$library[2]}} = @library;
 	}
-	elsif($colCount % $col == $col - 1)
+	foreach (sort {uc ($a) cmp uc($b)} keys %$libraryResult)
 	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
-	}
-	else
-	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
-	}
-	$colCount++;
-}
-my $doNotChangeGenome = ($assembly[7] != 0 && $assembly[5] > 0) ? '<sup class="ui-state-error ui-corner-all">Do NOT Change Unless You Plan To Re-Run Assembly!</sup><br>' : '';
-my $refGenomeId = '';
-my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome' ORDER BY name");
-$genome->execute();
-while (my @genome=$genome->fetchrow_array())
-{
-	next if ($genome[0] eq $assembly[4]);
-	if ($genome[4] > 0) #for assembly
-	{
-		my $checked = (exists $checkedExtraId->{$genome[0]}) ? "checked='checked'" : "";
+		my @library = @{$libraryResult->{$_}};
+		my $checked = (exists $checkedExtraId->{$library[0]}) ? "checked='checked'" : "";
 		if($colCount % $col == 0)
 		{
-			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
 		}
-		elsif($colCount % $col ==  $col - 1)
+		elsif($colCount % $col == $col - 1)
 		{
-			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
 		}
 		else
 		{
-			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
 		}
 		$colCount++;
 	}
-	if ($genome[5] > 0) #as reference
+}
+my $doNotChangeGenome = ($assembly[7] != 0 && $assembly[5] > 0) ? '<sup class="ui-state-error ui-corner-all">Do NOT Change Unless You Plan To Re-Run Assembly!</sup><br>' : '';
+my $refGenomeId = '';
+my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");# ORDER BY name
+$genome->execute();
+if ($genome->rows > 0)
+{
+	my $genomeResult;
+	while (my @genome=$genome->fetchrow_array())
 	{
-		$refGenomeId .= ($genome[0] eq $assembly[5] ) ?
-			"<option value='$genome[0]' selected>$genome[2]</option>" :
-			"<option value='$genome[0]'>$genome[2]</option>";
+		next if ($genome[0] eq $assembly[4]);
+		@{$genomeResult->{$genome[2]}} = @genome;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$genomeResult)
+	{
+		my @genome = @{$genomeResult->{$_}};
+		if ($genome[4] > 0) #for assembly
+		{
+			my $checked = (exists $checkedExtraId->{$genome[0]}) ? "checked='checked'" : "";
+			if($colCount % $col == 0)
+			{
+				$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			}
+			elsif($colCount % $col ==  $col - 1)
+			{
+				$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+			}
+			else
+			{
+				$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]' $checked><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			}
+			$colCount++;
+		}
+		if ($genome[5] > 0) #as reference
+		{
+			$refGenomeId .= ($genome[0] eq $assembly[5] ) ?
+				"<option value='$genome[0]' selected>$genome[2]</option>" :
+				"<option value='$genome[0]'>$genome[2]</option>";
+		}
 	}
 }
 if($refGenomeId)

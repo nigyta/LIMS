@@ -21,13 +21,22 @@ my $html = <DATA>;
 
 my $givenParentId = param ('parentId') || '';
 my $parentId = "<option class='ui-state-error-text' value='0'>None</option>";
-my $parentList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' ORDER BY name");
+my $parentList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank'");# ORDER BY name
 $parentList->execute();
-while (my @parentList = $parentList->fetchrow_array())
+if($parentList->rows > 0)
 {
-	my $genebankDetails = decode_json $parentList[8];
-	$genebankDetails->{'comments'} = escapeHTML($genebankDetails->{'comments'});
-	$parentId .= ($givenParentId eq $parentList[0]) ? "<option value='$parentList[0]' title='$genebankDetails->{'comments'}' selected>$parentList[1]: $parentList[2]</option>" : "<option value='$parentList[0]' title='$genebankDetails->{'comments'}'>$parentList[1]: $parentList[2]</option>";
+	my $parentListResult;
+	while (my @parentList = $parentList->fetchrow_array())
+	{
+		@{$parentListResult->{$parentList[2]}} = @parentList;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$parentListResult)
+	{
+		my @parentList = @{$parentListResult->{$_}};
+		my $genebankDetails = decode_json $parentList[8];
+		$genebankDetails->{'comments'} = escapeHTML($genebankDetails->{'comments'});
+		$parentId .= ($givenParentId eq $parentList[0]) ? "<option value='$parentList[0]' title='$genebankDetails->{'comments'}' selected>$parentList[1]: $parentList[2]</option>" : "<option value='$parentList[0]' title='$genebankDetails->{'comments'}'>$parentList[1]: $parentList[2]</option>";
+	}
 }
 
 $html =~ s/\$parentId/$parentId/g;

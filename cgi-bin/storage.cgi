@@ -35,14 +35,23 @@ my $activeDetector = 0;
 my $cookieRoom = cookie('room') || '';
 
 my $rooms = '';
-my $room=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'room' ORDER BY name");
+my $room=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'room'");# ORDER BY name
 $room->execute();
-while (my @room = $room->fetchrow_array())
+if($room->rows > 0)
 {
-	$room[2] = "Room Name N/A!" unless($room[2]);
-	$rooms .= "<li><a href='room.cgi?roomId=$room[0]'>$room[2]</a></li>\n";
-	$active = $activeDetector if ($cookieRoom eq $room[0]);
-	$activeDetector++;
+	my $roomResult;
+	while (my @room = $room->fetchrow_array())
+	{
+		@{$roomResult->{$room[2]}} = @room;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$roomResult)
+	{
+		my @room = @{$roomResult->{$_}};
+		$room[2] = "Room Name N/A!" unless($room[2]);
+		$rooms .= "<li><a href='room.cgi?roomId=$room[0]'>$room[2]</a></li>\n";
+		$active = $activeDetector if ($cookieRoom eq $room[0]);
+		$activeDetector++;
+	}
 }
 $html =~ s/\$rooms/$rooms/g;
 $html =~ s/\$active/$active/g;

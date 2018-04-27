@@ -46,13 +46,22 @@ foreach (sort {$a <=> $b} keys %datasetType)
 $html =~ s/\$datasetType/$datasetTypeList/g;
 
 my $parentId = "<option class='ui-state-error-text' value='0'>None</option>";
-my $parentList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' ORDER BY name");
+my $parentList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank'");# ORDER BY name
 $parentList->execute();
-while (my @parentList = $parentList->fetchrow_array())
+if($parentList->rows > 0)
 {
-	$parentId .= ($parentList[0] eq $dataset[6] ) ?
-		"<option value='$parentList[0]' title='$parentList[2]' selected>$parentList[1]: $parentList[2]</option>" :
-		"<option value='$parentList[0]' title='$parentList[2]'>$parentList[1]: $parentList[2]</option>";
+	my $parentListResult;
+	while (my @parentList = $parentList->fetchrow_array())
+	{
+		@{$parentListResult->{$parentList[2]}} = @parentList;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$parentListResult)
+	{
+		my @parentList = @{$parentListResult->{$_}};
+		$parentId .= ($parentList[0] eq $dataset[6] ) ?
+			"<option value='$parentList[0]' title='$parentList[2]' selected>$parentList[1]: $parentList[2]</option>" :
+			"<option value='$parentList[0]' title='$parentList[2]'>$parentList[1]: $parentList[2]</option>";
+	}
 }
 
 $html =~ s/\$parentId/$parentId/g;

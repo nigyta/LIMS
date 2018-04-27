@@ -21,43 +21,61 @@ my $html = <DATA>;
 my $col = 3;
 my $colCount=0;
 my $assemblyTargetIds = "<table id='assemblyTargetIds$$' class='display'><thead style='display:none;'><tr>" . "<th></th>" x $col . "</tr></thead><tbody>";
-my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' ORDER BY name");
+my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");# ORDER BY name
 $library->execute();
-while (my @library=$library->fetchrow_array())
+if($library->rows > 0)
 {
-	if($colCount % $col == 0)
+	my $libraryResult;
+	while (my @library=$library->fetchrow_array())
 	{
-		$assemblyTargetIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='targetId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
+		@{$libraryResult->{$library[2]}} = @library;
 	}
-	elsif($colCount % $col == $col - 1)
+	foreach (sort {uc ($a) cmp uc($b)} keys %$libraryResult)
 	{
-		$assemblyTargetIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='targetId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
+		my @library = @{$libraryResult->{$_}};
+		if($colCount % $col == 0)
+		{
+			$assemblyTargetIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='targetId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
+		}
+		elsif($colCount % $col == $col - 1)
+		{
+			$assemblyTargetIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='targetId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
+		}
+		else
+		{
+			$assemblyTargetIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='targetId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
+		}
+		$colCount++;
 	}
-	else
-	{
-		$assemblyTargetIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='targetId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
-	}
-	$colCount++;
 }
 
-my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome' ORDER BY name");
+my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");# ORDER BY name
 $genome->execute();
-while (my @genome=$genome->fetchrow_array())
+if($genome->rows > 0)
 {
-	next if ($genome[4] < 1);
-	if($colCount % $col == 0)
+	my $genomeResult;
+	while (my @genome=$genome->fetchrow_array())
 	{
-		$assemblyTargetIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='targetId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup>G</sup></label></td>";
+		next if ($genome[4] < 1);
+		@{$genomeResult->{$genome[2]}} = @genome;
 	}
-	elsif($colCount % $col == $col - 1)
+	foreach (sort {uc ($a) cmp uc($b)} keys %$genomeResult)
 	{
-		$assemblyTargetIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='targetId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+		my @genome = @{$genomeResult->{$_}};
+		if($colCount % $col == 0)
+		{
+			$assemblyTargetIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='targetId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup>G</sup></label></td>";
+		}
+		elsif($colCount % $col == $col - 1)
+		{
+			$assemblyTargetIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='targetId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+		}
+		else
+		{
+			$assemblyTargetIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='targetId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+		}
+		$colCount++;
 	}
-	else
-	{
-		$assemblyTargetIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='targetId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
-	}
-	$colCount++;
 }
 
 my $toBeFilled = $col - ( $colCount % $col);

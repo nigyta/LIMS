@@ -58,51 +58,68 @@ else
 my $col = 3;
 my $colCount=0;
 my $assemblyExtraIds = "<table id='assemblyExtraIds$$' class='display'><thead style='display:none;'><tr>" . "<th></th>" x $col . "</tr></thead><tbody>";
-my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' ORDER BY name");
+my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");# ORDER BY name
 $library->execute();
-while (my @library=$library->fetchrow_array())
+if($library->rows > 0)
 {
-	next if ($library[0] eq $targetId);
-	if($colCount % $col == 0)
+	my $libraryResult;
+	while (my @library=$library->fetchrow_array())
 	{
-		$assemblyExtraIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
+		next if ($library[0] eq $targetId);
+		@{$libraryResult->{$library[2]}} = @library;
 	}
-	elsif($colCount % $col == $col - 1)
+	foreach (sort {uc ($a) cmp uc($b)} keys %$libraryResult)
 	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
-	}
-	else
-	{
-		$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
-	}
-	$colCount++;
-}
-
-my $refGenomeId = '';
-my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome' ORDER BY name");
-$genome->execute();
-while (my @genome=$genome->fetchrow_array())
-{
-	next if ($genome[0] eq $targetId);
-	if ($genome[4] > 0) # for assembly
-	{
+		my @library = @{$libraryResult->{$_}};
 		if($colCount % $col == 0)
 		{
-			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
 		}
-		elsif($colCount % $col ==  $col - 1)
+		elsif($colCount % $col == $col - 1)
 		{
-			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
 		}
 		else
 		{
-			$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]'><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
 		}
 		$colCount++;
 	}
-	if ($genome[5] > 0) # as reference
+}
+my $refGenomeId = '';
+my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");# ORDER BY name
+$genome->execute();
+if($genome->rows > 0)
+{
+	my $genomeResult;
+	while (my @genome=$genome->fetchrow_array())
 	{
-		$refGenomeId .= "<option value='$genome[0]' title='$genome[8]'>$genome[2]</option>";
+		next if ($genome[0] eq $targetId);
+		@{$genomeResult->{$genome[2]}} = @genome;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$genomeResult)
+	{
+		my @genome = @{$genomeResult->{$_}};
+		if ($genome[4] > 0) # for assembly
+		{
+			if($colCount % $col == 0)
+			{
+				$assemblyExtraIds .= "<tr><td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			}
+			elsif($colCount % $col ==  $col - 1)
+			{
+				$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td></tr>";
+			}
+			else
+			{
+				$assemblyExtraIds .= "<td><input type='checkbox' id='genomeList$genome[0]$$' name='extraId' value='$genome[0]'><label for='genomeList$genome[0]$$' title='genome'>$genome[2]<sup class='ui-state-disabled'>G</sup></label></td>";
+			}
+			$colCount++;
+		}
+		if ($genome[5] > 0) # as reference
+		{
+			$refGenomeId .= "<option value='$genome[0]' title='$genome[8]'>$genome[2]</option>";
+		}
 	}
 }
 if($refGenomeId)

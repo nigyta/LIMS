@@ -57,15 +57,24 @@ else
 }
 
 my $libraryId = "<option class='ui-state-error-text' value='0'>None</option>";
-my $libraryList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library' ORDER BY name");
+my $libraryList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");# ORDER BY name
 $libraryList->execute();
-while (my @libraryList = $libraryList->fetchrow_array())
+if($libraryList->rows > 0)
 {
-	my $libraryDetails = decode_json $libraryList[8];
-	$libraryDetails->{'comments'} = escapeHTML($libraryDetails->{'comments'});
-	$libraryId .= ($libraryList[0] eq $genome[6] ) ?
-		"<option value='$libraryList[0]' title='$libraryDetails->{'comments'}' selected>Library: $libraryList[2]</option>" :
-		"<option value='$libraryList[0]' title='$libraryDetails->{'comments'}'>Library: $libraryList[2]</option>";
+	my $libraryListResult;
+	while (my @libraryList = $libraryList->fetchrow_array())
+	{
+		@{$libraryListResult->{$libraryList[2]}} = @libraryList;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$libraryListResult)
+	{
+		my @libraryList = @{$libraryListResult->{$_}};
+		my $libraryDetails = decode_json $libraryList[8];
+		$libraryDetails->{'comments'} = escapeHTML($libraryDetails->{'comments'});
+		$libraryId .= ($libraryList[0] eq $genome[6] ) ?
+			"<option value='$libraryList[0]' title='$libraryDetails->{'comments'}' selected>Library: $libraryList[2]</option>" :
+			"<option value='$libraryList[0]' title='$libraryDetails->{'comments'}'>Library: $libraryList[2]</option>";
+	}
 }
 
 $html =~ s/\$libraryId/$libraryId/g;

@@ -34,14 +34,23 @@ my $activeDetector = 0;
 my $cookieProject = cookie('project') || '';
 
 my $projects = '';
-my $project=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'project' ORDER BY name");
+my $project=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'project'");# ORDER BY name
 $project->execute();
-while (my @project = $project->fetchrow_array())
+if($project->rows > 0)
 {
-	$project[2] = "Project: Name N/A, please edit!" unless($project[2]);
-	$projects .= "<li><a href='project.cgi?projectId=$project[0]'>$project[2]</a></li>\n";
-	$active = $activeDetector if ($cookieProject eq $project[0]);
-	$activeDetector++;
+	my $projectResult;
+	while (my @project = $project->fetchrow_array())
+	{
+		@{$projectResult->{$project[2]}} = @project;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$projectResult)
+	{
+		my @project = @{$projectResult->{$_}};
+		$project[2] = "Project: Name N/A, please edit!" unless($project[2]);
+		$projects .= "<li><a href='project.cgi?projectId=$project[0]'>$project[2]</a></li>\n";
+		$active = $activeDetector if ($cookieProject eq $project[0]);
+		$activeDetector++;
+	}
 }
 
 $html =~ s/\$projects/$projects/;

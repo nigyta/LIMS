@@ -35,16 +35,24 @@ my $activeDetector = 0;
 my $cookieAsbProject = cookie('asbProject') || '';
 
 my $asbProjects = '';
-my $asbProject=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'asbProject' ORDER BY name");
+my $asbProject=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'asbProject'");# ORDER BY name
 $asbProject->execute();
-while (my @asbProject = $asbProject->fetchrow_array())
+if ($asbProject->rows > 0)
 {
-	$asbProject[2] = "AsbProject: Name N/A, please edit!" unless($asbProject[2]);
-	$asbProjects .= "<li><a href='asbProject.cgi?asbProjectId=$asbProject[0]'>$asbProject[2]</a></li>\n";
-	$active = $activeDetector if ($cookieAsbProject eq $asbProject[0]);
-	$activeDetector++;
+	my $asbProjectResult;
+	while (my @asbProject = $asbProject->fetchrow_array())
+	{
+		@{$asbProjectResult->{$asbProject[2]}} = @asbProject;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$asbProjectResult)
+	{
+		my @asbProject = @{$asbProjectResult->{$_}};
+		$asbProject[2] = "AsbProject: Name N/A, please edit!" unless($asbProject[2]);
+		$asbProjects .= "<li><a href='asbProject.cgi?asbProjectId=$asbProject[0]'>$asbProject[2]</a></li>\n";
+		$active = $activeDetector if ($cookieAsbProject eq $asbProject[0]);
+		$activeDetector++;
+	}
 }
-
 $html =~ s/\$asbProjects/$asbProjects/;
 $html =~ s/\$active/$active/;
 $html =~ s/\$commoncfg->{HTDOCS}/$commoncfg->{HTDOCS}/g;

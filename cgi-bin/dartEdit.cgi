@@ -33,15 +33,24 @@ $html =~ s/\$dartId/$dartId/g;
 $html =~ s/\$dartName/$dart[2]/g;
 
 my $genebankId = "<option class='ui-state-error-text' value='0'>None</option>";
-my $genebankList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank' ORDER BY name");
+my $genebankList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genebank'");# ORDER BY name
 $genebankList->execute();
-while (my @genebankList = $genebankList->fetchrow_array())
+if ($genebankList->rows > 0)
 {
-	my $genebankDetails = decode_json $genebankList[8];
-	$genebankDetails->{'comments'} = escapeHTML($genebankDetails->{'comments'});
-	$genebankId .= ($genebankList[0] eq $dart[6] ) ?
-		"<option value='$genebankList[0]' title='$genebankDetails->{'comments'}' selected>Genebank: $genebankList[2]</option>" :
-		"<option value='$genebankList[0]' title='$genebankDetails->{'comments'}'>Genebank: $genebankList[2]</option>";
+	my $genebankListResult;
+	while (my @genebankList = $genebankList->fetchrow_array())
+	{
+		@{$genebankListResult->{$genebankList[2]}} = @genebankList;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$genebankListResult)
+	{
+		my @genebankList = @{$genebankListResult->{$_}};
+		my $genebankDetails = decode_json $genebankList[8];
+		$genebankDetails->{'comments'} = escapeHTML($genebankDetails->{'comments'});
+		$genebankId .= ($genebankList[0] eq $dart[6] ) ?
+			"<option value='$genebankList[0]' title='$genebankDetails->{'comments'}' selected>Genebank: $genebankList[2]</option>" :
+			"<option value='$genebankList[0]' title='$genebankDetails->{'comments'}'>Genebank: $genebankList[2]</option>";
+	}
 }
 
 $html =~ s/\$genebankId/$genebankId/g;
