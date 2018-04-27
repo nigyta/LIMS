@@ -335,8 +335,6 @@ if ($seqId)
 		}
 	)->cdata("$nonFpcCloneNumber ($nonFpcCloneToBeFlippedNumber conflict) non-FPC clones");
 
-
-
     for my $currentClone (@besCloneList)
     {
 		next if ($fpcCloneRightEnd->{$currentClone} eq '-1');
@@ -405,15 +403,15 @@ if ($seqId)
 	@lengthList = sort {$b <=> $a} @lengthList;
 
 	my $medianLength = 0;
-	if($#lengthlist % 2 == 1)
+	if($#lengthList % 2 == 1)
 	{
-		my $median = int ($#lengthlist/2);
-		$medianLength = ($lengthlist[$median]+$lengthlist[$median+1])/2;
+		my $median = int ($#lengthList/2);
+		$medianLength = ($lengthList[$median]+$lengthList[$median+1])/2;
 	}
 	else
 	{
-		my $median = $#lengthlist/2;
-		$medianLength = $lengthlist[$median];
+		my $median = $#lengthList/2;
+		$medianLength = $lengthList[$median];
 	}
 
 	my $n50Length = 0;

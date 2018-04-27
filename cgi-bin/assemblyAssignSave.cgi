@@ -48,7 +48,7 @@ END
 	{
 		if ($chrNumber == 0)
 		{
-			my $update=$dbh->do("UPDATE matrix SET x = $chrNumber WHERE id = $assemblyCtgId ");
+			my $update=$dbh->do("UPDATE matrix SET x = 0, z = 0 WHERE id = $assemblyCtgId ");
 		}
 		else
 		{
@@ -93,7 +93,7 @@ END
 		my $update=$dbh->do("UPDATE matrix SET x = $chrNumber WHERE id = $assemblyCtgId ");
 	}
 }
-		print <<END;
+	print <<END;
 <script>
 	parent.closeDialog();
 	parent.informationPop("Chromosome number assignment is done.");

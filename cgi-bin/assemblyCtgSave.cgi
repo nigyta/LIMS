@@ -26,6 +26,7 @@ my $assemblyCtgNumber = param ('assemblyCtgNumber') || '';
 my $assemblyChr = param ('assemblyChr') || '0';
 my $assemblyPosition = param ('assemblyPosition') || '0';
 $assemblyPosition =~ s/\D//g;
+$assemblyPosition = 0 if ($assemblyChr eq 0);
 my $assemblySeqs = param ('assemblySeqs') || '';
 my $insertSeq = param ('insertSeq') || '';
 my $appendCtg = param ('appendCtg') || '0';
