@@ -44,7 +44,7 @@ while(my @checkAsbProject=$checkAsbProject->fetchrow_array())
 	}
 }
 
-my $col = 3;
+my $col = 2;
 my $colCount=0;
 my $assemblyTargetIds = "<table id='assemblyTargetIds$$' class='display'><thead style='display:none;'><tr>" . "<th></th>" x $col . "</tr></thead><tbody>";
 my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");# ORDER BY name

@@ -94,35 +94,35 @@ while(my @checkAsbGenome=$checkAsbGenome->fetchrow_array())
 my $col = 2;
 my $colCount=0;
 my $assemblyExtraIds = "<table id='assemblyExtraIds$$' class='display'><thead style='display:none;'><tr>" . "<th></th>" x $col . "</tr></thead><tbody>";
-my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");# ORDER BY name
-$library->execute();
-if ($library->rows > 0)
-{
-	my $libraryResult;
-	while (my @library=$library->fetchrow_array())
-	{
-		next if ($library[0] eq $assembly[4]);
-		@{$libraryResult->{$library[2]}} = @library;
-	}
-	foreach (sort {uc ($a) cmp uc($b)} keys %$libraryResult)
-	{
-		my @library = @{$libraryResult->{$_}};
-		my $checked = (exists $checkedExtraId->{$library[0]}) ? "checked='checked'" : "";
-		if($colCount % $col == 0)
-		{
-			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
-		}
-		elsif($colCount % $col == $col - 1)
-		{
-			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
-		}
-		else
-		{
-			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
-		}
-		$colCount++;
-	}
-}
+# my $library = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'library'");# ORDER BY name
+# $library->execute();
+# if ($library->rows > 0)
+# {
+# 	my $libraryResult;
+# 	while (my @library=$library->fetchrow_array())
+# 	{
+# 		next if ($library[0] eq $assembly[4]);
+# 		@{$libraryResult->{$library[2]}} = @library;
+# 	}
+# 	foreach (sort {uc ($a) cmp uc($b)} keys %$libraryResult)
+# 	{
+# 		my @library = @{$libraryResult->{$_}};
+# 		my $checked = (exists $checkedExtraId->{$library[0]}) ? "checked='checked'" : "";
+# 		if($colCount % $col == 0)
+# 		{
+# 			$assemblyExtraIds .= "<tr><td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
+# 		}
+# 		elsif($colCount % $col == $col - 1)
+# 		{
+# 			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td></tr>";
+# 		}
+# 		else
+# 		{
+# 			$assemblyExtraIds .= "<td><input type='checkbox' id='libraryList$library[0]$$' name='extraId' value='$library[0]' $checked><label for='libraryList$library[0]$$' title='library'>$library[2]<sup class='ui-state-disabled'>L</sup></label></td>";
+# 		}
+# 		$colCount++;
+# 	}
+# }
 my $doNotChangeGenome = ($assembly[7] != 0 && $assembly[5] > 0) ? '<sup class="ui-state-error ui-corner-all">Do NOT Change Unless You Plan To Re-Run Assembly!</sup><br>' : '';
 my $refGenomeId = '';
 my $genome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");# ORDER BY name

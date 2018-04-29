@@ -44,6 +44,7 @@ if ($assemblyCtgId)
 	$assemblyCtg->execute($assemblyCtgId);
 	my @assemblyCtg = $assemblyCtg->fetchrow_array();
 	my $assemblyPreCtgButton = '';
+	my $assemblyCurrentCtgButton = "{ text: 'Reload - Ctg$assemblyCtg[2]', click: function() { closeViewer();openViewer('assemblyCtgView.cgi?assemblyCtgId=$assemblyCtg[0]');} }";
 	my $assemblyNextCtgButton = '';
 	my $assemblyCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? AND x = ? ORDER BY y");
 	$assemblyCtgList->execute($assemblyCtg[3],$assemblyCtg[4]);
@@ -58,22 +59,22 @@ if ($assemblyCtgId)
 	{
 		if($assemblyNextCtgButton)
 		{
-			$assemblySwitchCtgButton = "$assemblyPreCtgButton,$assemblyNextCtgButton";
+			$assemblySwitchCtgButton = "$assemblyPreCtgButton,$assemblyCurrentCtgButton,$assemblyNextCtgButton";
 		}
 		else
 		{
-			$assemblySwitchCtgButton = "$assemblyPreCtgButton";
+			$assemblySwitchCtgButton = "$assemblyPreCtgButton,$assemblyCurrentCtgButton";
 		}
 	}
 	else
 	{
 		if($assemblyNextCtgButton)
 		{
-			$assemblySwitchCtgButton = "$assemblyNextCtgButton";
+			$assemblySwitchCtgButton = "$assemblyCurrentCtgButton,$assemblyNextCtgButton";
 		}
 		else
 		{
-			$assemblySwitchCtgButton = "";
+			$assemblySwitchCtgButton = "$assemblyCurrentCtgButton";
 		}
 	}	
 	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
