@@ -42,11 +42,19 @@ END
 	{
 		my @checkAssemblyCtg = $checkAssemblyCtg->fetchrow_array();
 		my @seqInCtg;
+		my %seqInCtg;
 		foreach (split ",", $checkAssemblyCtg[8])
 		{
 			/^-/ and next;
 			$_ =~ s/[^a-zA-Z0-9]//g;
 			push @seqInCtg,$_;
+
+			my $assemblySeqs = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblySeqs->execute($_);
+			while(my @assemblySeqs = $assemblySeqs->fetchrow_array())
+			{
+				$seqInCtg{$assemblySeqs[5]} = $assemblySeqs[0]; #sequenceId -> assemblySeqId
+			}
 		}
 		my $totalSeqInCtg = @seqInCtg;
 
@@ -56,8 +64,8 @@ END
 			$getAlignment->execute($alignmentId);
 			my @getAlignment = $getAlignment->fetchrow_array();
 			
-			my $assemblyPreSeq=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ? AND y = ?");
-			$assemblyPreSeq->execute($checkAssemblyCtg[3],$getAlignment[2]);
+			my $assemblyPreSeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblyPreSeq->execute($seqInCtg{$getAlignment[2]});
 			my @assemblyPreSeq = $assemblyPreSeq->fetchrow_array();
 			my $preSeqStart;
 			my $preSeqEnd;
@@ -74,8 +82,8 @@ END
 			$preSequence->execute($getAlignment[2]);
 			my @preSequence = $preSequence->fetchrow_array();
 
-			my $assemblyNextSeq=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ? AND y = ?");
-			$assemblyNextSeq->execute($checkAssemblyCtg[3],$getAlignment[3]);
+			my $assemblyNextSeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblyNextSeq->execute($seqInCtg{$getAlignment[3]});
 			my @assemblyNextSeq = $assemblyNextSeq->fetchrow_array();
 			my $nextSeqStart;
 			my $nextSeqEnd;

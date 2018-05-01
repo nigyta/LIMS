@@ -19,6 +19,7 @@ print header('application/json');
 
 if($assemblyId)
 {
+
 	if($extra)
 	{
 		my $asbGenome = $dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND matrix.id = link.child AND link.parent = $assemblyId");
@@ -37,6 +38,25 @@ if($assemblyId)
 					$hash{'value'} = $sequence[2];
 					push @results, \%hash;
 				}
+			}
+		}
+		my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+		$assembly->execute($assemblyId);
+		my @assembly = $assembly->fetchrow_array();
+		my $target=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+		$target->execute($assembly[4]);
+		my @target = $target->fetchrow_array();
+		if($target[1] eq 'genome')
+		{
+			my $sequence=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = $target[0] AND name LIKE '%$keyword%' LIMIT 20");
+			$sequence->execute();
+			while (my @sequence = $sequence->fetchrow_array())
+			{
+				my %hash;
+				$hash{'id'} = $sequence[0];
+				$hash{'label'} = "*$target[2]:$sequence[2]($sequence[0])";
+				$hash{'value'} = $sequence[2];
+				push @results, \%hash;
 			}
 		}
 	}
