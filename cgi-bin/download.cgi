@@ -1604,7 +1604,7 @@ elsif (param ('assemblyIdForCtgList'))
 	print header(-type=>'application/octet-stream',
 		-attachment=>"ctgList.$assemblyIdForCtgList.txt",
 		);
-	print "CTG\tNumber-of-assemblySeqs\tAssigned-chomosome#\tLength(bp)\tComment\n";
+	print "CTG\tNumber-of-assemblySeqs[hidden]\tLength(bp)\tAssigned-chomosome#\tComment\n";
 
 	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$assembly->execute($assemblyIdForCtgList);
@@ -1630,6 +1630,7 @@ elsif (param ('assemblyIdForCtgList'))
 	while (my @assemblyCtg = $assemblyCtg->fetchrow_array())
 	{
 		my $num = 0;
+		my $numHide = 0;
 		my $hide;
 		my $source;
 		foreach (split ",", $assemblyCtg[8])
@@ -1656,6 +1657,7 @@ elsif (param ('assemblyIdForCtgList'))
 				}
 				if($hideFlag)
 				{
+					$numHide++;
 					if (exists $hide->{$assemblyExtraIds->{$assemblySequence[4]}})
 					{
 						$hide->{$assemblyExtraIds->{$assemblySequence[4]}}++;
@@ -1678,6 +1680,7 @@ elsif (param ('assemblyIdForCtgList'))
 				}
 				if($hideFlag)
 				{
+					$numHide++;
 					if (exists $hide->{$target[2]})
 					{
 						$hide->{$target[2]}++;
@@ -1740,11 +1743,25 @@ elsif (param ('assemblyIdForCtgList'))
 			$commentDetails = decode_json $comment[8];
 			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
 			$commentDetails->{'description'} =~ s/[\n\r]/\\n/g;
-			print "Ctg$assemblyCtg[2]\t$num ($sourceDetails)\t$chrName\t".commify($assemblyCtg[7])."\t'$commentDetails->{'description'}'\n";
+			if ($numHide)
+			{
+				print "Ctg$assemblyCtg[2]\t$num\[-$numHide\] ($sourceDetails)\t".commify($assemblyCtg[7])."\t$chrName\t'$commentDetails->{'description'}'\n";
+			}
+			else
+			{
+				print "Ctg$assemblyCtg[2]\t$num ($sourceDetails)\t".commify($assemblyCtg[7])."\t$chrName\t'$commentDetails->{'description'}'\n";
+			}
 		}
 		else
 		{
-			print "Ctg$assemblyCtg[2]\t$num ($sourceDetails)\t$chrName\t".commify($assemblyCtg[7])."\t\n";
+			if ($numHide)
+			{
+				print "Ctg$assemblyCtg[2]\t$num\[-$numHide\] ($sourceDetails)\t".commify($assemblyCtg[7])."\t$chrName\t\n";
+			}
+			else
+			{
+				print "Ctg$assemblyCtg[2]\t$num ($sourceDetails)\t".commify($assemblyCtg[7])."\t$chrName\t\n";
+			}
 		}
 	}
 }

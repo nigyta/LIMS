@@ -47,6 +47,7 @@ if ($assemblyId)
 		}
 	}
 	my $numTotal = 0;
+	my $numHideTotal = 0;
 	my $sourceTotal;
 	my $hideTotal;
 	my $lengthTotal = 0;
@@ -56,6 +57,7 @@ if ($assemblyId)
 	while (my @assemblyCtg = $assemblyCtg->fetchrow_array())
 	{
 		my $num = 0;
+		my $numHide = 0;
 		my $source;
 		my $hide;
 		foreach (split ",", $assemblyCtg[8])
@@ -91,6 +93,8 @@ if ($assemblyId)
 				}
 				if($hideFlag)
 				{
+					$numHide++;
+					$numHideTotal++;
 					if (exists $hide->{$assemblyExtraIds->{$assemblySequence[4]}})
 					{
 						$hide->{$assemblyExtraIds->{$assemblySequence[4]}}++;
@@ -129,6 +133,8 @@ if ($assemblyId)
 				}
 				if($hideFlag)
 				{
+					$numHide++;
+					$numHideTotal++;
 					if (exists $hide->{$target[2]})
 					{
 						$hide->{$target[2]}++;
@@ -148,14 +154,14 @@ if ($assemblyId)
 				}
 			}
 		}
-		my $sourceDetails = (exists $source->{$target[2]}) ? (exists $hide->{$target[2]}) ? "$target[2]:$source->{$target[2]}<sub title='hidden'>[-$hide->{$target[2]}]</sub>": "$target[2]:$source->{$target[2]}" : "";
+		my $sourceDetails = (exists $source->{$target[2]}) ? (exists $hide->{$target[2]}) ? "$target[2]:$source->{$target[2]}<a title='hidden'>[-$hide->{$target[2]}]</a>": "$target[2]:$source->{$target[2]}" : "";
 		foreach (keys %$assemblyExtraIds)
 		{
 			if (exists $source->{$assemblyExtraIds->{$_}})
 			{
 				$sourceDetails .= ($sourceDetails) ? 
-				(exists $hide->{$assemblyExtraIds->{$_}}) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hide->{$assemblyExtraIds->{$_}}]</sub>" : "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : 
-				(exists $hide->{$assemblyExtraIds->{$_}}) ? "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hide->{$assemblyExtraIds->{$_}}]</sub>" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
+				(exists $hide->{$assemblyExtraIds->{$_}}) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}<a title='hidden'>[-$hide->{$assemblyExtraIds->{$_}}]</a>" : "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : 
+				(exists $hide->{$assemblyExtraIds->{$_}}) ? "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}<a title='hidden'>[-$hide->{$assemblyExtraIds->{$_}}]</a>" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
 			}
 		}
 
@@ -198,30 +204,38 @@ if ($assemblyId)
 		{
 			$commentDetails = decode_json $comment[8];
 			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])."</td><td>$commentDetails->{'description'}</td></tr>" ;
+			$ctgListDetails .= ($numHide) ?
+			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>" : 
+			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>";
 		}
 		else
 		{
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])."</td><td></td></tr>" ;
+			$ctgListDetails .= ($numHide) ?
+			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>" :
+			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>";
 		}
 	}
-	my $sourceTotalDetails = (exists $sourceTotal->{$target[2]}) ? (exists $hideTotal->{$target[2]}) ? "$target[2]:$sourceTotal->{$target[2]}<sub title='hidden'>[-$hideTotal->{$target[2]}]</sub>" : "$target[2]:$sourceTotal->{$target[2]}" : "";
+	my $sourceTotalDetails = (exists $sourceTotal->{$target[2]}) ? (exists $hideTotal->{$target[2]}) ? "$target[2]:$sourceTotal->{$target[2]}<a title='hidden'>[-$hideTotal->{$target[2]}]</a>" : "$target[2]:$sourceTotal->{$target[2]}" : "";
 	foreach (keys %$assemblyExtraIds)
 	{
 		if (exists $sourceTotal->{$assemblyExtraIds->{$_}})
 		{
 			$sourceTotalDetails .= ($sourceTotalDetails) ? 
-			(exists $hideTotal->{$assemblyExtraIds->{$_}}) ? "; $assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hideTotal->{$assemblyExtraIds->{$_}}]</sub>" : "; $assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}" : 
-			(exists $hideTotal->{$assemblyExtraIds->{$_}}) ? "$assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hideTotal->{$assemblyExtraIds->{$_}}]</sub>" : "$assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}";
+			(exists $hideTotal->{$assemblyExtraIds->{$_}}) ? "; $assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}<a title='hidden'>[-$hideTotal->{$assemblyExtraIds->{$_}}]</a>" : "; $assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}" : 
+			(exists $hideTotal->{$assemblyExtraIds->{$_}}) ? "$assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}<a title='hidden'>[-$hideTotal->{$assemblyExtraIds->{$_}}]</a>" : "$assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}";
 		}
 	}
 	
-	$ctgListDetails = "
-	<table id='ctgLengthDetails$$' class='display'>
-	<thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs</b></th><th><b>Assigned chromosome #</b></th><th><b>Length (bp)</b></th><th><b>Comment</b></th></tr></thead>
+	$ctgListDetails = ($numHideTotal) ? 
+	"<table id='ctgLengthDetails$$' class='display'>
+	<thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs [hidden]</b></th><th><b>Length (bp)</b></th><th><b>Assigned chromosome #</b></th><th><b>Comment</b></th></tr></thead>
 	<tbody>$ctgListDetails</tbody>
-	<tfoot><tr><th><b>Total</b></th><th>$numTotal ($sourceTotalDetails)</th><th><b></b></th><th>".commify($lengthTotal)."</th><th><b></b></th></tr></tfoot></table>
-	";
+	<tfoot><tr><th><b>Total</b></th><th>$numTotal<a title='hidden'>[-$numHideTotal]</a> ($sourceTotalDetails)</th><th>".commify($lengthTotal)."</th><th><b></b></th><th><b></b></th></tr></tfoot></table>"
+	:
+	"<table id='ctgLengthDetails$$' class='display'>
+	<thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs</b></th><th><b>Length (bp)</b></th><th><b>Assigned chromosome #</b></th><th><b>Comment</b></th></tr></thead>
+	<tbody>$ctgListDetails</tbody>
+	<tfoot><tr><th><b>Total</b></th><th>$numTotal ($sourceTotalDetails)</th><th>".commify($lengthTotal)."</th><th><b></b></th><th><b></b></th></tr></tfoot></table>";
 	
 }
 
