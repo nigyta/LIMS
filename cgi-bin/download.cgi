@@ -1605,12 +1605,77 @@ elsif (param ('assemblyIdForCtgList'))
 		-attachment=>"ctgList.$assemblyIdForCtgList.txt",
 		);
 	print "CTG\tNumber-of-assemblySeqs\tAssigned-chomosome#\tLength(bp)\tComment\n";
+
+	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+	$assembly->execute($assemblyIdForCtgList);
+	my @assembly = $assembly->fetchrow_array();
+
+	my $target=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+	$target->execute($assembly[4]);
+	my @target = $target->fetchrow_array();
+
+	my $assemblyExtraIds;
+	my $checkAsbGenome = $dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND link.child = matrix.id AND link.parent = ?");
+	$checkAsbGenome->execute($assemblyIdForCtgList);
+	if ($checkAsbGenome->rows > 0)
+	{
+		while(my @checkAsbGenome=$checkAsbGenome->fetchrow_array())
+		{
+			$assemblyExtraIds->{$checkAsbGenome[0]} = $checkAsbGenome[2];
+		}
+	}
+
 	my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
 	$assemblyCtg->execute($assemblyIdForCtgList);
 	while (my @assemblyCtg = $assemblyCtg->fetchrow_array())
 	{
-		my @seq=split",",$assemblyCtg[8];
-		my $num=@seq;
+		my $num = 0;
+		my $hide = 0;
+		my $source;
+		foreach (split ",", $assemblyCtg[8])
+		{
+			next unless ($_);
+			$num++;
+			$hide++ if ($_ =~ /^-/);
+			$_ =~ s/[^a-zA-Z0-9]//g;
+			my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblySeq->execute($_);
+			my @assemblySeq = $assemblySeq->fetchrow_array();
+			my $assemblySequence=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblySequence->execute($assemblySeq[5]);
+			my @assemblySequence = $assemblySequence->fetchrow_array();
+			if (exists $assemblyExtraIds->{$assemblySequence[4]})
+			{
+				if (exists $source->{$assemblyExtraIds->{$assemblySequence[4]}})
+				{
+					$source->{$assemblyExtraIds->{$assemblySequence[4]}}++;
+				}
+				else
+				{
+					$source->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
+				}
+			}
+			else
+			{
+				if (exists $source->{$target[2]})
+				{
+					$source->{$target[2]}++;
+				}
+				else
+				{
+					$source->{$target[2]} = 1;
+				}
+			}
+		}
+		my $sourceDetails = (exists $source->{$target[2]}) ? "$target[2]:$source->{$target[2]}" : "";
+		foreach (keys %$assemblyExtraIds)
+		{
+			if (exists $source->{$assemblyExtraIds->{$_}})
+			{
+				$sourceDetails .= ($sourceDetails) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
+			}
+		}
+
 		my $chrName = '';
 		if($assemblyCtg[4] == 0)
 		{
@@ -1651,11 +1716,11 @@ elsif (param ('assemblyIdForCtgList'))
 			$commentDetails = decode_json $comment[8];
 			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
 			$commentDetails->{'description'} =~ s/[\n\r]/\\n/g;
-			print "Ctg$assemblyCtg[2]\t$num\t$chrName\t".commify($assemblyCtg[7])."\t'$commentDetails->{'description'}'\n";
+			print "Ctg$assemblyCtg[2]\t$num ($sourceDetails)\t$chrName\t".commify($assemblyCtg[7])."\t'$commentDetails->{'description'}'\n";
 		}
 		else
 		{
-			print "Ctg$assemblyCtg[2]\t$num\t$chrName\t".commify($assemblyCtg[7])."\t\n";
+			print "Ctg$assemblyCtg[2]\t$num ($sourceDetails)\t$chrName\t".commify($assemblyCtg[7])."\t\n";
 		}
 	}
 }

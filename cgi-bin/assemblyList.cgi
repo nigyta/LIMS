@@ -69,8 +69,13 @@ if ($assemblyId)
 	my $assemblyDetails = decode_json $assembly[8];
 	$assemblyDetails->{'autoCheckNewSeq'} = 0 if (!exists $assemblyDetails->{'autoCheckNewSeq'});
 	$assemblyDetails->{'log'} = 'None.' if (!exists $assemblyDetails->{'log'});
+	$assemblyDetails->{'log'} = 'None.' unless ($assemblyDetails->{'log'}); #give a value to $assemblyDetails->{'log'}
 	$assemblyDetails->{'log'} = escapeHTML($assemblyDetails->{'log'});
 	$assemblyDetails->{'log'} =~ s/\n/<br>/g;
+	$assemblyDetails->{'description'} = 'None.' if (!exists $assemblyDetails->{'description'});
+	$assemblyDetails->{'description'} = 'None.' unless ($assemblyDetails->{'description'}); #give a value to $assemblyDetails->{'description'}
+	$assemblyDetails->{'description'} = escapeHTML($assemblyDetails->{'description'});
+	$assemblyDetails->{'description'} =~ s/\n/<br>/g;
 
 	my $target=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 	$target->execute($assembly[4]);
@@ -613,9 +618,61 @@ END
 		$assemblyList .= "<li><a href='assemblyCheckSeq.cgi?assemblyId=$assemblyId'>Check New Sequences</a></li>";
 	}
 
-	$assemblyList .= "<li><a href='#tabs-assemblyLog$assemblyId$$'>Logs</a></li>";
-	
-	$assemblyList .= "</ul>$assembledCtg <div id='tabs-assemblyLog$assemblyId$$'>$assemblyDetails->{'log'}</div> $assemblySortableStyle</div>";
+	$assemblyList .= "<li><a href='#tabs-assemblyAbout$assemblyId$$'>About</a></li>";
+
+	my $fpcOrAgpId = '';
+	if($assembly[6])
+	{
+		my $fpcOrAgpList=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+		$fpcOrAgpList->execute($assembly[6]);
+		my @fpcOrAgpList = $fpcOrAgpList->fetchrow_array();
+		if($fpcOrAgpList[1] eq 'fpc')
+		{
+			$fpcOrAgpId .= "<tr><td style='text-align:right'><b>Physical Reference</b></td><td title='$fpcOrAgpList[8]'>FPC: $fpcOrAgpList[2] v.$fpcOrAgpList[3]</td></tr>";
+		}
+		elsif($fpcOrAgpList[1]  eq 'agp')
+		{
+			$fpcOrAgpId .= "<tr><td style='text-align:right'><b>Physical Reference</b></td><td>AGP: $fpcOrAgpList[2] v.$fpcOrAgpList[3]</td></tr>";
+		}
+	}
+
+	my $refGenomeId = '';
+	if($assembly[5])
+	{
+		my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+		$genomeList->execute($assembly[5]);
+		my @genomeList = $genomeList->fetchrow_array();
+		$refGenomeId = "<tr><td style='text-align:right'><b>Reference Genome</b></td><td title='$genomeList[8]'>$genomeList[2]</td></tr>";
+	}
+
+	my $assemblyExtraIds = "<tr><td style='text-align:right'><b>Extra Genome</b></td><td>";
+	my $checkAsbGenome = $dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND link.child = matrix.id AND link.parent = ?");
+	$checkAsbGenome->execute($assemblyId);
+	if ($checkAsbGenome->rows > 0)
+	{
+		while(my @checkAsbGenome=$checkAsbGenome->fetchrow_array())
+		{
+			$assemblyExtraIds .= "<a onclick='closeDialog();openDialog(\"genomeView.cgi?genomeId=$checkAsbGenome[0]\")' title='$checkAsbGenome[8]'>$checkAsbGenome[2]<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-arrow-1-ne'></span></a><br>";
+		}
+		$assemblyExtraIds .= "</td></tr>";
+	}
+	else
+	{
+		$assemblyExtraIds .= "None.</td></tr>";
+	}
+
+	$target[1] = ucfirst ($target[1]);
+	$assemblyList .= <<END;
+	</ul>$assembledCtg <div id='tabs-assemblyAbout$assemblyId$$'><h3>About '$assembly[2]'</h3><table>
+	<tr><td style='text-align:right'><b>Assembly Name</b></td><td>$assembly[2]<br>Version $assembly[3] <sup class='ui-state-disabled'>by $assembly[9] on $assembly[10]</sup></td></tr>
+	<tr><td style='text-align:right'><b>Source $target[1]</b></td><td>$target[2]</td></tr>
+	$fpcOrAgpId
+	$refGenomeId
+	$assemblyExtraIds
+	<tr><td style='text-align:right'><b>Description</b></td><td>$assemblyDetails->{'description'}</td></tr>
+	</table><hr>
+	<h3>Run Logs</h3>$assemblyDetails->{'log'}</div> $assemblySortableStyle</div>
+END
 	$html =~ s/\$assemblyList/$assemblyList/g;
 	$html =~ s/\$assemblyId/$assemblyId/g;
 	$html =~ s/\$assemblySortableJs/$assemblySortableJs/g;

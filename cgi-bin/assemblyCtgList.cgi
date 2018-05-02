@@ -28,12 +28,76 @@ undef $/;# enable slurp mode
 my $html = <DATA>;
 if ($assemblyId)
 {
+	my $assembly=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+	$assembly->execute($assemblyId);
+	my @assembly = $assembly->fetchrow_array();
+
+	my $target=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+	$target->execute($assembly[4]);
+	my @target = $target->fetchrow_array();
+
+	my $assemblyExtraIds;
+	my $checkAsbGenome = $dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND link.child = matrix.id AND link.parent = ?");
+	$checkAsbGenome->execute($assemblyId);
+	if ($checkAsbGenome->rows > 0)
+	{
+		while(my @checkAsbGenome=$checkAsbGenome->fetchrow_array())
+		{
+			$assemblyExtraIds->{$checkAsbGenome[0]} = $checkAsbGenome[2];
+		}
+	}
+
 	my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
 	$assemblyCtg->execute($assemblyId);
 	while (my @assemblyCtg = $assemblyCtg->fetchrow_array())
 	{
-		my @seq=split",",$assemblyCtg[8];
-		my $num=@seq;
+		my $num = 0;
+		my $hide = 0;
+		my $source;
+		foreach (split ",", $assemblyCtg[8])
+		{
+			next unless ($_);
+			$num++;
+			$hide++ if ($_ =~ /^-/);
+			$_ =~ s/[^a-zA-Z0-9]//g;
+			my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblySeq->execute($_);
+			my @assemblySeq = $assemblySeq->fetchrow_array();
+			my $assemblySequence=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+			$assemblySequence->execute($assemblySeq[5]);
+			my @assemblySequence = $assemblySequence->fetchrow_array();
+			if (exists $assemblyExtraIds->{$assemblySequence[4]})
+			{
+				if (exists $source->{$assemblyExtraIds->{$assemblySequence[4]}})
+				{
+					$source->{$assemblyExtraIds->{$assemblySequence[4]}}++;
+				}
+				else
+				{
+					$source->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
+				}
+			}
+			else
+			{
+				if (exists $source->{$target[2]})
+				{
+					$source->{$target[2]}++;
+				}
+				else
+				{
+					$source->{$target[2]} = 1;
+				}
+			}
+		}
+		my $sourceDetails = (exists $source->{$target[2]}) ? "$target[2]:$source->{$target[2]}" : "";
+		foreach (keys %$assemblyExtraIds)
+		{
+			if (exists $source->{$assemblyExtraIds->{$_}})
+			{
+				$sourceDetails .= ($sourceDetails) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
+			}
+		}
+
 		my $chrName= '';
 		if($assemblyCtg[4] == 0)
 		{
@@ -73,11 +137,11 @@ if ($assemblyId)
 		{
 			$commentDetails = decode_json $comment[8];
 			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td>$commentDetails->{'description'}</td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td>$commentDetails->{'description'}</td></tr>" ;
 		}
 		else
 		{
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td></td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td></td></tr>" ;
 		}
 	}
 	
