@@ -1630,13 +1630,13 @@ elsif (param ('assemblyIdForCtgList'))
 	while (my @assemblyCtg = $assemblyCtg->fetchrow_array())
 	{
 		my $num = 0;
-		my $hide = 0;
+		my $hide;
 		my $source;
 		foreach (split ",", $assemblyCtg[8])
 		{
 			next unless ($_);
 			$num++;
-			$hide++ if ($_ =~ /^-/);
+			my $hideFlag = ($_ =~ /^-/) ? 1 : 0;
 			$_ =~ s/[^a-zA-Z0-9]//g;
 			my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 			$assemblySeq->execute($_);
@@ -1654,6 +1654,17 @@ elsif (param ('assemblyIdForCtgList'))
 				{
 					$source->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
 				}
+				if($hideFlag)
+				{
+					if (exists $hide->{$assemblyExtraIds->{$assemblySequence[4]}})
+					{
+						$hide->{$assemblyExtraIds->{$assemblySequence[4]}}++;
+					}
+					else
+					{
+						$hide->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
+					}
+				}
 			}
 			else
 			{
@@ -1665,14 +1676,27 @@ elsif (param ('assemblyIdForCtgList'))
 				{
 					$source->{$target[2]} = 1;
 				}
+				if($hideFlag)
+				{
+					if (exists $hide->{$target[2]})
+					{
+						$hide->{$target[2]}++;
+					}
+					else
+					{
+						$hide->{$target[2]} = 1;
+					}
+				}
 			}
 		}
-		my $sourceDetails = (exists $source->{$target[2]}) ? "$target[2]:$source->{$target[2]}" : "";
+		my $sourceDetails = (exists $source->{$target[2]}) ? (exists $hide->{$target[2]}) ? "$target[2]:$source->{$target[2]}\[-$hide->{$target[2]}\]" : "$target[2]:$source->{$target[2]}" : "";
 		foreach (keys %$assemblyExtraIds)
 		{
 			if (exists $source->{$assemblyExtraIds->{$_}})
 			{
-				$sourceDetails .= ($sourceDetails) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
+				$sourceDetails .= ($sourceDetails) ? 
+				(exists $hide->{$assemblyExtraIds->{$_}}) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}\[-$hide->{$assemblyExtraIds->{$_}}\]" : "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : 
+				(exists $hide->{$assemblyExtraIds->{$_}}) ? "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}\[-$hide->{$assemblyExtraIds->{$_}}\]" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
 			}
 		}
 

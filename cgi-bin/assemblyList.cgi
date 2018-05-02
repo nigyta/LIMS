@@ -571,7 +571,7 @@ END
 	my $assembledCtg = ($totalAssembled->{'All'} > 0) ? "<div id='tabs-assembled$assemblyId$$'>$assembledCtgDetails</div><div id='tabs-assemblyStats$assemblyId$$'>$assemblyStats</div>"
 			: "<div id='tabs-assembled$assemblyId$$'>No assembly! Please run assembly!</div>";
 
-	my $totalInAssembly = keys %$assemblySeq;
+	my $totalInAssembly = keys %$inCtgSeq;
 	$assemblyList .= "<div id='assemblyTab$assemblyId$$'><ul>";
 	$assemblyList .= ($totalAssembled->{'All'} > 1) ? "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contigs)" : "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contig)";
 	$assemblyList .= ($totalInAssembly > 1) ? " - $totalInAssembly Sequences</a></li>" : " - $totalInAssembly Sequence</a></li>";

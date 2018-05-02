@@ -46,19 +46,24 @@ if ($assemblyId)
 			$assemblyExtraIds->{$checkAsbGenome[0]} = $checkAsbGenome[2];
 		}
 	}
+	my $numTotal = 0;
+	my $sourceTotal;
+	my $hideTotal;
+	my $lengthTotal = 0;
 
 	my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
 	$assemblyCtg->execute($assemblyId);
 	while (my @assemblyCtg = $assemblyCtg->fetchrow_array())
 	{
 		my $num = 0;
-		my $hide = 0;
 		my $source;
+		my $hide;
 		foreach (split ",", $assemblyCtg[8])
 		{
 			next unless ($_);
 			$num++;
-			$hide++ if ($_ =~ /^-/);
+			$numTotal++;
+			my $hideFlag = ($_ =~ /^-/) ? 1 : 0;
 			$_ =~ s/[^a-zA-Z0-9]//g;
 			my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 			$assemblySeq->execute($_);
@@ -76,6 +81,33 @@ if ($assemblyId)
 				{
 					$source->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
 				}
+				if (exists $sourceTotal->{$assemblyExtraIds->{$assemblySequence[4]}})
+				{
+					$sourceTotal->{$assemblyExtraIds->{$assemblySequence[4]}}++;
+				}
+				else
+				{
+					$sourceTotal->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
+				}
+				if($hideFlag)
+				{
+					if (exists $hide->{$assemblyExtraIds->{$assemblySequence[4]}})
+					{
+						$hide->{$assemblyExtraIds->{$assemblySequence[4]}}++;
+					}
+					else
+					{
+						$hide->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
+					}
+					if (exists $hideTotal->{$assemblyExtraIds->{$assemblySequence[4]}})
+					{
+						$hideTotal->{$assemblyExtraIds->{$assemblySequence[4]}}++;
+					}
+					else
+					{
+						$hideTotal->{$assemblyExtraIds->{$assemblySequence[4]}} = 1;
+					}
+				}
 			}
 			else
 			{
@@ -87,14 +119,43 @@ if ($assemblyId)
 				{
 					$source->{$target[2]} = 1;
 				}
+				if (exists $sourceTotal->{$target[2]})
+				{
+					$sourceTotal->{$target[2]}++;
+				}
+				else
+				{
+					$sourceTotal->{$target[2]} = 1;
+				}
+				if($hideFlag)
+				{
+					if (exists $hide->{$target[2]})
+					{
+						$hide->{$target[2]}++;
+					}
+					else
+					{
+						$hide->{$target[2]} = 1;
+					}
+					if (exists $hideTotal->{$target[2]})
+					{
+						$hideTotal->{$target[2]}++;
+					}
+					else
+					{
+						$hideTotal->{$target[2]} = 1;
+					}
+				}
 			}
 		}
-		my $sourceDetails = (exists $source->{$target[2]}) ? "$target[2]:$source->{$target[2]}" : "";
+		my $sourceDetails = (exists $source->{$target[2]}) ? (exists $hide->{$target[2]}) ? "$target[2]:$source->{$target[2]}<sub title='hidden'>[-$hide->{$target[2]}]</sub>": "$target[2]:$source->{$target[2]}" : "";
 		foreach (keys %$assemblyExtraIds)
 		{
 			if (exists $source->{$assemblyExtraIds->{$_}})
 			{
-				$sourceDetails .= ($sourceDetails) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
+				$sourceDetails .= ($sourceDetails) ? 
+				(exists $hide->{$assemblyExtraIds->{$_}}) ? "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hide->{$assemblyExtraIds->{$_}}]</sub>" : "; $assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}" : 
+				(exists $hide->{$assemblyExtraIds->{$_}}) ? "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hide->{$assemblyExtraIds->{$_}}]</sub>" : "$assemblyExtraIds->{$_}:$source->{$assemblyExtraIds->{$_}}";
 			}
 		}
 
@@ -128,7 +189,7 @@ if ($assemblyId)
 				}
 			}
 		}
-
+		$lengthTotal += $assemblyCtg[7];
 		my $commentDescription;
 		my $comment = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'comment' AND o = ?");
 		$comment->execute($assemblyCtg[0]);
@@ -137,16 +198,29 @@ if ($assemblyId)
 		{
 			$commentDetails = decode_json $comment[8];
 			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td>$commentDetails->{'description'}</td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])."</td><td>$commentDetails->{'description'}</td></tr>" ;
 		}
 		else
 		{
-			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])." </td><td></td></tr>" ;
+			$ctgListDetails.="<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>$chrName</td><td>".commify($assemblyCtg[7])."</td><td></td></tr>" ;
+		}
+	}
+	my $sourceTotalDetails = (exists $sourceTotal->{$target[2]}) ? (exists $hideTotal->{$target[2]}) ? "$target[2]:$sourceTotal->{$target[2]}<sub title='hidden'>[-$hideTotal->{$target[2]}]</sub>" : "$target[2]:$sourceTotal->{$target[2]}" : "";
+	foreach (keys %$assemblyExtraIds)
+	{
+		if (exists $sourceTotal->{$assemblyExtraIds->{$_}})
+		{
+			$sourceTotalDetails .= ($sourceTotalDetails) ? 
+			(exists $hideTotal->{$assemblyExtraIds->{$_}}) ? "; $assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hideTotal->{$assemblyExtraIds->{$_}}]</sub>" : "; $assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}" : 
+			(exists $hideTotal->{$assemblyExtraIds->{$_}}) ? "$assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}<sub title='hidden'>[-$hideTotal->{$assemblyExtraIds->{$_}}]</sub>" : "$assemblyExtraIds->{$_}:$sourceTotal->{$assemblyExtraIds->{$_}}";
 		}
 	}
 	
 	$ctgListDetails = "
-	<table id='ctgLengthDetails$$' class='display'><thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs</b></th><th><b>Assigned chromosome #</b></th><th><b>Length (bp)</b></th><th><b>Comment</b></th></tr></thead><tbody>$ctgListDetails</tbody></table>
+	<table id='ctgLengthDetails$$' class='display'>
+	<thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs</b></th><th><b>Assigned chromosome #</b></th><th><b>Length (bp)</b></th><th><b>Comment</b></th></tr></thead>
+	<tbody>$ctgListDetails</tbody>
+	<tfoot><tr><th><b>Total</b></th><th>$numTotal ($sourceTotalDetails)</th><th><b></b></th><th>".commify($lengthTotal)."</th><th><b></b></th></tr></tfoot></table>
 	";
 	
 }
