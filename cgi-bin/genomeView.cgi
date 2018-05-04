@@ -44,7 +44,7 @@ if ($genome[6])
 }
 
 my $sequences = "
-	<table id='genome$$' class='display'>
+	<table id='genome$$' class='display' style='width: 100%;'>
 		<thead>
 			<tr>
 				<th><b>Seq Name</b></th>
@@ -90,7 +90,13 @@ while (my @getSequences =  $getSequences->fetchrow_array())
 	{
 		$gapCount->{$gaps} = 1;
 	}
-	$sequences .= "<tr><td><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequences[0]\")' title='View $getSequences[2]'>$getSequences[2]</a><br><sup>$sequenceDetails->{'description'}</sup></td><td><div id='seqChr$getSequences[0]' style='position: relative;'><a id='seqChr$getSequences[0]$$' onmouseover='editIconShow(\"seqChr$getSequences[0]$$\")' onmouseout='editIconHide(\"seqChr$getSequences[0]$$\")' onclick='loaddiv(\"seqChr$getSequences[0]\",\"seqChrEdit.cgi?seqId=$getSequences[0]\")' title='Edit this chromosome number'>$getSequences[6]</a></div></td><td>$getSequences[5]</td><td>$gaps</td><td><a onclick='closeDialog();closeViewer();openViewer(\"seqBrowse.cgi?seqId=$getSequences[0]\")'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-image' title='Browse'></span></a></td></tr>";
+	$sequences .= "<tr>
+	<td><a onclick='closeDialog();openDialog(\"seqView.cgi?seqId=$getSequences[0]\")' title='View $getSequences[2]'>$getSequences[2]</a><br><sup>$sequenceDetails->{'description'}</sup></td>
+	<td><div id='seqChr$getSequences[0]' style='position: relative;'><a id='seqChr$getSequences[0]$$' onmouseover='editIconShow(\"seqChr$getSequences[0]$$\")' onmouseout='editIconHide(\"seqChr$getSequences[0]$$\")' onclick='loaddiv(\"seqChr$getSequences[0]\",\"seqChrEdit.cgi?seqId=$getSequences[0]\")' title='Edit this chromosome number'>$getSequences[6]</a></div></td>
+	<td>$getSequences[5]</td>
+	<td>$gaps</td>
+	<td><a onclick='closeDialog();closeViewer();openViewer(\"seqBrowse.cgi?seqId=$getSequences[0]\")'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-image' title='Browse'></span></a></td>
+	</tr>";
 }
 
 @sequenceLength = sort {$b <=> $a} @sequenceLength;
@@ -137,7 +143,7 @@ $medianLength = commify($medianLength);
 $html =~ s/\$medianLength/$medianLength/g;
 $totalGaps = commify($totalGaps);
 
-my $gapStats = "<table id='gap$$' class='display'>
+my $gapStats = "<table id='gap$$' class='display' style='width: 100%;'>
 		<thead>
 			<tr>
 				<th><b>Gap#</b></th>
@@ -202,23 +208,35 @@ __DATA__
 	<tr><td style='text-align:right;white-space: nowrap;'>For Reassembly?</td><td>$genomeForGPM. $agpAvailable</td></tr>
 	<tr><td style='text-align:right;white-space: nowrap;'>As Reference?</td><td>$genomeAsReference.</td></tr>
 	<tr><td style='text-align:right;white-space: nowrap;'>Link to library:</td><td>$relatedLibraries</td></tr>
-	<tr><td style='text-align:right;white-space: nowrap;'><b>$sequenceNumber</b><br>Total: $totalLength bp<br>Median: $medianLength bp<br>N50: $n50Length bp<br><hr>$gapStats</td><td>$sequences</td></tr>
-	<tr><td style='text-align:right'><b>Description</b></td><td>$genomeDescription</td></tr>
 </table>
+<div id='genomeTabs$$'>
+	<ul>
+		<li><a href='#genomeTabs-sequences$$'>Sequences</a></li>
+		<li><a href='#genomeTabs-stats$$'>Stats</a></li>
+		<li><a href='#genomeTabs-description$$'>Description</a></li>
+	</ul>
+	<div id='genomeTabs-sequences$$'>$sequences</div>
+	<div id='genomeTabs-stats$$'><b>$sequenceNumber</b><br>Total: $totalLength bp<br>Median: $medianLength bp<br>N50: $n50Length bp<br><hr>$gapStats</div>
+	<div id='genomeTabs-description$$'>$genomeDescription</div>
+</div>
 <script>
 $('#dialog').dialog("option", "title", "View Genome");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Alignment as Query", click: function() { closeDialog();openDialog("alignmentForm.cgi?queryId=$genomeId"); } }, { text: "Alignment as Reference", click: function() { closeDialog();openDialog("alignmentForm.cgi?subjectId=$genomeId"); } }, { text: "Edit", click: function() { closeDialog();openDialog("genomeEdit.cgi?genomeId=$genomeId"); } }, { text: "OK", click: function() {closeDialog(); } } ] );
+$( "#genome$$" ).dataTable({
+	"scrollY": "400px",
+	"scrollCollapse": false,
+	"paging": false,
+	"columnDefs": [
+    { "orderable": false, "targets": 4 }
+  ]
+});
 $( "#gap$$" ).dataTable({
 	"dom": 'lfrtip',
-	"scrollY": "300px",
+	"scrollY": "400px",
 	"scrollCollapse": true,
 	"paging": false,
 	"searching": false,
 	"info": false
 });
-$( "#genome$$" ).dataTable({
-	"scrollY": "400px",
-	"scrollCollapse": true,
-	"paging": false
-});
+$( "#genomeTabs$$" ).tabs();
 </script>

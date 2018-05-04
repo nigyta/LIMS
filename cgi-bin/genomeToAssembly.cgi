@@ -24,13 +24,15 @@ if($genomeId)
 	$relatedAssembly->execute();
 	while (my @relatedAssembly = $relatedAssembly->fetchrow_array())
 	{
-			$relatedAssemblies .= (length $relatedAssembly[2] > 12) ? "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . substr($relatedAssembly[2],0,12 )."...</a> " : "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . $relatedAssembly[2] ."</a> ";
+#			$relatedAssemblies .= (length $relatedAssembly[2] > 12) ? "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . substr($relatedAssembly[2],0,12 )."...</a> " : "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . $relatedAssembly[2] ."</a> ";
+			$relatedAssemblies .= "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . $relatedAssembly[2] ."</a> ";
 	}
 	my $relatedAssemblyByExtra=$dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND link.parent = matrix.id AND link.child = ?");
 	$relatedAssemblyByExtra->execute($genomeId);
 	while (my @relatedAssemblyByExtra = $relatedAssemblyByExtra->fetchrow_array())
 	{
-		$relatedAssemblies .= (length $relatedAssemblyByExtra[2] > 12) ? "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . substr($relatedAssemblyByExtra[2],0,12 )."...</a> " : "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . $relatedAssemblyByExtra[2] ."</a> ";
+#		$relatedAssemblies .= (length $relatedAssemblyByExtra[2] > 12) ? "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . substr($relatedAssemblyByExtra[2],0,12 )."...</a> " : "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . $relatedAssemblyByExtra[2] ."</a> ";
+		$relatedAssemblies .= "<a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . $relatedAssemblyByExtra[2] ."</a> ";
 	}
 	print $relatedAssemblies;
 }

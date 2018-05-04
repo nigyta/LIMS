@@ -40,6 +40,13 @@ my $allGenome=$dbh->prepare("SELECT * FROM matrix WHERE container Like 'genome'"
 $allGenome->execute();
 if($allGenome->rows > 0)
 {
+# 	my $allLibraryResult;
+# 	my $allLibrary=$dbh->prepare("SELECT * FROM matrix WHERE container Like 'library'");
+# 	$allLibrary->execute();
+# 	while (my @allLibrary = $allLibrary->fetchrow_array())
+# 	{
+# 		@{$allLibraryResult->{$allLibrary[0]}} = @allLibrary;
+# 	}
 	my $allGenomeResult;
 	while (my @allGenome = $allGenome->fetchrow_array())
 	{
@@ -50,14 +57,8 @@ if($allGenome->rows > 0)
 		my @allGenome = @{$allGenomeResult->{$_}};
 		$allGenome[8] = escapeHTML($allGenome[8]);
 		$allGenome[8] =~ s/\n/<br>/g;
-		my $relatedLibraries = '';
-		if ($allGenome[6])
-		{
-			my $relatedLibrary=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-			$relatedLibrary->execute($allGenome[6]);
-			my @relatedLibrary = $relatedLibrary->fetchrow_array();
-			$relatedLibraries = "<a onclick='openDialog(\"libraryView.cgi?libraryId=$allGenome[6]\")'>$relatedLibrary[2]</a> ";
-		}
+#		my $relatedLibraries = ($allGenome[6]) ? "<a onclick='openDialog(\"libraryView.cgi?libraryId=$allGenome[6]\")'>${$allLibraryResult->{$allGenome[6]}}[2]</a> " :'';
+		my $relatedLibraries = ($allGenome[6]) ? "<a onclick='openDialog(\"libraryView.cgi?libraryId=$allGenome[6]\")'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-link' title='View'></span>View</a> " :'';
 	
 		my $agpAvailable = "";
 		my $agpList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'agp' AND x = ?");# ORDER BY o
