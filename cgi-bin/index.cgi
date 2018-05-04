@@ -274,6 +274,14 @@ __DATA__
 		$("input[name="+ checkBoxName +"]").prop('checked', false);
 		return false;
 	}
+	function checkOrUncheck(checkBoxId){
+		if ($('#'+checkBoxId).prop('checked')){
+			$('#'+checkBoxId).prop('checked', false);
+		}
+		else{
+			$('#'+checkBoxId).prop('checked', true);
+		}
+	}
 	function checkClass(className) {
 		$("input."+ className).prop('checked', true);
 		return false;
