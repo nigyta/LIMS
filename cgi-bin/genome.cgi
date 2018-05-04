@@ -50,21 +50,6 @@ if($allGenome->rows > 0)
 		my @allGenome = @{$allGenomeResult->{$_}};
 		$allGenome[8] = escapeHTML($allGenome[8]);
 		$allGenome[8] =~ s/\n/<br>/g;
-		my $relatedAssemblies = '';
-		my $relatedAssembly=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assembly' AND (x = $allGenome[0] OR y = $allGenome[0])");
-		$relatedAssembly->execute();
-		while (my @relatedAssembly = $relatedAssembly->fetchrow_array())
-		{
-	
-			$relatedAssemblies .= (length $relatedAssembly[2] > 12) ? "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . substr($relatedAssembly[2],0,10 )."...</a></li>" : "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssembly[0]\")' title='$relatedAssembly[2]'>" . $relatedAssembly[2] ."</a></li>";
-		}
-		my $relatedAssemblyByExtra=$dbh->prepare("SELECT * FROM matrix,link WHERE link.type LIKE 'asbGenome' AND link.parent = matrix.id AND link.child = ?");
-		$relatedAssemblyByExtra->execute($allGenome[0]);
-		while (my @relatedAssemblyByExtra = $relatedAssemblyByExtra->fetchrow_array())
-		{
-			$relatedAssemblies .= (length $relatedAssemblyByExtra[2] > 12) ? "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . substr($relatedAssemblyByExtra[2],0,10 )."...</a></li>" : "<li><a onclick='openDialog(\"assemblyView.cgi?assemblyId=$relatedAssemblyByExtra[0]\")' title='$relatedAssemblyByExtra[2]'>" . $relatedAssemblyByExtra[2] ."</a></li>";
-		}
-
 		my $relatedLibraries = '';
 		if ($allGenome[6])
 		{
@@ -108,7 +93,7 @@ if($allGenome->rows > 0)
 			<td>$yesOrNo{$allGenome[4]}. $agpAvailable</td>
 			<td title='As a reference for assembly'>$yesOrNo{$allGenome[5]}</td>
 			<td title='Related Library'>$relatedLibraries</td>
-			<td><ul class='gridGenomeList'>$relatedAssemblies</ul></td>
+			<td><div id='relatedAssembly$allGenome[0]' style='position: relative;'><script>loaddiv(\"relatedAssembly$allGenome[0]\",\"genomeToAssembly.cgi?genomeId=$allGenome[0]\");</script></div></td>
 			<td title='Creator'>$allGenome[9]</td>
 			<td title='Creation date'>$allGenome[10]</td>
 			</tr>";
@@ -146,10 +131,6 @@ print $html;
 __DATA__
 $button
 $genomes
-<style>
-	.gridGenomeList { list-style-type: none; display:inline-block;margin: 0; padding: 0; width: 100%; }
-	.gridGenomeList li { margin: 3px 3px 3px 0; padding: 1px; float: left; width: 100px; text-align: left; }
-</style>
 <script>
 buttonInit();
 $( "#genomes$$" ).dataTable({
