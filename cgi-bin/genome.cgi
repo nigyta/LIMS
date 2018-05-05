@@ -88,7 +88,7 @@ if($allGenome->rows > 0)
 				</thead>
 				<tbody>" unless($genomes);
 		$genomes .= "<tr onclick='checkOrUncheck(\"genomeList$allGenome[0]$$\");'>
-			<td style='text-align:center;'><input type='checkbox' id='genomeList$allGenome[0]$$' name='itemId' value='$allGenome[0]'></td>
+			<td style='text-align:center;'><input type='checkbox' id='genomeList$allGenome[0]$$' name='itemId' value='$allGenome[0]' onClick='checkOrUncheck(\"genomeList$allGenome[0]$$\");'></td>
 			<td title='Genome'><a id='genomeId$allGenome[0]$$' onclick='openDialog(\"genomeView.cgi?genomeId=$allGenome[0]\")' title='View'>$allGenome[2]</a></td>
 			<td title='Click to download $allGenome[3] Sequences'><a href='download.cgi?genomeId=$allGenome[0]' target='hiddenFrame'>$allGenome[3]<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-disk'></span></a></td>
 			<td>$yesOrNo{$allGenome[4]}. $agpAvailable</td>

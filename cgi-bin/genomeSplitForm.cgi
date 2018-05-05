@@ -107,7 +107,7 @@ while (my @getSequences =  $getSequences->fetchrow_array())
 	{
 		$sequenceDetails->{'description'} = "<a title='$sequenceDetails->{'description'}'>". substr($sequenceDetails->{'description'},0,25). "...". substr($sequenceDetails->{'description'},-5). "</a>";
 	}
-	$sequences .= "<tr onclick='checkOrUncheck(\"seqList$getSequences[0]$$\");'><td style='text-align:center;'><input type='checkbox' id='seqList$getSequences[0]$$' name='seqId' value='$getSequences[0]'></td><td>$getSequences[2]</td><td>$getSequences[5]</td><td>$sequenceDetails->{'description'}</td></tr>";
+	$sequences .= "<tr onclick='checkOrUncheck(\"seqList$getSequences[0]$$\");'><td style='text-align:center;'><input type='checkbox' id='seqList$getSequences[0]$$' name='seqId' value='$getSequences[0]' onclick='checkOrUncheck(\"seqList$getSequences[0]$$\");'></td><td>$getSequences[2]</td><td>$getSequences[5]</td><td>$sequenceDetails->{'description'}</td></tr>";
 }
 $sequences .= "</tbody></table>\n";
 
