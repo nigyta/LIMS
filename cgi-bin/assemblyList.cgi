@@ -307,6 +307,11 @@ if ($assemblyId)
 			'tenK'   => '0',
 			'hundredK'  => '0',
 			'oneM' => '0');
+		my %sumLength = ('halfK'  => '0',
+			'oneK'    => '0',
+			'tenK'   => '0',
+			'hundredK'  => '0',
+			'oneM' => '0');
 		my $lFifty=0;
 		my $lFiftyCounter=0;
 		foreach (@{$lengthList->{$contigType}})
@@ -328,6 +333,11 @@ if ($assemblyId)
 			$countByLength{'tenK'}++ if ($_ > 10000);
 			$countByLength{'hundredK'}++ if ($_ > 100000);
 			$countByLength{'oneM'}++ if ($_ > 1000000);
+			$sumLength{'halfK'} += $_ if ($_ > 500);
+			$sumLength{'oneK'} += $_ if ($_ > 1000);
+			$sumLength{'tenK'} += $_ if ($_ > 10000);
+			$sumLength{'hundredK'} += $_ if ($_ > 100000);
+			$sumLength{'oneM'} += $_ if ($_ > 1000000);
 		}
 		my $graphic = '';
 		if ($totalLength->{$contigType} > 0)
@@ -464,7 +474,22 @@ if ($assemblyId)
 		if ($totalAssembled->{$contigType} > 0)
 		{
 			$assemblyStats .= ($assemblyStats) ? "<hr style='page-break-before: always;'>" : "";
-			$assemblyStats .= "<div><h3>$contigType Contigs</h3><div style='display:inline-block;'>$graphic</div><div style='display:inline-block;'>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>Longest sequence: " . commify($maxLength->{$contigType}). " bp.<br>Shortest sequence: " . commify($minLength->{$contigType}). " bp.<br>Number of sequences > 500 nt: $countByLength{'halfK'}.<br>Number of sequences > 1k nt: $countByLength{'oneK'}.<br>Number of sequences > 10k nt: $countByLength{'tenK'}.<br>Number of sequences > 100k nt: $countByLength{'hundredK'}.<br>Number of sequences > 1M nt: $countByLength{'oneM'}.<br>Mean sequence size: " . commify($meanLength). " bp.<br>Median sequence size: " . commify($medianLength). " bp.<br>N50 sequence length: " . commify($n50Length). " bp.<br>L50 sequence count: " . commify($lFifty). ".</div></div>";
+			$assemblyStats .= "<div><h3>$contigType Contigs</h3>
+			<div style='display:inline-block;'>$graphic</div>
+			<div style='display:inline-block;'>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>
+			Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>
+			Longest sequence: " . commify($maxLength->{$contigType}). " bp.<br>
+			Shortest sequence: " . commify($minLength->{$contigType}). " bp.<br>
+			Number of sequences > 500 nt: $countByLength{'halfK'} (" . commify($sumLength{'halfK'}) ." bp).<br>
+			Number of sequences > 1k nt: $countByLength{'oneK'} (" . commify($sumLength{'oneK'}) ." bp).<br>
+			Number of sequences > 10k nt: $countByLength{'tenK'} (" . commify($sumLength{'tenK'}) ." bp).<br>
+			Number of sequences > 100k nt: $countByLength{'hundredK'} (" . commify($sumLength{'hundredK'}) ." bp).<br>
+			Number of sequences > 1M nt: $countByLength{'oneM'} (" . commify($sumLength{'oneM'}) ." bp).<br>
+			Mean sequence size: " . commify($meanLength). " bp.<br>
+			Median sequence size: " . commify($medianLength). " bp.<br>
+			N50 sequence length: " . commify($n50Length). " bp.<br>
+			L50 sequence count: " . commify($lFifty). ".</div>
+			</div>";
 		}
 	}
 
