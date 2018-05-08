@@ -661,7 +661,7 @@ elsif(param ('assemblyId'))
 		my $preChr = 'na';
 		my $chrSequence;
 		my $lastComponentTypeOnChr;
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
 		$assemblyCtg->execute($assemblyId);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{
@@ -953,7 +953,7 @@ elsif(param ('assemblyId'))
 	}
 	else
 	{
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
 		$assemblyCtg->execute($assemblyId);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{
@@ -1100,7 +1100,7 @@ elsif(param ('assemblyIdForAgp'))
 		my $num;
 		my $begin;
 		my $lastComponentType;
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
 		$assemblyCtg->execute($assemblyIdForAgp);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{
@@ -1470,7 +1470,7 @@ elsif(param ('assemblyIdForAgp'))
 	}
 	else
 	{
-		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,name");
+		my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,y");
 		$assemblyCtg->execute($assemblyIdForAgp);
 		while(my @assemblyCtg = $assemblyCtg->fetchrow_array())
 		{

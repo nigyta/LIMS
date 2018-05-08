@@ -23,6 +23,7 @@ my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$co
 
 my $assemblyId = param ('assemblyId') || '';
 my $ctgListDetails;
+my $ctgListDetailsUnplaced;
 my $commentDetails;
 undef $/;# enable slurp mode
 my $html = <DATA>;
@@ -200,19 +201,39 @@ if ($assemblyId)
 		my $comment = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'comment' AND o = ?");
 		$comment->execute($assemblyCtg[0]);
 		my @comment = $comment->fetchrow_array();
-		if ($comment->rows > 0)
+		if ($assemblyCtg[4] == 0)
 		{
-			$commentDetails = decode_json $comment[8];
-			$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
-			$ctgListDetails .= ($numHide) ?
-			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>" : 
-			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>";
+			if ($comment->rows > 0)
+			{
+				$commentDetails = decode_json $comment[8];
+				$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
+				$ctgListDetailsUnplaced .= ($numHide) ?
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>" : 
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>";
+			}
+			else
+			{
+				$ctgListDetailsUnplaced .= ($numHide) ?
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>" :
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>";
+			}
 		}
 		else
 		{
-			$ctgListDetails .= ($numHide) ?
-			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>" :
-			"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>";
+			if ($comment->rows > 0)
+			{
+				$commentDetails = decode_json $comment[8];
+				$commentDetails->{'description'} = '' unless (exists $commentDetails->{'description'});
+				$ctgListDetails .= ($numHide) ?
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>" : 
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td>$commentDetails->{'description'}</td></tr>";
+			}
+			else
+			{
+				$ctgListDetails .= ($numHide) ?
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num<a title='hidden'>[-$numHide]</a> ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>" :
+				"<tr><td>Ctg$assemblyCtg[2]</td><td>$num ($sourceDetails)</td><td>".commify($assemblyCtg[7])."</td><td>$chrName</td><td></td></tr>";
+			}
 		}
 	}
 	my $sourceTotalDetails = (exists $sourceTotal->{$target[2]}) ? (exists $hideTotal->{$target[2]}) ? "$target[2]:$sourceTotal->{$target[2]}<a title='hidden'>[-$hideTotal->{$target[2]}]</a>" : "$target[2]:$sourceTotal->{$target[2]}" : "";
@@ -229,12 +250,12 @@ if ($assemblyId)
 	$ctgListDetails = ($numHideTotal) ? 
 	"<table id='ctgLengthDetails$$' class='display'>
 	<thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs [hidden]</b></th><th><b>Length (bp)</b></th><th><b>Assigned chromosome #</b></th><th><b>Comment</b></th></tr></thead>
-	<tbody>$ctgListDetails</tbody>
+	<tbody>$ctgListDetails$ctgListDetailsUnplaced</tbody>
 	<tfoot><tr><th><b>Total</b></th><th>$numTotal<a title='hidden'>[-$numHideTotal]</a> ($sourceTotalDetails)</th><th>".commify($lengthTotal)."</th><th><b></b></th><th><b></b></th></tr></tfoot></table>"
 	:
 	"<table id='ctgLengthDetails$$' class='display'>
 	<thead><tr><th><b>Contig</b></th><th><b>Number of assemblySeqs</b></th><th><b>Length (bp)</b></th><th><b>Assigned chromosome #</b></th><th><b>Comment</b></th></tr></thead>
-	<tbody>$ctgListDetails</tbody>
+	<tbody>$ctgListDetails$ctgListDetailsUnplaced</tbody>
 	<tfoot><tr><th><b>Total</b></th><th>$numTotal ($sourceTotalDetails)</th><th>".commify($lengthTotal)."</th><th><b></b></th><th><b></b></th></tr></tfoot></table>";
 	
 }
