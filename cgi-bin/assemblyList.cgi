@@ -667,7 +667,7 @@ END
 		my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
 		$genomeList->execute($assembly[5]);
 		my @genomeList = $genomeList->fetchrow_array();
-		$refGenomeId = "<tr><td style='text-align:right'><b>Reference Genome</b></td><td title='$genomeList[8]'>$genomeList[2]</td></tr>";
+		$refGenomeId = "<tr><td style='text-align:right'><b>Reference Genome</b></td><td title='$genomeList[8]'><a onclick='openDialog(\"genomeView.cgi?genomeId=$genomeList[0]\")' title='View'>$genomeList[2]<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-arrow-1-ne' title='View'></span></a></td></tr>";
 	}
 
 	my $assemblyExtraIds = "<tr><td style='text-align:right'><b>Extra Genome</b></td><td>";
@@ -685,7 +685,15 @@ END
 	{
 		$assemblyExtraIds .= "None.</td></tr>";
 	}
-
+	
+	if($target[1] eq 'library')
+	{
+		$target[2] = "<a onclick='openDialog(\"libraryView.cgi?libraryId=$target[0]\")' title='View'>$target[2]<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-arrow-1-ne' title='View'></span></a>";
+	}
+	elsif($target[1] eq 'genome')
+	{
+		$target[2] = "<a onclick='openDialog(\"genomeView.cgi?genomeId=$target[0]\")' title='$target[8]'>$target[2]<span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-arrow-1-ne' title='View'></span></a>";
+	}
 	$target[1] = ucfirst ($target[1]);
 	$assemblyList .= <<END;
 	</ul>$assembledCtg <div id='tabs-assemblyAbout$assemblyId$$'><h3>About '$assembly[2]'</h3><table>

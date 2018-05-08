@@ -36,7 +36,7 @@ if($assemblyId)
 	{
 		print <<END;
 <script>
-	closeDialog();
+	parent.closeDialog();
 	parent.errorPop("This assembly is running or frozen.");
 </script>	
 END
@@ -60,6 +60,7 @@ END
 	}
 	print <<END;
 <script>
+	parent.closeDialog();
 	parent.informationPop("The assembly redundancy has been reset!");
 </script>	
 END
