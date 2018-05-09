@@ -448,6 +448,10 @@ END
 									{
 										$chrNumber = 99;
 									}
+									if ($agpLine[0] =~ /Contamination/)
+									{
+										$chrNumber = 100;
+									}
 									my $updatedAssemblyCtg = $dbh->prepare("UPDATE matrix SET x = ?, z = ? WHERE id = ?");
 									$updatedAssemblyCtg->execute($chrNumber,$agpLine[1],$assemblySeqCtgId->{$assemblySeqByName[5]});
 								}

@@ -211,6 +211,21 @@ if ($assemblyId)
 				$maxLength->{'Mitochondrion'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'Mitochondrion'});
 				$minLength->{'Mitochondrion'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'Mitochondrion'});
 			}
+			elsif($assemblyCtgs[4] % 100 == 0)
+			{
+				unless (exists $totalLength->{'Contamination'})
+				{
+					$totalAssembled->{'Contamination'} = 0;
+					$totalLength->{'Contamination'} = 0;
+					$maxLength->{'Contamination'} = 0;
+					$minLength->{'Contamination'} = 999999999;
+				}
+				push @{$lengthList->{'Contamination'}},$assemblyCtgs[7];
+				$totalAssembled->{'Contamination'}++;
+				$totalLength->{'Contamination'} += $assemblyCtgs[7];
+				$maxLength->{'Contamination'} = $assemblyCtgs[7] if ($assemblyCtgs[7] > $maxLength->{'Contamination'});
+				$minLength->{'Contamination'} = $assemblyCtgs[7] if ($assemblyCtgs[7] < $minLength->{'Contamination'});
+			}
 			else
 			{
 				unless (exists $totalLength->{'All Chromosome'})
@@ -569,8 +584,12 @@ END
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
 		my $headerByChr;
-		my $formattedChr = ($_ % 100 == 0) ? "Unplaced" : ($_ % 100 == 98) ? "Chloroplast" : ($_ % 100 == 99) ? "Mitochondrion" : ($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
-		$headerByChr->{$_} = ($_ > 0 && $assembly[5] > 0) ?
+		my $formattedChr = ($_ == 0) ? "Unplaced"
+			: ($_ % 100 == 0) ? "Contamination" :
+				($_ % 100 == 98) ? "Chloroplast" : 
+					($_ % 100 == 99) ? "Mitochondrion" : 
+						($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
+		$headerByChr->{$_} = ($_ % 100 > 0 && $assembly[5] > 0) ?
 			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>$formattedChr</a>"
 			: "<h3>$formattedChr";
 
@@ -589,13 +608,13 @@ END
 		$headerByChr->{$_} .= ($_ > 0) ?
 			"<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='100 Ns will be added to connect two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame' title='100 Ns will be added to connect two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='100 Ns will be added to connect seqeunces at edges of two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li></ul></li></ul></sup></h3>"
 			: "<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li></ul></li><li><a class='ui-state-error-text' onclick='deleteItem($assemblyId,\"chrZeroOnly\")' title='Delete Unplaced Contigs'><span class='ui-icon ui-icon-trash'></span>Delete Ctgs</a></li></ul></sup></h3>";
-		$assemblyStatsSummary = "<tr><td>$formattedChr</td><td>$totalAssembledContigByChr->{$_}</td><td>" . commify($totalLength->{$_}). "</td><td>$totalAssembledSeqNumberByChr->{$_} Seqs</td></tr>" . $assemblyStatsSummary;
+		$assemblyStatsSummary = "<tr><td>$formattedChr</td><td>$totalAssembledContigByChr->{$_}</td><td>" . commify($totalLength->{$_}). "</td><td>$totalAssembledSeqNumberByChr->{$_}</td></tr>" . $assemblyStatsSummary;
 
-		$assembledCtgDetails = ($_ > 0) ? $headerByChr->{$_}.$assembledCtgByChr->{$_}.$assembledCtgDetails : $assembledCtgDetails.$headerByChr->{$_}.$assembledCtgByChr->{$_}; #list chromosome-assigned first.
+		$assembledCtgDetails = ($_ % 100 > 0) ? $headerByChr->{$_}.$assembledCtgByChr->{$_}.$assembledCtgDetails : $assembledCtgDetails.$headerByChr->{$_}.$assembledCtgByChr->{$_}; #list chromosome-assigned first.
 		$assemblySortableStyle .= $assemblySortableStyleByChr->{$_};
 		$assemblySortableJs .= $assemblySortableJsByChr->{$_};
     }
-	$assemblyStatsSummary = "<table id='assemblyStatsSummary$$' class='display'><thead><tr><th><b>Assignment</b></th><th><b>Number of Contigs</b></th><th><b>Length (bp)</b></th><th><b>Components</b></th></tr></thead><tbody>$assemblyStatsSummary</tbody><tfoot><tr><td><b>Total</b></td><td>$totalAssembled->{'All'}</td><td>" . commify($totalLength->{'All'}). "</td><td>$totalInAssembly</td></tr></tfoot></table>";
+	$assemblyStatsSummary = "<table id='assemblyStatsSummary$$' class='display'><thead><tr><th><b>Assignment</b></th><th><b>Number of Contigs</b></th><th><b>Length (bp)</b></th><th><b>Component Seqs</b></th></tr></thead><tbody>$assemblyStatsSummary</tbody><tfoot><tr><td><b>Total</b></td><td>$totalAssembled->{'All'}</td><td>" . commify($totalLength->{'All'}). "</td><td>$totalInAssembly</td></tr></tfoot></table>";
 
 	$assemblyList .= "<div id='assemblyTab$assemblyId$$'><ul>";
 	$assemblyList .= ($totalAssembled->{'All'} > 1) ? "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contigs)" : "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contig)";

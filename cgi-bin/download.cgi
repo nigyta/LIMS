@@ -802,6 +802,10 @@ elsif(param ('assemblyId'))
 				{
 					$chrName = "Mitochondrion";
 				}
+				elsif($assemblyCtg[4] % 100 == 0)
+				{
+					$chrName = "Contamination";
+				}
 				else
 				{
 					if($assemblyCtg[4] > 100)
@@ -1247,6 +1251,10 @@ elsif(param ('assemblyIdForAgp'))
 				elsif($assemblyCtg[4] % 100 == 99)
 				{
 					$chrName = "Mitochondrion";
+				}
+				elsif($assemblyCtg[4] % 100 == 0)
+				{
+					$chrName = "Contamination";
 				}
 				else
 				{
@@ -1704,11 +1712,7 @@ elsif (param ('assemblyIdForCtgList'))
 		}
 
 		my $chrName = '';
-		if($assemblyCtg[4] == 0)
-		{
-			$chrName = "$assemblyCtg[4] = Unplaced";		
-		}
-		else
+		if($assemblyCtg[4])
 		{
 			if ($assemblyCtg[4] % 100 == 98)
 			{
@@ -1717,6 +1721,10 @@ elsif (param ('assemblyIdForCtgList'))
 			elsif($assemblyCtg[4] % 100 == 99)
 			{
 				$chrName = "$assemblyCtg[4] = Mitochondrion";
+			}
+			elsif($assemblyCtg[4] % 100 == 0)
+			{
+				$chrName = "$assemblyCtg[4] = Contamination";
 			}
 			else
 			{
@@ -1732,6 +1740,10 @@ elsif (param ('assemblyIdForCtgList'))
 					$chrName = "$assemblyCtg[4] = Chr$chrNumber";
 				}
 			}
+		}
+		else
+		{
+			$chrName = "$assemblyCtg[4] = Unplaced";		
 		}
 
 		my $commentDetails;
