@@ -269,6 +269,8 @@ if ($assemblyId)
 			$inCtgSeq->{$_} = 1;
 		}
 	}
+	my $totalInAssembly = keys %$inCtgSeq;
+
 	my $assemblySeqs = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblySeq' AND o = ?");
 	$assemblySeqs->execute($assembly[0]);
 	while(my @assemblySeqs = $assemblySeqs->fetchrow_array())
@@ -473,8 +475,7 @@ if ($assemblyId)
 
 		if ($totalAssembled->{$contigType} > 0)
 		{
-			$assemblyStats .= ($assemblyStats) ? "<hr style='page-break-before: always;'>" : "";
-			$assemblyStats .= "<div><h3>$contigType Contigs</h3>
+			$assemblyStats .= "<hr style='page-break-before: always;'><div><h3>$contigType Contigs</h3>
 			<div style='display:inline-block;'>$graphic</div>
 			<div style='display:inline-block;'>Number of sequences: " . commify($totalAssembled->{$contigType}). ".<br>
 			Total size of sequences: " . commify($totalLength->{$contigType}). " bp.<br>
@@ -563,6 +564,7 @@ END
 END
     }
     my $assembledCtgDetails = '';
+	my $assemblyStatsSummary = "";
     for (sort {($b % 100 == $a % 100) ? ($b <=> $a) : ($b % 100 <=> $a % 100) } keys %$assembledCtgByChr)
     {
 		$assembledCtgByChr->{$_} .= "</ul><input name='assemblyCtgOrders' id='assemblyCtgOrders$assemblyId$_' type='hidden' value='$assemblyCtgOrders->{$_}' /></form>";
@@ -587,16 +589,14 @@ END
 		$headerByChr->{$_} .= ($_ > 0) ?
 			"<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='100 Ns will be added to connect two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame' title='100 Ns will be added to connect two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr' target='hiddenFrame' title='100 Ns will be added to connect seqeunces at edges of two contigs'><span class='ui-icon ui-icon-bullet'></span>Chr-Seq AGP</a></li></ul></li></ul></sup></h3>"
 			: "<li><a href='download.cgi?assemblyId=$assemblyId&chr=$_&unit=chr' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr Pseudomolecule</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_' target='hiddenFrame' title='Click to Download'><span class='ui-icon ui-icon-bullet'></span>Ctg-Seq AGP</a></li><li><a href='download.cgi?assemblyIdForAgp=$assemblyId&chr=$_&unit=chr&element=ctg' target='hiddenFrame'><span class='ui-icon ui-icon-bullet'></span>Chr-Ctg AGP</a></li></ul></li><li><a class='ui-state-error-text' onclick='deleteItem($assemblyId,\"chrZeroOnly\")' title='Delete Unplaced Contigs'><span class='ui-icon ui-icon-trash'></span>Delete Ctgs</a></li></ul></sup></h3>";
+		$assemblyStatsSummary = "<tr><td>$formattedChr</td><td>$totalAssembledContigByChr->{$_}</td><td>" . commify($totalLength->{$_}). "</td><td>$totalAssembledSeqNumberByChr->{$_} Seqs</td></tr>" . $assemblyStatsSummary;
 
 		$assembledCtgDetails = ($_ > 0) ? $headerByChr->{$_}.$assembledCtgByChr->{$_}.$assembledCtgDetails : $assembledCtgDetails.$headerByChr->{$_}.$assembledCtgByChr->{$_}; #list chromosome-assigned first.
 		$assemblySortableStyle .= $assemblySortableStyleByChr->{$_};
 		$assemblySortableJs .= $assemblySortableJsByChr->{$_};
     }
+	$assemblyStatsSummary = "<table id='assemblyStatsSummary$$' class='display'><thead><tr><th><b>Assignment</b></th><th><b>Number of Contigs</b></th><th><b>Length (bp)</b></th><th><b>Components</b></th></tr></thead><tbody>$assemblyStatsSummary</tbody><tfoot><tr><td><b>Total</b></td><td>$totalAssembled->{'All'}</td><td>" . commify($totalLength->{'All'}). "</td><td>$totalInAssembly</td></tr></tfoot></table>";
 
-	my $assembledCtg = ($totalAssembled->{'All'} > 0) ? "<div id='tabs-assembled$assemblyId$$'>$assembledCtgDetails</div><div id='tabs-assemblyStats$assemblyId$$'>$assemblyStats</div>"
-			: "<div id='tabs-assembled$assemblyId$$'>No assembly! Please run assembly!</div>";
-
-	my $totalInAssembly = keys %$inCtgSeq;
 	$assemblyList .= "<div id='assemblyTab$assemblyId$$'><ul>";
 	$assemblyList .= ($totalAssembled->{'All'} > 1) ? "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contigs)" : "<li><a href='#tabs-assembled$assemblyId$$'>Assembly ($totalAssembled->{'All'} Contig)";
 	$assemblyList .= ($totalInAssembly > 1) ? " - $totalInAssembly Sequences</a></li>" : " - $totalInAssembly Sequence</a></li>";
@@ -644,6 +644,24 @@ END
 	}
 
 	$assemblyList .= "<li><a href='#tabs-assemblyAbout$assemblyId$$'>About</a></li>";
+
+	my $assembledCtg = ($totalAssembled->{'All'} > 0) ? "<div id='tabs-assembled$assemblyId$$'>$assembledCtgDetails</div><div id='tabs-assemblyStats$assemblyId$$'>$assemblyStatsSummary$assemblyStats</div>"
+			: "<div id='tabs-assembled$assemblyId$$'>No assembly! Please run assembly!</div>";
+
+	my $assemblyStatsSummaryJs = '';
+	if ($totalAssembled->{'All'} > 0)
+	{
+		$assemblyStatsSummaryJs = <<END;
+\$( "#assemblyStatsSummary$$" ).dataTable({
+	"dom": 'lfrtip',
+	"scrollCollapse": true,
+	"paging": false,
+	"searching": false,
+	"ordering": false,
+	"info": false
+});
+END
+	}
 
 	my $fpcOrAgpId = '';
 	if($assembly[6])
@@ -709,6 +727,7 @@ END
 	$html =~ s/\$assemblyList/$assemblyList/g;
 	$html =~ s/\$assemblyId/$assemblyId/g;
 	$html =~ s/\$assemblySortableJs/$assemblySortableJs/g;
+	$html =~ s/\$assemblyStatsSummaryJs/$assemblyStatsSummaryJs/g;
 	$html =~ s/\$autoSeqSearchUrl/$autoSeqSearchUrl/g;
 	$html =~ s/\$commoncfg->{HTDOCS}/$commoncfg->{HTDOCS}/g;
 	$html =~ s/\$\$/$$/g;
@@ -742,6 +761,7 @@ $( "#assemblySearchSeqName$$" ).autocomplete({
 	}
 });
 $assemblySortableJs
+$assemblyStatsSummaryJs
 loadingHide();
 
 </script>

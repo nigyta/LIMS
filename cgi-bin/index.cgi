@@ -167,6 +167,7 @@ __DATA__
 <link rev="made" href="mailto:zhangjw@email.arizona.edu" />
 <meta name="keywords" content="$keywords" />
 <meta name="copyright" content="coypright $copyright" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link type="image/png" rel="icon" href="$commoncfg->{HTDOCS}/favicon.ico" />
 <link type="image/x-icon" rel="shortcut icon" href="$commoncfg->{HTDOCS}/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/smoothness/jquery-ui-1.10.4.custom.min.css" />
@@ -180,7 +181,6 @@ __DATA__
 <script src="$commoncfg->{HTDOCS}/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <script src="$commoncfg->{HTDOCS}/js/dataTables.jqueryui.js" type="text/javascript"></script>
 <script src="$commoncfg->{HTDOCS}/js/jquery.ui-contextmenu.min.js" type="text/javascript"></script>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 </head>
 <body id="top">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
