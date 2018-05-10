@@ -591,7 +591,7 @@ END
 						($_ > 100) ? "Subgenome-" . substr ($_, 0, -2) . " Chromosome " . substr ($_, -2) : "Chromosome $_";
 		$headerByChr->{$_} = ($_ % 100 > 0 && $assembly[5] > 0) ?
 			"<h3><a onclick='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$_\")'>$formattedChr</a>"
-			: "<h3>$formattedChr";
+			: "<h3><a class='ui-state-error-text'>$formattedChr</a>";
 
 		$headerByChr->{$_} .= ($totalAssembledContigByChr->{$_} > 1) ?
 			" ($totalAssembledContigByChr->{$_} Contigs)"
