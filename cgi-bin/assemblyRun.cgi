@@ -439,18 +439,23 @@ END
 									#set assemblyCtg position based on $agpLine[1] and chrNumber based on $agpLine[0]
 									($agpLine[0] =~ /^ChrUN/) and next;
 									($agpLine[0] =~ /^Ctg/) and next;
-									my $chrNumber = ($agpLine[0] =~ /(\d+)/) ? $1 : 0;
+									my $chrNumber = 0;
 									if ($agpLine[0] =~ /Chloroplast/)
 									{
 										$chrNumber = 98;
 									}
-									if ($agpLine[0] =~ /Mitochondrion/)
+									elsif ($agpLine[0] =~ /Mitochondrion/)
 									{
 										$chrNumber = 99;
 									}
-									if ($agpLine[0] =~ /Contamination/)
+									elsif ($agpLine[0] =~ /Contamination/)
 									{
 										$chrNumber = 100;
+									}
+									else
+									{
+										$agpLine[0] =~ s/\D//g;
+										$chrNumber = $agpLine[0];
 									}
 									my $updatedAssemblyCtg = $dbh->prepare("UPDATE matrix SET x = ?, z = ? WHERE id = ?");
 									$updatedAssemblyCtg->execute($chrNumber,$agpLine[1],$assemblySeqCtgId->{$assemblySeqByName[5]});
