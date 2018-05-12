@@ -50,6 +50,7 @@ if ($assemblyId)
 		$extraGenomeId .= "<option value='$checkAsbGenome[0]' title='Extra data for assembly'>[Extra] $target[2] $target[1]</option>";
 	}
 
+	my $allGenomeResult;
 	my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");
 	$genomeList->execute();
 	while (my @genomeList = $genomeList->fetchrow_array())
@@ -57,6 +58,11 @@ if ($assemblyId)
 		next if ($genomeList[0] eq $assembly[4]);
 		next if ($genomeList[5] < 1);#remove not for reference
 		next if (exists $checkedExtraId->{$genomeList[0]}); #skip extra genomes
+		@{$allGenomeResult->{$genomeList[2]}} = @genomeList;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$allGenomeResult)
+	{
+		my @genomeList = @{$allGenomeResult->{$_}};
 		if($genomeList[0] eq $assembly[5])
 		{
 			$subjectGenomeId = "<option value='$genomeList[0]' title='$genomeList[8]' selected>[Assembly Default] $genomeList[2]</option>" . $subjectGenomeId;
@@ -83,10 +89,16 @@ END
 }
 else
 {
+	my $allGenomeResult;
 	my $genomeList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'genome'");
 	$genomeList->execute();
 	while (my @genomeList = $genomeList->fetchrow_array())
 	{
+		@{$allGenomeResult->{$genomeList[2]}} = @genomeList;
+	}
+	foreach (sort {uc ($a) cmp uc($b)} keys %$allGenomeResult)
+	{
+		my @genomeList = @{$allGenomeResult->{$_}};
 		$queryGenomeId .= ($genomeList[0] eq $queryId ) ?
 			"<option value='$genomeList[0]' title='$genomeList[8]' selected>$genomeList[2]</option>" :
 			"<option value='$genomeList[0]' title='$genomeList[8]'>$genomeList[2]</option>";
