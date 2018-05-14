@@ -167,7 +167,7 @@ __DATA__
 <link rev="made" href="mailto:zhangjw@email.arizona.edu" />
 <meta name="keywords" content="$keywords" />
 <meta name="copyright" content="coypright $copyright" />
-nom<link type="image/png" rel="icon" href="$commoncfg->{HTDOCS}/favicon.ico" />
+<link type="image/png" rel="icon" href="$commoncfg->{HTDOCS}/favicon.ico" />
 <link type="image/x-icon" rel="shortcut icon" href="$commoncfg->{HTDOCS}/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/smoothness/jquery-ui-1.10.4.custom.min.css" />
 <link rel="stylesheet" type="text/css" href="$commoncfg->{HTDOCS}/css/dataTables.jqueryui.css" />
