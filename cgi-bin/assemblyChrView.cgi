@@ -55,6 +55,9 @@ if ($assemblyId && $chr)
 	{
 		$companionAssemblyList .= ($companionAssemblyId eq $companionAssembly[0]) ? "<option value='$companionAssembly[0]' selected>$companionAssembly[2].$companionAssembly[3]</option>":"<option value='$companionAssembly[0]'>$companionAssembly[2].$companionAssembly[3]</option>";
 	}
+	my $refGenome=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+	$refGenome->execute($assembly[5]);
+	my @refGenome = $refGenome->fetchrow_array();
 	my $refGenomeSequence=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ? AND z = ?");
 	$refGenomeSequence->execute($assembly[5],$refChr);
 	my @refGenomeSequence = $refGenomeSequence->fetchrow_array();
@@ -88,7 +91,6 @@ if ($assemblyId && $chr)
 		'fill-url' => "assemblyGapFillForm.cgi?assemblyId=$assemblyId"
 	);
 
-
 	# use explicit element constructor to generate a group element
     my $ruler=$svg->group(
         id    => 'ruler',
@@ -117,6 +119,18 @@ if ($assemblyId && $chr)
 			onclick => "closeDialog();openDialog('seqView.cgi?seqId=$refGenomeSequence[0]')",
 			id    => "assemblyRefChr$refGenomeSequence[0]"
 		);
+
+	$assemblyRefChr->text(
+		id      => 'refName'.$refGenomeSequence[0],
+		onclick => "closeDialog();openDialog('seqView.cgi?seqId=$refGenomeSequence[0]')",
+		x       => $margin,
+		y       => $barY + $spaceForCompanion + $barHeight - 2,
+		style   => {
+			'font-size'   => $textFontSize,
+			'stroke'        =>  'black'
+		}
+	)->cdata("$refGenome[2]-$refGenomeSequence[2]");
+
 	if($refSequenceDetails->{'gapList'})
 	{
 		foreach (split ",", $refSequenceDetails->{'gapList'})
