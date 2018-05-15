@@ -1,4 +1,4 @@
-# LIMS
+# ![Pangu](https://github.com/Jianwei-Zhang/LIMS/blob/master/htdocs/images/logo.png) LIMS
 ## Laboratory Information Management System
 
 We developed a web-based LIMS to manage and analyze genomic data at different levels from both wet and dry lab experiments.
