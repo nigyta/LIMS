@@ -114,6 +114,7 @@ if ($assemblyId && $chr)
 			style => { stroke => 'black',
 						fill => 'lightgreen'
 					},
+			onclick => "closeDialog();openDialog('seqView.cgi?seqId=$refGenomeSequence[0]')",
 			id    => "assemblyRefChr$refGenomeSequence[0]"
 		);
 	if($refSequenceDetails->{'gapList'})
