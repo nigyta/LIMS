@@ -28,14 +28,28 @@ my $assemblyCtgDetails = '';
 my $dialogWidth = 600;
 my $textFontSize = 10;
 my $textFontWidth = 7;
-my $pixelUnit = 500;
+my $cookiePixelUnit = cookie("pixelUnit") || '500';
+my $pixelUnit = param ('pixelUnit') || $cookiePixelUnit;
+my %pixelUnitOptions = ( 500=>'500 bp/pixel', 5000=>'5000 bp/pixel');
+my $pixelUnitList = '';
+for (sort {$a <=>$b} keys %pixelUnitOptions)
+{
+	$pixelUnitList .= ($_ eq $pixelUnit) ? "<option value='$_' selected>$pixelUnitOptions{$_}</option>":"<option value='$_'>$pixelUnitOptions{$_}</option>";
+}
 my $barY = 25;
 my $rulerY = 20;
 my $margin = 4;
 my $barHeight = 12;
 my $hiddenSeqPosition = 50;
 my $barSpacing = 300; #space between two bars
-my $unitLength = 10000;
+my $cookieTickLength = cookie("tickLength") || '10000';
+my $tickLength = param ('tickLength') || $cookieTickLength;
+my %tickLengthOptions = ( 10000=>'10kb', 100000=>'100kb');
+my $tickLengthList;
+for (sort {$a <=>$b} keys %tickLengthOptions)
+{
+	$tickLengthList .= ($_ eq $tickLength) ? "<option value='$_' selected>$tickLengthOptions{$_}</option>":"<option value='$_'>$tickLengthOptions{$_}</option>";
+}
 my $maxCol = 0;
 my $gapLength = 100;
 if ($assemblyCtgId)
@@ -515,13 +529,13 @@ if ($assemblyCtgId)
     	$seqCount++;
 	}
 
-	for (my $rulerNumber = 0;$rulerNumber <= $assemblySeqMaxEnd;$rulerNumber += $unitLength)
+	for (my $rulerNumber = 0;$rulerNumber <= $assemblySeqMaxEnd;$rulerNumber += $tickLength)
 	{
 		#dash lines
 		$ruler->line(
 			id    => "rulerDash$rulerNumber",
 			style => {
-				stroke=> ($rulerNumber % (5*$unitLength) == 0) ? 'grey' : 'lightgrey',
+				stroke=> ($rulerNumber % (5*$tickLength) == 0) ? 'grey' : 'lightgrey',
 				'stroke-dasharray' => '3,3'
 				},
 			x1    => $margin + $rulerNumber / $pixelUnit,
@@ -534,19 +548,19 @@ if ($assemblyCtgId)
 			id    => "rulerRegion$rulerNumber",
 			x1    => $margin + $rulerNumber / $pixelUnit,
 			y1    => $rulerY,
-			x2    => $margin +  ($rulerNumber + $unitLength ) / $pixelUnit,
+			x2    => $margin +  ($rulerNumber + $tickLength ) / $pixelUnit,
 			y2    => $rulerY
 		);
 		#ticks
 		$ruler->line(
 			id    => "rulerTick$rulerNumber",
 			x1    => $margin + $rulerNumber / $pixelUnit,
-			y1    => ($rulerNumber % (5*$unitLength) == 0) ? $rulerY - 5 : $rulerY - 3,
+			y1    => ($rulerNumber % (5*$tickLength) == 0) ? $rulerY - 5 : $rulerY - 3,
 			x2    => $margin + $rulerNumber / $pixelUnit,
 			y2    => $rulerY
 			
 		);
-		if($rulerNumber % (5*$unitLength) == 0)
+		if($rulerNumber % (5*$tickLength) == 0)
 		{
 			my $commifiedRulerNumber = commify($rulerNumber);
 			$commifiedRulerNumber =~ s/,000$/k/g;
@@ -615,7 +629,11 @@ if ($assemblyCtgId)
 			</ul>
 		</li>
 	</ul>
-	<a style='float: right;' onclick='openDialog(\"comment.cgi?itemId=$assemblyCtgId\");'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-comment'></span>Comments</a>
+	<div style='float: right; margin-right: .3em; white-space: nowrap;'>
+		<label for='pixelUnit'><b>Pixel Unit</b></label><select class='ui-widget-content ui-corner-all' name='pixelUnit' id='pixelUnit' onchange='closeViewer();openViewer(\"assemblyCtgView.cgi?assemblyCtgId=$assemblyCtg[0]&pixelUnit=\"+this.value);'>$pixelUnitList</select>
+		<label for='tickLength'><b>Tick Length</b></label><select class='ui-widget-content ui-corner-all' name='tickLength' id='tickLength' onchange='closeViewer();openViewer(\"assemblyCtgView.cgi?assemblyCtgId=$assemblyCtg[0]&tickLength=\"+this.value);'>$tickLengthList</select>
+		<a onclick='openDialog(\"comment.cgi?itemId=$assemblyCtgId\");'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-comment'></span>Comments</a>
+	</div>
 	<br><br>
 	<div id='assemblyCtgForAll$assemblyCtgId$$'>
 	<div id='assemblyCtgForSeq$assemblyCtgId$$'>
@@ -633,7 +651,7 @@ if ($assemblyCtgId)
 	$html =~ s/\$scrollLeft/$scrollLeft/g;
 	$html =~ s/\$\$/$$/g;
 
-	print header(-cookie=>cookie(-name=>'assemblyCtg',-value=>$assemblyCtgId));
+	print header(-cookie=>[cookie(-name=>'assemblyCtg',-value=>$assemblyCtgId),cookie(-name=>"pixelUnit",-value=>$pixelUnit),cookie(-name=>"tickLength",-value=>$tickLength)]);
 	print $html;
 }
 else

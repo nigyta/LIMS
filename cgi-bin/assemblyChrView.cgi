@@ -33,14 +33,28 @@ my $assemblyChrDetails = '';
 my $dialogWidth = 600;
 my $textFontSize = 10;
 my $textFontWidth = 7;
-my $pixelUnit = 500;
+my $cookiePixelUnit = cookie("pixelUnit") || '500';
+my $pixelUnit = param ('pixelUnit') || $cookiePixelUnit;
+my %pixelUnitOptions = ( 500=>'500 bp/pixel', 5000=>'5000 bp/pixel');
+my $pixelUnitList = '';
+for (sort {$a <=>$b} keys %pixelUnitOptions)
+{
+	$pixelUnitList .= ($_ eq $pixelUnit) ? "<option value='$_' selected>$pixelUnitOptions{$_}</option>":"<option value='$_'>$pixelUnitOptions{$_}</option>";
+}
 my $barY = 25;
 my $rulerY = 20;
 my $margin = 4;
 my $barHeight = 12;
 my $hiddenSeqPosition = 50;
 my $barSpacing = ($companionAssemblyId) ?  300: 400; #space between reference and ctgs
-my $unitLength = 10000;
+my $cookieTickLength = cookie("tickLength") || '10000';
+my $tickLength = param ('tickLength') || $cookieTickLength;
+my %tickLengthOptions = ( 10000=>'10kb', 100000=>'100kb');
+my $tickLengthList;
+for (sort {$a <=>$b} keys %tickLengthOptions)
+{
+	$tickLengthList .= ($_ eq $tickLength) ? "<option value='$_' selected>$tickLengthOptions{$_}</option>":"<option value='$_'>$tickLengthOptions{$_}</option>";
+}
 my $maxCol = 0;
 my $totalLength;
 if ($assemblyId && $chr)
@@ -1025,13 +1039,13 @@ if ($assemblyId && $chr)
 		$longest = $totalLength->{$_} if ($totalLength->{$_} > $longest);
 	}
 
-	for (my $rulerNumber = 0;$rulerNumber <= $longest;$rulerNumber += $unitLength)
+	for (my $rulerNumber = 0;$rulerNumber <= $longest;$rulerNumber += $tickLength)
 	{
 		#dash lines
 		$ruler->line(
 			id    => "rulerDash$rulerNumber",
 			style => {
-				stroke=> ($rulerNumber % (5*$unitLength) == 0) ? 'grey' : 'lightgrey',
+				stroke=> ($rulerNumber % (5*$tickLength) == 0) ? 'grey' : 'lightgrey',
 				'stroke-dasharray' => '3,3'
 				},
 			x1    => $margin + $rulerNumber / $pixelUnit,
@@ -1044,19 +1058,19 @@ if ($assemblyId && $chr)
 			id    => "rulerRegion$rulerNumber",
 			x1    => $margin + $rulerNumber / $pixelUnit,
 			y1    => $rulerY,
-			x2    => $margin +  ($rulerNumber + $unitLength ) / $pixelUnit,
+			x2    => $margin +  ($rulerNumber + $tickLength ) / $pixelUnit,
 			y2    => $rulerY
 		);
 		#ticks
 		$ruler->line(
 			id    => "rulerTick$rulerNumber",
 			x1    => $margin + $rulerNumber / $pixelUnit,
-			y1    => ($rulerNumber % (5*$unitLength) == 0) ? $rulerY - 5 : $rulerY - 3,
+			y1    => ($rulerNumber % (5*$tickLength) == 0) ? $rulerY - 5 : $rulerY - 3,
 			x2    => $margin + $rulerNumber / $pixelUnit,
 			y2    => $rulerY
 			
 		);
-		if($rulerNumber % (5*$unitLength) == 0)
+		if($rulerNumber % (5*$tickLength) == 0)
 		{
 			my $commifiedRulerNumber = commify($rulerNumber);
 			$commifiedRulerNumber =~ s/,000$/k/g;
@@ -1112,7 +1126,11 @@ if ($assemblyId && $chr)
 			</ul>
 		</li>
 	</ul>
-	<div style='float: right; margin-right: .3em; white-space: nowrap;' id='companionAssembly$assemblyId$$'><label for='companionAssemblyId'><b>Companion Assembly</b></label><select class='ui-widget-content ui-corner-all' name='companionAssemblyId' id='companionAssemblyId' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&companionAssemblyId=\"+this.value);'>$companionAssemblyList</select></div>
+	<div style='float: right; margin-right: .3em; white-space: nowrap;'>
+		<label for='companionAssemblyId'><b>Companion Assembly</b></label><select class='ui-widget-content ui-corner-all' name='companionAssemblyId' id='companionAssemblyId' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&companionAssemblyId=\"+this.value);'>$companionAssemblyList</select>
+		<label for='pixelUnit'><b>Pixel Unit</b></label><select class='ui-widget-content ui-corner-all' name='pixelUnit' id='pixelUnit' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&pixelUnit=\"+this.value);'>$pixelUnitList</select>
+		<label for='tickLength'><b>Tick Length</b></label><select class='ui-widget-content ui-corner-all' name='tickLength' id='tickLength' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&tickLength=\"+this.value);'>$tickLengthList</select>
+	</div>
 	<br><br>
 	<div id='assemblyChrListForAll$assemblyId$$'>
 	<div id='assemblyChrListForCtg$assemblyId$$'>
@@ -1131,7 +1149,7 @@ if ($assemblyId && $chr)
 	$html =~ s/\$pixelUnit/$pixelUnit/g;
 	$html =~ s/\$\$/$$/g;
 
-	print header(-cookie=>cookie(-name=>"companionAssembly$assemblyId",-value=>$companionAssemblyId));
+	print header(-cookie=>[cookie(-name=>"companionAssembly$assemblyId",-value=>$companionAssemblyId),cookie(-name=>"pixelUnit",-value=>$pixelUnit),cookie(-name=>"tickLength",-value=>$tickLength)]);
 	print $html;
 }
 else
