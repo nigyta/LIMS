@@ -72,6 +72,7 @@ The source of these modules are:
 	
 11) Open the "main.conf" file in /var/www/cgi-bin/lims/ directory and complete the information as follow:
 
+```
 	USERNAME = root
 
 	PASSWORD = YOUR PASSWORD OF THE ROOT
@@ -105,7 +106,7 @@ The source of these modules are:
 	POLISHED = /var/www/html/lims/data/polished
 
 	POLISHEDURL = /lims/data/polished
-
+```
 Make sure that you enter the correct path of your files and don't forget to bring the directory name you created on step 2. In this text we add "lims" into the path.
 
 12) To optimize GPM, enlarge the number of "max_allowed_packet" (The maximum size of one packet or any generated/intermediate string) to "128M", set "ft_min_word_len" (The minimum length of the word to be included in a MyISAM FULLTEXT index) to "1" in the /etc/my.cnf file. 
