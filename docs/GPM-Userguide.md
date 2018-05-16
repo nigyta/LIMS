@@ -9,7 +9,6 @@
 - [Running an Assembly](#running-an-assembly)
 - [Chromosome View](#chromosome-view)
 - [“Cleaning Up” and Moving Contigs](#cleaning-up-and-moving-contigs)
-- [Moving Contigs](#moving-contigs)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -89,12 +88,16 @@ It can be seen that the alignment (red and yellow lines) of example contig (top 
 The general idea is to determine where the alignment begins by following the path of red and yellow lines to where it intersects with the reference genome, and then move the contig to that point.  
 ![Cleaning Up and Moving Contigs](images/GPM_Screenshots/Slide13.PNG)
 
-### Moving Contigs
-By scrolling to the left we can determine where that point of origin is. 
+* Moving Contigs
+> By scrolling to the left we can determine where that point of origin is. 
 ![Moving Contigs](images/GPM_Screenshots/Slide14_2.PNG)
 
-From here, scroll back to the contig to be moved, right click on the blue portion, and click edit contig.  
+> From here, scroll back to the contig to be moved, right click on the blue portion, and click edit contig.  
 ![Edit Contig](images/GPM_Screenshots/Slide14_1.PNG)
 
-In this example, the alignment point of origin was approximately 40,150,000 bp.  We will change the “Estimated Position” field to this value.  
+> In this example, the alignment point of origin was approximately 40,150,000 bp.  We will change the “Estimated Position” field to this value.  
 ![Edit Contig Pisition](images/GPM_Screenshots/Slide15_2.PNG)
+
+> Shown is the new placement at 40,150,000bp. It clearly aligns well with its counterpart contig from the companion assembly.  
+![Edit Contig After](images/GPM_Screenshots/slide16.PNG)
+
