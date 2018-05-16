@@ -51,17 +51,13 @@ The source of these modules are:
 `$ ln -s /usr/biosoft/blast+/`
 
 10) Make a new database named "gpm" for GPM by mysql. The command are:
-
-`$ mysql -u root -p`
-
-`Enter password: ********`
-
-`mysql> CREATE DATABASE IF NOT EXISTS gmp;`
-
-`mysql> use gmp;`
-
-`mysql> source /LIMS-master/sql/lims.sql`
-	
+```
+$ mysql -u root -p
+Enter password: ********
+mysql> CREATE DATABASE IF NOT EXISTS gmp;
+mysql> use gmp;
+mysql> source /LIMS-master/sql/lims.sql
+```
 11) Open the "main.conf" file in /var/www/cgi-bin/lims/ directory and complete the information as follow:
 
 ```
@@ -87,31 +83,20 @@ Make sure that you enter the correct path of your files and don't forget to brin
 
 12) To optimize GPM, enlarge the number of "max_allowed_packet" (The maximum size of one packet or any generated/intermediate string) to "128M", set "ft_min_word_len" (The minimum length of the word to be included in a MyISAM FULLTEXT index) to "1" in the /etc/my.cnf file. 
 
-13) Visit your local instance at http://YOUR-HOSTURL/lims on your Server. The username and password are "admin/admin".
-
-Before loading data, please make sure the above link is alive. Any questions during installation, please contact Jianwei Zhang (jzhang@mail.hzau.edu.cn).
+13) Visit your local instance at http://YOUR-HOSTURL/lims on your Server. The username and password are "admin/admin". Before loading data, please make sure the above link is alive. Any questions during installation, please contact Jianwei Zhang (jzhang@mail.hzau.edu.cn).
 
 ## Required Programs, JavaScript Libraries and Perl Modules
-
-	BLAST+ ftp://ftp.ncbi.nih.gov/blast/
-
-	Scalable Vector Graphics (SVG) Library http://search.cpan.org/dist/SVG/
-
-	CGI http://search.cpan.org/dist/CGI/
-
-	URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
-
-	Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
-
-	JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
-
-	JSON::XS http://search.cpan.org/~mlehmann/JSON-XS-3.04/XS.pm
+- BLAST+ ftp://ftp.ncbi.nih.gov/blast/
+- Scalable Vector Graphics (SVG) Library http://search.cpan.org/dist/SVG/
+- CGI http://search.cpan.org/dist/CGI/
+- URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
+- Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
+- JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
+- JSON::XS http://search.cpan.org/~mlehmann/JSON-XS-3.04/XS.pm
 
 jQuery has been included in this repository, for more details, you can visit
-
-	jQuery http://jquery.com/
-
-	jQuery UI http://jqueryui.com/
+- jQuery http://jquery.com/
+- jQuery UI http://jqueryui.com/
 
 ## Manual
 To be added.
