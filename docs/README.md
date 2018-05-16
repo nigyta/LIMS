@@ -40,15 +40,11 @@ $ cpan JSON
 ```
 The source of these modules are:
 
-	Scalable Vector Graphics (SVG) Library http://search.cpan.org/dist/SVG/
-
-	CGI http://search.cpan.org/dist/CGI/
-
-	URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
-
-	Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
-
-	JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
+- Scalable Vector Graphics (SVG) Library http://search.cpan.org/dist/SVG/
+- CGI http://search.cpan.org/dist/CGI/
+- URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
+- Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
+- JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
 
 9) Download the blast+(ftp://ftp.ncbi.nih.gov/blast/) then install it in /usr/biosoft/ directory and create symbol link in the /var/www/cgi-bin/lims/ document by using the command: 
 
