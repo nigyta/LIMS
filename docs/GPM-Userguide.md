@@ -90,3 +90,8 @@ The general idea is to determine where the alignment begins by following the pat
 ![Cleaning Up and Moving Contigs](images/GPM_Screenshots/Slide13.PNG)
 
 ### Moving Contigs
+By scrolling to the left we can determine where that point of origin is. 
+![Moving Contigs](images/GPM_Screenshots/Slide14_2.PNG)
+
+From here, scroll back to the contig to be moved, right click on the blue portion, and click edit contig.  
+![Edit Contig](images/GPM_Screenshots/Slide14_1.PNG)
