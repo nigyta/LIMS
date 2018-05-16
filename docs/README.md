@@ -1,9 +1,9 @@
 # ![Pangu](https://github.com/Jianwei-Zhang/LIMS/blob/master/htdocs/images/logo.png?raw=true) LIMS Docs
 
-## How to Install
+## How to Install?
 [Installation Instruction](INSTALL.md)
 
-## How to Use
+## How to Use?
 [GPM Manual](GPM-Manual.md)
 
 ## Required Programs, JavaScript Libraries and Perl Modules
@@ -19,5 +19,5 @@ jQuery has been included in this repository, for more details, you can visit
 - jQuery http://jquery.com/
 - jQuery UI http://jqueryui.com/
 
-## How to cite
+## How to cite?
 Zhang, J. et al. Genome Puzzle Master (GPM): an integrated pipeline for building and editing pseudomolecules from fragmented sequences. [Bioinformatics, 2016, 32 (20): 3058-3064](https://doi.org/10.1093/bioinformatics/btw370)
