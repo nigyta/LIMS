@@ -1,6 +1,6 @@
 # ![Pangu](https://github.com/Jianwei-Zhang/LIMS/blob/master/htdocs/images/logo.png) LIMS Docs
 
-### Installation Instruction (draft)
+## Installation Instruction (draft)
 
 1) Download GPM source files and unzip the file on your own local system.
 
@@ -112,30 +112,34 @@ Make sure that you enter the correct path of your files and don't forget to brin
 
 13) Visit your local instance at http://YOUR-HOSTURL/lims on your Server. The username and password are "admin/admin".
 
+Before loading data, please make sure the above link is alive. Any questions during installation, please contact Jianwei Zhang (jzhang@mail.hzau.edu.cn).
+
 ## Required Programs, JavaScript Libraries and Perl Modules
 
-BLAST+ ftp://ftp.ncbi.nih.gov/blast/
+	BLAST+ ftp://ftp.ncbi.nih.gov/blast/
 
-Scalable Vector Graphics (SVG) Library http://search.cpan.org/dist/SVG/
+	Scalable Vector Graphics (SVG) Library http://search.cpan.org/dist/SVG/
 
-CGI http://search.cpan.org/dist/CGI/
+	CGI http://search.cpan.org/dist/CGI/
 
-URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
+	URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
 
-Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
+	Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
 
-JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
+	JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
 
-JSON::XS http://search.cpan.org/~mlehmann/JSON-XS-3.04/XS.pm
+	JSON::XS http://search.cpan.org/~mlehmann/JSON-XS-3.04/XS.pm
 
-jQuery http://jquery.com/
+jQuery has been included in this repository, for more details, you can visit
 
-jQuery UI http://jqueryui.com/
+	jQuery http://jquery.com/
 
-Before loading data, please make sure the above link is alive. Any questions during installation, please contact Jianwei Zhang (jzhang@mail.hzau.edu.cn).
+	jQuery UI http://jqueryui.com/
 
 ## Manual
 To be added.
+
+
 
 ## How to cite
 Zhang, J. et al. Genome Puzzle Master (GPM): an integrated pipeline for building and editing pseudomolecules from fragmented sequences. Bioinformatics, 2016, 32 (20): 3058-3064 (https://doi.org/10.1093/bioinformatics/btw370).
