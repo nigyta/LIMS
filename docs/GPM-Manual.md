@@ -3,6 +3,7 @@
 - [GPM assemblyRun](#gpm-assemblyrun)
 - [Visualization of typical available data in GPM](#visualization-of-typical-available-data-in-gpm)
 - [Flowchart for processing unitigs with postHGAP](#flowchart-for-processing-unitigs-with-posthgap)
+- [Genome Puzzle Master Basic User Guide](GPM-Userguide.md)
 
 ### GPM assemblyRun
 - AssemblyRun operations
