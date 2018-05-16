@@ -1,5 +1,5 @@
-# ![Pangu](images/logo.png) [LIMS Docs](README.md) [GPM Manual](GPM-Manual.md)
-## Genome Puzzle Master Basic User Guide
+# ![Pangu](images/logo.png) [LIMS Docs](README.md)
+## [GPM Manual](GPM-Manual.md) > Genome Puzzle Master Basic User Guide
 - [GPM Workflow](#gpm-workflow)
 - [GPM Main Interface](#gpm-main-interface)
 
