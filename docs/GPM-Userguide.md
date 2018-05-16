@@ -6,6 +6,7 @@
 - [Running Preliminary Alignments](#running-preliminary-alignments)
 - [Creating a Project and Assigning Genomes](#creating-a-project-and-assigning-genomes)
 - [Creating an Assembly](#creating-an-assembly)
+- [Running an Assembly](#running-an-assembly)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -53,3 +54,16 @@
 3. Select the desired uploaded reference genome from the dropdown menu.  
 4. Assign “Gap Filler” genomes by checking boxes in the “Extra Genomes” field. 
 5. Click “Save” when finished.
+
+### Running an Assembly
+![Running an Assembly](images/GPM_Screenshots/Slide6.PNG)
+1. click on the “Assembly Tools” button and select “Run Assembly”. 
+2. Specify the desired assembly parameters (ensure the correct reference genome is being used.)
+3. Click “Run Assembly”.
+
+- Before: all contigs are unplaced. 
+![all contigs are unplaced](images/GPM_Screenshots/Slide7.PNG)
+
+- After: contigs are numbered and assigned to chromosomes.  
+![contigs are numbered and assigned](images/GPM_Screenshots/Slide9.PNG)
+
