@@ -31,17 +31,13 @@
 `$ mv /var/www/cgi-bin/lims/main.conf.tmpl /var/www/cgi-bin/lims/main.conf`
 
 8) Install the following perl modules for GPM: 
-
-`$ cpan SVG`
-
-`$ cpan CGI`
-
-`$ cpan URI-Escape-XS`
-
-`$ cpan Math::Trig`
-
-`$ cpan JSON`
-
+```
+$ cpan SVG
+$ cpan CGI
+$ cpan URI-Escape-XS
+$ cpan Math::Trig
+$ cpan JSON
+```
 The source of these modules are:
 
 	Scalable Vector Graphics (SVG) Library http://search.cpan.org/dist/SVG/
@@ -73,39 +69,23 @@ The source of these modules are:
 11) Open the "main.conf" file in /var/www/cgi-bin/lims/ directory and complete the information as follow:
 
 ```
-	USERNAME = root
-
-	PASSWORD = YOUR PASSWORD OF THE ROOT
-
-	DATABASE = gpm (YOUR DATABASE-NAME YOU CREATED ON STEP 10)
-
-	DBHOST = localhost
-
-	HOSTURL = http://YOUR-HOSTURL
-
-	CGIBINDIR = /var/www/cgi-bin/lims
-
-	CGIBIN = /cgi-bin/lims
-
-	HTMLDIR = /var/www/html/lims
-
-	HTDOCS =  /lims
-
-	DATADIR = /var/www/html/lims/data
-
-	TMPDIR = /var/www/html/lims/data/tmp
-
-	TMPURL = /lims/data/tmp
-
-	JOBDIR = /var/www/html/lims/data/jobs
-
-	VECTOR = /var/www/html/lims/data/pAGIBAC1_HindIII.txt
-
-	VECTORLENGTH = 7522
-
-	POLISHED = /var/www/html/lims/data/polished
-
-	POLISHEDURL = /lims/data/polished
+USERNAME = root
+PASSWORD = YOUR PASSWORD OF THE ROOT
+DATABASE = gpm (YOUR DATABASE-NAME YOU CREATED ON STEP 10)
+DBHOST = localhost
+HOSTURL = http://YOUR-HOSTURL
+CGIBINDIR = /var/www/cgi-bin/lims
+CGIBIN = /cgi-bin/lims
+HTMLDIR = /var/www/html/lims
+HTDOCS =  /lims
+DATADIR = /var/www/html/lims/data
+TMPDIR = /var/www/html/lims/data/tmp
+TMPURL = /lims/data/tmp
+JOBDIR = /var/www/html/lims/data/jobs
+VECTOR = /var/www/html/lims/data/pAGIBAC1_HindIII.txt
+VECTORLENGTH = 7522
+POLISHED = /var/www/html/lims/data/polished
+POLISHEDURL = /lims/data/polished
 ```
 Make sure that you enter the correct path of your files and don't forget to bring the directory name you created on step 2. In this text we add "lims" into the path.
 
