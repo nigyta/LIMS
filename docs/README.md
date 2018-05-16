@@ -1,9 +1,10 @@
 # ![Pangu](https://github.com/Jianwei-Zhang/LIMS/blob/master/htdocs/images/logo.png?raw=true) LIMS Docs
 
-## [Installation Instruction](INSTALL.md)
+## How to Install
+[Installation Instruction](INSTALL.md)
 
-## Manual
-[GPM Manual](GPM-Manual.md).
+## How to Use
+[GPM Manual](GPM-Manual.md)
 
 ## Required Programs, JavaScript Libraries and Perl Modules
 - BLAST+ ftp://ftp.ncbi.nih.gov/blast/
