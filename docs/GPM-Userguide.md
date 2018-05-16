@@ -8,7 +8,7 @@
 - [Creating an Assembly](#creating-an-assembly)
 - [Running an Assembly](#running-an-assembly)
 - [Chromosome View](#chromosome-view)
-- [“Cleaning Up” and Moving Contigs](#)
+- [“Cleaning Up” and Moving Contigs](#cleaning-up-and-moving-contigs)
 - [Moving Contigs](#moving-contigs)
 
 ### GPM Workflow
@@ -95,3 +95,6 @@ By scrolling to the left we can determine where that point of origin is.
 
 From here, scroll back to the contig to be moved, right click on the blue portion, and click edit contig.  
 ![Edit Contig](images/GPM_Screenshots/Slide14_1.PNG)
+
+In this example, the alignment point of origin was approximately 40,150,000 bp.  We will change the “Estimated Position” field to this value.  
+![Edit Contig Pisition](images/GPM_Screenshots/Slide15_2.PNG)
