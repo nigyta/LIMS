@@ -79,6 +79,16 @@ POLISHEDURL = /lims/data/polished
 ```
 Make sure that you enter the correct path of your files and don't forget to bring the directory name you created on step 2. In this text we add "lims" into the path.
 
-12) To optimize GPM, enlarge the number of "max_allowed_packet" (The maximum size of one packet or any generated/intermediate string) to "128M", set "ft_min_word_len" (The minimum length of the word to be included in a MyISAM FULLTEXT index) to "1" in the /etc/my.cnf file. 
+12) To optimize GPM, change some settings in the /etc/my.cnf file as below:
+```
+#set max_allowed_packet to 512M for loading long sequences, like maize genome
+#The maximum size of one packet or any generated/intermediate string
+max_allowed_packet      = 512M
 
+#set myisam_sort_buffer_size to 2G, system default is 8M
+myisam_sort_buffer_size = 2G
+
+#The minimum length of the word to be included in a MyISAM FULLTEXT index, sytem default is 4
+ft_min_word_len = 1
+```
 13) Visit your local instance at http://YOUR-HOSTURL/lims on your Server. The username and password are "admin/admin". Before loading data, please make sure the above link is alive. Any questions during installation, please contact Jianwei Zhang (jzhang@mail.hzau.edu.cn).
