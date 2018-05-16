@@ -9,6 +9,7 @@
 - [Running an Assembly](#running-an-assembly)
 - [Chromosome View](#chromosome-view)
 - [“Cleaning Up” and Moving Contigs](#cleaning-up-and-moving-contigs)
+- [Contig View](#contig-view)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -101,3 +102,8 @@ The general idea is to determine where the alignment begins by following the pat
 > Shown is the new placement at 40,150,000bp. It clearly aligns well with its counterpart contig from the companion assembly.  
 ![Edit Contig After](images/GPM_Screenshots/slide16.PNG)
 
+### Contig View
+To view a single contig and the sequence(s) that comprise it, simply click on the specified contig number.  
+![Contig View Click](images/GPM_Screenshots/slide17_1.PNG)
+> Shown in green is the sequence that contig 5 in this example is composed of. Note that this contig is made of a single sequence.  Multi-sequence contigs will be covered later under “Gap Filling and Merging Contigs”.
+![Contig View Click](images/GPM_Screenshots/Slide17_2.PNG)
