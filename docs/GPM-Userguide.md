@@ -7,6 +7,8 @@
 - [Creating a Project and Assigning Genomes](#creating-a-project-and-assigning-genomes)
 - [Creating an Assembly](#creating-an-assembly)
 - [Running an Assembly](#running-an-assembly)
+- [Chromosome View](#chromosome-view)
+
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -66,4 +68,18 @@
 
 - After: contigs are numbered and assigned to chromosomes.  
 ![contigs are numbered and assigned](images/GPM_Screenshots/Slide9.PNG)
+
+### Chromosome View
+To view the entire chromosome and all of its assigned contigs, click on the Chromosome number. 
+![Chromosome View Click](images/GPM_Screenshots/Slide11_2.PNG)
+
+![Chromosome View](images/GPM_Screenshots/slide11_1.PNG)
+
+To view two assemblies side-by-side for easy visualization and facilitated gap filling, select a companion assembly from the drop down menu in chromosome view.
+![Companion Chromosome View Click](images/GPM_Screenshots/sLIDE12_1.PNG)
+> It will appear on top of the target assembly.
+> Note that not all of the contigs will be perfectly aligned with their start and end points on the reference genome and will have to be moved.
+![Companion Chromosome View](images/GPM_Screenshots/Slide12_2.PNG)
+
+
 
