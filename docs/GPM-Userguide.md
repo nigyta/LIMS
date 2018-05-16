@@ -8,7 +8,8 @@
 - [Creating an Assembly](#creating-an-assembly)
 - [Running an Assembly](#running-an-assembly)
 - [Chromosome View](#chromosome-view)
-
+- [“Cleaning Up” and Moving Contigs](#)
+- [Moving Contigs](#moving-contigs)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -80,5 +81,12 @@ To view two assemblies side-by-side for easy visualization and facilitated gap f
 > Note that not all of the contigs will be perfectly aligned with their start and end points on the reference genome and will have to be moved.
 > ![Companion Chromosome View](images/GPM_Screenshots/Slide12_2.PNG)
 
+### “Cleaning Up” and Moving Contigs
+Here is an example of what it looks like when a contig needs to be moved.  
 
+It can be seen that the alignment (red and yellow lines) of example contig (top blue line) begins much earlier in the reference genome (middle green line)  than where it is currently placed.  
 
+The general idea is to determine where the alignment begins by following the path of red and yellow lines to where it intersects with the reference genome, and then move the contig to that point.  
+![Cleaning Up and Moving Contigs](images/GPM_Screenshots/Slide13.PNG)
+
+### Moving Contigs
