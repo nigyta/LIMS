@@ -1,35 +1,34 @@
 # ![Pangu](https://github.com/Jianwei-Zhang/LIMS/blob/master/htdocs/images/logo.png) LIMS Docs
 
-## Installation Instruction (draft)
+## Installation Instruction
 
 1) Download GPM source files and unzip the file on your own local system.
 
 2) Make a new directory under both /var/www/cgi-bin/ directory and /var/www/html/ directory. For example, the new directory named "lims". The commands are:
-
-`$ mkdir /var/www/cgi-bin/lims`
-
-`$ mkdir /var/www/html/lims`
-
+```
+$ mkdir /var/www/cgi-bin/lims
+$ mkdir /var/www/html/lims
+```
 3) Copy all the files and directories in the "cgi-bin" directory (GPM source directory, e.g. ~/LIMS-master/cgi-bin/) to the /var/www/cgi-bin/lims directory:
-
-`$ cp -r ~/LIMS-master/cgi-bin/* /var/www/cgi-bin/lims/`
-
+```
+$ cp -r ~/LIMS-master/cgi-bin/* /var/www/cgi-bin/lims/
+```
 4) Copy all the files and directories in the "htdocs" directory (GPM source directory, e.g. ~/LIMS-master/htdocs/) to /var/www/html/lims directory:
-
-`$ cp -r ~/LIMS-master/htdocs/* /var/www/html/lims/`
-
+```
+$ cp -r ~/LIMS-master/htdocs/* /var/www/html/lims/
+```
 5) Make all files in /var/www/cgi-bin/lims/ executable: 
-
-`$ chmod 775 /usr/www/cgi-bin/lims/*`
-
+```
+$ chmod 775 /usr/www/cgi-bin/lims/*
+```
 6) Activate the index file, rename the "index.html.tmpl" file in /var/www/html/lims/ directory as "index.html":
-
-`$ mv /var/www/html/lims/index.html.tmpl /var/www/html/lims/index.html`
-
+```
+$ mv /var/www/html/lims/index.html.tmpl /var/www/html/lims/index.html
+```
 7) Activate the configuration file, rename the "main.conf.tmpl" file in the /var/www/cgi-bin/lims/ directory as "main.conf":
-
-`$ mv /var/www/cgi-bin/lims/main.conf.tmpl /var/www/cgi-bin/lims/main.conf`
-
+```
+$ mv /var/www/cgi-bin/lims/main.conf.tmpl /var/www/cgi-bin/lims/main.conf
+```
 8) Install the following perl modules for GPM: 
 ```
 $ cpan SVG
@@ -47,9 +46,9 @@ The source of these modules are:
 - JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
 
 9) Download the blast+(ftp://ftp.ncbi.nih.gov/blast/) then install it in /usr/biosoft/ directory and create symbol link in the /var/www/cgi-bin/lims/ document by using the command: 
-
-`$ ln -s /usr/biosoft/blast+/`
-
+```
+$ ln -s /usr/biosoft/blast+/
+```
 10) Make a new database named "gpm" for GPM by mysql. The command are:
 ```
 $ mysql -u root -p
