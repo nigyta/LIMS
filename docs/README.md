@@ -1,4 +1,4 @@
-# ![Pangu](https://github.com/Jianwei-Zhang/LIMS/blob/master/htdocs/images/logo.png) LIMS Docs
+# ![Pangu](https://github.com/Jianwei-Zhang/LIMS/blob/master/htdocs/images/logo.png?raw=true) LIMS Docs
 
 ## Installation Instruction
 
