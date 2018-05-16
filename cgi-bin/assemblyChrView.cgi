@@ -583,6 +583,7 @@ if ($assemblyId && $chr)
 				$alignments->execute($companionAssemblySequenceId->{$currentSeq},$refGenomeSequence[0]);
 				while (my @alignments = $alignments->fetchrow_array())
 				{
+						next if ($alignments[5] < $pixelUnit); #skip if alignment shorter than pixelUnit
 						my $seqXOne = 0;
 						my $seqXTwo = 0;
 						if($companionAssemblySeqOrient->{$currentSeq} eq "+")
@@ -993,6 +994,7 @@ if ($assemblyId && $chr)
 			$alignments->execute($assemblySequenceId->{$currentSeq},$refGenomeSequence[0]);
 			while (my @alignments = $alignments->fetchrow_array())
 			{
+					next if ($alignments[5] < $pixelUnit); #skip if alignment shorter than pixelUnit
 					my $seqXOne = 0;
 					my $seqXTwo = 0;
 					if($assemblySeqOrient->{$currentSeq} eq "+")

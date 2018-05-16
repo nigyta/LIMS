@@ -446,6 +446,7 @@ if ($assemblyCtgId)
 			
 			while (my @alignments = $alignments->fetchrow_array())
 			{
+				next if ($alignments[5] < $pixelUnit); #skip if alignment shorter than pixelUnit
 				my $preXOne = 0;
 				my $preXTwo = 0;
 				if($assemblySeqOrient->{$preSeq} eq "+")
