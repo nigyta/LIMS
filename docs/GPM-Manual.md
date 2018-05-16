@@ -1,5 +1,8 @@
 # ![Pangu](images/logo.png) [LIMS Docs](README.md)
 ## GPM Manual
+- [GPM assemblyRun](#gpm-assemblyrun)
+- [Visualization of typical available data in GPM](#visualization-of-typical-available-data-in-gpm)
+- [Flowchart for processing unitigs with postHGAP](#flowchart-for-processing-unitigs-with-posthgap)
 
 ### GPM assemblyRun
 - AssemblyRun operations
