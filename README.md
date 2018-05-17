@@ -3,7 +3,7 @@
 
 We developed a web-based LIMS to manage and analyze genomic data at different levels from both wet and dry lab experiments. 
 
-Read [More details](https://github.com/Jianwei-Zhang/LIMS/tree/master/docs) about how to install and use this system.
+Read [LIMS Docs](https://github.com/Jianwei-Zhang/LIMS/tree/master/docs) to learn more about how to install and use this system.
 
 ## Contact
 Jianwei Zhang (jzhang@mail.hzau.edu.cn or jzhang@cals.arizona.edu)
