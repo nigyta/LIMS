@@ -1,4 +1,4 @@
-# ![Pangu](images/logo.png) LIMS Docs
+# Pangu LIMS Docs
 
 ## [How to Install?](INSTALL.md)
 
