@@ -122,6 +122,13 @@ This criteria allows for using the top sequence to fill the bottom gap.
 > There are three pieces of information needed to fill this type of gap.  
 ![Gap Filling Ex](images/GPM_Screenshots/Slide19_2.PNG)
 > First the unique identification number of the sequence being used to fill the gap must be known.  This is found by left clicking on the sequence (green portion) of the top contig.  
-![Gap Filling Ex](images/GPM_Screenshots/Slide19_1.PNG)
+![Gap Filling filler](images/GPM_Screenshots/Slide19_1.PNG)
 
+> Next is determining the contig number of the initial piece of the gap labeled  “2”.   This is easily determined by right clicking the blue portion of the first contig, and selecting “Edit Contig”.  It can be seen that the contig number is “Ctg56”.
+![Gap Filling left](images/GPM_Screenshots/Slide20_1.PNG)
+
+> Last is the number of second contig in the bottom assembly to be filled.   We can see circled in blue that it is “Ctg 57”. With these three pieces of information we can now fill the gap. 
+
+> To Fill the gap, again right click on the initial contig prior to the gap to be filled, in this case Ctg56, and select “Edit Contig”. Now in the “Insert Sequence” field, enter the identification number of the sequence being used to  to bridge the gap. Finally, check the box labeled “Append” and type in the number of the final contig in the sequence after the gap, then click “Save”. The gap has now been filled, however now redundant alignments need to be filtered out of the new contig.  
+![Gap Filling left](images/GPM_Screenshots/Slide22.PNG)
 
