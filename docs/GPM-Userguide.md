@@ -15,7 +15,7 @@
 - [Flipping Contigs](#flipping-contigs)
 - [Alignment Checker](#alignment-checker)
 - [Unplaced Contigs](#unplaced-contigs)
-
+- [Troubleshooting](#troubleshooting)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -164,6 +164,7 @@ If ever a misassembly is made when attempting to merge contigs or fill gaps, it 
 
 > To use this, enter the contig that is being modified and simply right click on any sequence in the contig to select “Break Contig”.  
 ![Breaking Contigs Menu](images/GPM_Screenshots/Slide27_1.PNG)
+
 > Drag and drop the “Break From Here” block in between the area that needs to be separated and click “Break”.  
 > The separated pieces will receive new contig identification numbers.  
 ![Breaking Contigs](images/GPM_Screenshots/Slide27_2.PNG)
