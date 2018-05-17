@@ -10,6 +10,7 @@
 - [Chromosome View](#chromosome-view)
 - [“Cleaning Up” and Moving Contigs](#cleaning-up-and-moving-contigs)
 - [Contig View](#contig-view)
+- [Gap Filling and Merging Contigs](#gap-filling-and-merging-contigs)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -107,3 +108,20 @@ To view a single contig and the sequence(s) that comprise it, simply click on th
 ![Contig View Click](images/GPM_Screenshots/slide17_1.PNG)
 > Shown in green is the sequence that contig 5 in this example is composed of. Note that this contig is made of a single sequence.  Multi-sequence contigs will be covered later under “Gap Filling and Merging Contigs”.
 ![Contig View Click](images/GPM_Screenshots/Slide17_2.PNG)
+
+### Gap Filling and Merging Contigs
+In this instance a gap on the bottom assembly will be filled using a sequence from the top assembly.  
+
+The blue circle emphasizes a break or gap between two contigs.  
+
+The purple square shows that the sequence in the top assembly bridges the gap on the bottom and shares alignment in the reference genome on both sides of the gap.  
+
+This criteria allows for using the top sequence to fill the bottom gap.  
+![Gap Filling](images/GPM_Screenshots/Slide18.PNG)
+
+> There are three pieces of information needed to fill this type of gap.  
+![Gap Filling Ex](images/GPM_Screenshots/Slide19_2.PNG)
+> First the unique identification number of the sequence being used to fill the gap must be known.  This is found by left clicking on the sequence (green portion) of the top contig.  
+![Gap Filling Ex](images/GPM_Screenshots/Slide19_1.PNG)
+
+
