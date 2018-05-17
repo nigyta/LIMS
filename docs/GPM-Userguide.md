@@ -1,20 +1,5 @@
 # [Pangu LIMS Docs](README.md)
 ## [GPM Manual](GPM-Manual.md) > Basic User Guide
-- [GPM Main Interface](#gpm-main-interface)
-- [Uploading A New Genome](#uploading-a-new-genome)
-- [Running Preliminary Alignments](#running-preliminary-alignments)
-- [Creating a Project and Assigning Genomes](#creating-a-project-and-assigning-genomes)
-- [Creating an Assembly](#creating-an-assembly)
-- [Running an Assembly](#running-an-assembly)
-- [Chromosome View](#chromosome-view)
-- [“Cleaning Up” and Moving Contigs](#cleaning-up-and-moving-contigs)
-- [Contig View](#contig-view)
-- [Gap Filling and Merging Contigs](#gap-filling-and-merging-contigs)
-- [Breaking Contigs](#breaking-contigs)
-- [Flipping Contigs](#flipping-contigs)
-- [Alignment Checker](#alignment-checker)
-- [Unplaced Contigs](#unplaced-contigs)
-- [Troubleshooting](#troubleshooting)
 
 ### GPM Main Interface
 > The “General” tab is used to upload and manage genomes.
