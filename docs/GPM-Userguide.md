@@ -137,3 +137,11 @@ This criteria allows for using the top sequence to fill the bottom gap.
 > In order to visualize the alignment between sequences, they must be BLASTed against each other.  
 > This is done by right clicking the first sequence labeled “1”, selecting the alignment tab, and selecting BLAST2SEQ.
 ![Gap Filling blast](images/GPM_Screenshots/SSlide23.PNG)
+
+> Now alignment between each of the sequences can be visualized.  
+![Gap Filling blast](images/GPM_Screenshots/Slide24_2.PNG)
+
+
+> Now it is possible for the redundant overlap to be filtered out of the combined contig.  
+> This is done by simply right clicking the yellow alignment, and selecting “Smart Redundancy Filter” for each overlapping portion.
+![Gap Filling blast](images/GPM_Screenshots/Slide24_1.PNG)
