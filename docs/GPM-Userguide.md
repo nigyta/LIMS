@@ -141,7 +141,16 @@ This criteria allows for using the top sequence to fill the bottom gap.
 > Now alignment between each of the sequences can be visualized.  
 ![Gap Filling blast](images/GPM_Screenshots/Slide24_2.PNG)
 
-
 > Now it is possible for the redundant overlap to be filtered out of the combined contig.  
 > This is done by simply right clicking the yellow alignment, and selecting “Smart Redundancy Filter” for each overlapping portion.
 ![Gap Filling blast](images/GPM_Screenshots/Slide24_1.PNG)
+
+> Here we can see the final result of the gap filling and redundancy filtering process for contig 56.  
+> The white or clear sections of the sequences are being hidden, while the green portions are being used in the final contig 56.
+![Gap Filling blast](images/GPM_Screenshots/Slide25.PNG)
+
+> Before merging
+![Gap Filling blast](images/GPM_Screenshots/Slide26_1.PNG)
+> After merging
+![Gap Filling blast](images/GPM_Screenshots/Slide26_2.PNG)
+
