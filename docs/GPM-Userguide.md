@@ -167,11 +167,11 @@ If ever a misassembly is made when attempting to merge contigs or fill gaps, it 
 
 ### Flipping Contigs
 Sometimes when attempting to fill gaps a sequence will need to be re-oriented prior to redundancy filtering.  
-
 ![Flipping Contigs](images/GPM_Screenshots/Slide28_1.PNG)
+
 > This is simply done by right clicking the appropriate sequence and clicking “Flip Sequence”. 
 ![Flipping Contigs Menu](images/GPM_Screenshots/Slide28_2.PNG)
->The result often looks much more manageable and can be more efficiently  filtered for redundancy afterwards. 
+> The result often looks much more manageable and can be more efficiently  filtered for redundancy afterwards. 
 ![Flipping Contigs After](images/GPM_Screenshots/Slide29.PNG)
 
 
