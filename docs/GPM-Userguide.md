@@ -13,6 +13,9 @@
 - [Gap Filling and Merging Contigs](#gap-filling-and-merging-contigs)
 - [Breaking Contigs](#breaking-contigs)
 - [Flipping Contigs](#flipping-contigs)
+- [Alignment Checker](#alignment-checker)
+- [Unplaced Contigs](#unplaced-contigs)
+
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -171,7 +174,29 @@ Sometimes when attempting to fill gaps a sequence will need to be re-oriented pr
 
 > This is simply done by right clicking the appropriate sequence and clicking “Flip Sequence”. 
 ![Flipping Contigs Menu](images/GPM_Screenshots/Slide28_2.PNG)
+
 > The result often looks much more manageable and can be more efficiently  filtered for redundancy afterwards. 
 ![Flipping Contigs After](images/GPM_Screenshots/Slide29.PNG)
 
+### Alignment Checker
+Occasionally misassemblies can occur and some contigs will be much longer than they should be, or contigs will be appear to be missing from certain chromosomes.  
 
+With the alignment checker function, it is easy to determine if a long sequence with little identity to the reference genome belongs elsewhere.  
+
+> Right click on the sequence of interest and select “Alignment Checker” from the alignment tab. 
+![Alignment Checker Menu](images/GPM_Screenshots/Slide30_1.PNG)
+
+> Similar to the BLAST2SEQ  function, this BLASTS the designated sequence.  However the second “Sequence-2” field is left BLANK.  This causes the desired sequence to be blasted to all of the sequences in the genome.  
+![Alignment Checker](images/GPM_Screenshots/Slide30_2.PNG)
+
+> The output can be easily filtered by a variety of parameters which should provide information as to where the indicated sequence might belong. 
+![Alignment Checker Output](images/GPM_Screenshots/Slide31.PNG)
+
+### Unplaced Contigs
+Often there are many small (10-400kb) contigs that remain unplaced after finishing an assembly.  These can be easily downloaded and BLASTed either individually or all together to determine if they are due to contamination.  
+![Unplaced Contigs](images/GPM_Screenshots/Slide32_1.PNG)
+![Unplaced Contigs Contamination](images/GPM_Screenshots/Slide32_2.PNG)
+
+### Troubleshooting
+- If the chromosomes look far too “messy” and there are unmanageable red lines all over, try re-running the alignment between subject and reference with higher identity.
+- If not all of the chromosomes have contigs, or seemingly have too few and there are large contigs that are categorized as unplaced, try re-running the alignment with lower identity or lower minimum base overlap. 
