@@ -1,5 +1,5 @@
 # ![Pangu](images/logo.png) [LIMS Docs](README.md)
-## [GPM Manual](GPM-Manual.md) > Genome Puzzle Master Basic User Guide
+## [GPM Manual](GPM-Manual.md) > Basic User Guide
 - [GPM Main Interface](#gpm-main-interface)
 - [Uploading A New Genome](#uploading-a-new-genome)
 - [Running Preliminary Alignments](#running-preliminary-alignments)

@@ -1,10 +1,10 @@
 # ![Pangu](images/logo.png) [LIMS Docs](README.md)
-## GPM Manual
+## Genome Puzzle Master Manual
 - [GPM Workflow](#gpm-workflow)
 - [GPM assemblyRun](#gpm-assemblyrun)
 - [Visualization of typical available data in GPM](#visualization-of-typical-available-data-in-gpm)
 - [Flowchart for processing unitigs with postHGAP](#flowchart-for-processing-unitigs-with-posthgap)
-- [Genome Puzzle Master Basic User Guide](GPM-Userguide.md)
+- [GPM Basic User Guide](GPM-Userguide.md)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -35,3 +35,4 @@
 ### Flowchart for processing unitigs with postHGAP
 ![postHGAP](images/postHGAP-4-JZ.png)
 
+### [GPM Basic User Guide](GPM-Userguide.md)
