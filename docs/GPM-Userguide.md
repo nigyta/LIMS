@@ -156,6 +156,7 @@ This criteria allows for using the top sequence to fill the bottom gap.
 
 > Before merging
 ![Gap Filling Before merging](images/GPM_Screenshots/Slide26_1.PNG)
+
 > After merging
 ![Gap Filling After merging](images/GPM_Screenshots/Slide26_2.PNG)
 
