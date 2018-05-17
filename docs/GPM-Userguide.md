@@ -11,6 +11,7 @@
 - [“Cleaning Up” and Moving Contigs](#cleaning-up-and-moving-contigs)
 - [Contig View](#contig-view)
 - [Gap Filling and Merging Contigs](#gap-filling-and-merging-contigs)
+- [Breaking Contigs](#breaking-contigs)
 
 ### GPM Workflow
 - Upload Subject and Reference Genomes.
@@ -154,3 +155,11 @@ This criteria allows for using the top sequence to fill the bottom gap.
 > After merging
 ![Gap Filling blast](images/GPM_Screenshots/Slide26_2.PNG)
 
+### Breaking Contigs
+If ever a misassembly is made when attempting to merge contigs or fill gaps, it is easy to correct using the “Break Contig” function.  
+
+> To use this, enter the contig that is being modified and simply right click on any sequence in the contig to select “Break Contig”.  
+> Drag and drop the “Break From Here” block in between the area that needs to be separated and click “Break”.  
+> The separated pieces will receive new contig identification numbers.  
+![Gap Filling blast](images/GPM_Screenshots/Slide27_1.PNG)
+![Gap Filling blast](images/GPM_Screenshots/Slide27_2.PNG)
