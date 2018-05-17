@@ -1,4 +1,4 @@
-# ![Pangu](images/logo.png) [LIMS Docs](README.md)
+# [Pangu LIMS Docs](README.md)
 ## Installation Instruction
 
 1) Download GPM source files and unzip the file on your own local system.

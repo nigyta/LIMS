@@ -1,4 +1,4 @@
-# ![Pangu](images/logo.png) [LIMS Docs](README.md)
+# [Pangu LIMS Docs](README.md)
 ## Genome Puzzle Master Manual
 - [GPM Workflow](#gpm-workflow)
 - [GPM assemblyRun](#gpm-assemblyrun)

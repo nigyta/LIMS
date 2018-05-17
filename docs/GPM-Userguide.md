@@ -1,4 +1,4 @@
-# ![Pangu](images/logo.png) [LIMS Docs](README.md)
+# [Pangu LIMS Docs](README.md)
 ## [GPM Manual](GPM-Manual.md) > Basic User Guide
 - [GPM Main Interface](#gpm-main-interface)
 - [Uploading A New Genome](#uploading-a-new-genome)
