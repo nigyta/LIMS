@@ -1,9 +1,18 @@
 # ![Pangu](images/logo.png) [LIMS Docs](README.md)
 ## GPM Manual
+- [GPM Workflow](#gpm-workflow)
 - [GPM assemblyRun](#gpm-assemblyrun)
 - [Visualization of typical available data in GPM](#visualization-of-typical-available-data-in-gpm)
 - [Flowchart for processing unitigs with postHGAP](#flowchart-for-processing-unitigs-with-posthgap)
 - [Genome Puzzle Master Basic User Guide](GPM-Userguide.md)
+
+### GPM Workflow
+- Upload Subject and Reference Genomes.
+- Run preliminary alignments of each subject Genome to the Reference.
+- Run an assembly of each Genome.
+- “Clean Up” each Chromosome for the assemblies.
+- Fill any possible gaps using alternative assemblies of the same subject.  
+- Eliminate any identifiable contamination.  
 
 ### GPM assemblyRun
 - AssemblyRun operations
