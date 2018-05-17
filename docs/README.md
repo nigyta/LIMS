@@ -1,10 +1,8 @@
 # ![Pangu](images/logo.png) LIMS Docs
 
-## How to Install?
-[Installation Instruction](INSTALL.md)
+## [How to Install?](INSTALL.md)
 
-## How to Use?
-[GPM Manual](GPM-Manual.md)
+## [How to Use?](GPM-Manual.md)
 
 ## Required Programs, JavaScript Libraries and Perl Modules
 - BLAST+ ftp://ftp.ncbi.nih.gov/blast/
