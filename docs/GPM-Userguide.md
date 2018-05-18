@@ -34,6 +34,7 @@ From the GPM main page, click on the "General" tab on the top toolbar.
 
 ### Creating an Assembly
 1. Select the genome to be assembled from the project on the left hand side of the screen.  
+![Creating an Assembly](images/GPM_Screenshots/Slide5-0.PNG)
 2. Here preliminary options for the new assembly must be set.  
 ![Creating an Assembly](images/GPM_Screenshots/Slide5.PNG)
 3. First, assign the reference genome to be used with the assembly.  
