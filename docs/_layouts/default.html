@@ -43,10 +43,11 @@
       <section>
         {{ content }}
         {% if site.github.is_project_page %}
-          <hr><p>Project maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a> | <small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
-          <img src="/LIMS/images/logo.png" alt="Pangu">
+          <hr><p><a href="{{ site.github.repository_url }}" class="button fork"><img src="/LIMS/images/logo.png" alt="Pangu" /></a> Project maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
+          <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
         {% endif %}
       </section>
+          <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
     </div>
 
     {% if site.google_analytics %}
