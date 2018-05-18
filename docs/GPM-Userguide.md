@@ -34,12 +34,6 @@ From the GPM main page, click on the "General" tab on the top toolbar.
 
 ### Creating an Assembly
 1. Select the genome to be assembled from the project on the left hand side of the screen.  
-2. First, a reference genome must be assigned by clicking the "Assembly Tools" Button.
-3. Select the desired uploaded reference genome from the dropdown menu.  
-4. Assign “Gap Filler” genomes by checking boxes in the “Extra Genomes” field. 
-5. Click “Save” when finished.
-
-1. Select the genome to be assembled from the project on the left hand side of the screen.  
 2. Here preliminary options for the new assembly must be set.  
 ![Creating an Assembly](images/GPM_Screenshots/Slide5.PNG)
 3. First, assign the reference genome to be used with the assembly.  
