@@ -55,6 +55,14 @@ for (sort {$a <=>$b} keys %tickLengthOptions)
 {
 	$tickLengthList .= ($_ eq $tickLength) ? "<option value='$_' selected>$tickLengthOptions{$_}</option>":"<option value='$_'>$tickLengthOptions{$_}</option>";
 }
+my $cookieAlignmentLength = cookie("alignmentLength") || '1000';
+my $alignmentLength = param ('alignmentLength') || $cookieAlignmentLength;
+my %alignmentLengthOptions = ( 1000=>'1kb', 10000=>'10kb', 100000=>'100kb');
+my $alignmentLengthList;
+for (sort {$a <=>$b} keys %alignmentLengthOptions)
+{
+	$alignmentLengthList .= ($_ eq $alignmentLength) ? "<option value='$_' selected>$alignmentLengthOptions{$_}</option>":"<option value='$_'>$alignmentLengthOptions{$_}</option>";
+}
 my $maxCol = 0;
 my $totalLength;
 if ($assemblyId && $chr)
@@ -583,7 +591,7 @@ if ($assemblyId && $chr)
 				$alignments->execute($companionAssemblySequenceId->{$currentSeq},$refGenomeSequence[0]);
 				while (my @alignments = $alignments->fetchrow_array())
 				{
-						next if ($alignments[5] < $pixelUnit); #skip if alignment shorter than pixelUnit
+						next if ($alignments[5] < $alignmentLength); #skip if alignment shorter than alignmentLength
 						my $seqXOne = 0;
 						my $seqXTwo = 0;
 						if($companionAssemblySeqOrient->{$currentSeq} eq "+")
@@ -994,7 +1002,7 @@ if ($assemblyId && $chr)
 			$alignments->execute($assemblySequenceId->{$currentSeq},$refGenomeSequence[0]);
 			while (my @alignments = $alignments->fetchrow_array())
 			{
-					next if ($alignments[5] < $pixelUnit); #skip if alignment shorter than pixelUnit
+					next if ($alignments[5] < $alignmentLength); #skip if alignment shorter than alignmentLength
 					my $seqXOne = 0;
 					my $seqXTwo = 0;
 					if($assemblySeqOrient->{$currentSeq} eq "+")
@@ -1132,6 +1140,7 @@ if ($assemblyId && $chr)
 		<label for='companionAssemblyId'><b>Companion Assembly</b></label><select class='ui-widget-content ui-corner-all' name='companionAssemblyId' id='companionAssemblyId' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&companionAssemblyId=\"+this.value);'>$companionAssemblyList</select>
 		<label for='pixelUnit'><b>Pixel Unit</b></label><select class='ui-widget-content ui-corner-all' name='pixelUnit' id='pixelUnit' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&pixelUnit=\"+this.value);'>$pixelUnitList</select>
 		<label for='tickLength'><b>Tick Length</b></label><select class='ui-widget-content ui-corner-all' name='tickLength' id='tickLength' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&tickLength=\"+this.value);'>$tickLengthList</select>
+		<label for='alignmentLength'><b>Alignment Length</b></label><select class='ui-widget-content ui-corner-all' name='alignmentLength' id='alignmentLength' onchange='closeViewer();openViewer(\"assemblyChrView.cgi?assemblyId=$assemblyId&chr=$chr&alignmentLength=\"+this.value);'>$alignmentLengthList</select>
 	</div>
 	<br><br>
 	<div id='assemblyChrListForAll$assemblyId$$'>
@@ -1151,7 +1160,7 @@ if ($assemblyId && $chr)
 	$html =~ s/\$pixelUnit/$pixelUnit/g;
 	$html =~ s/\$\$/$$/g;
 
-	print header(-cookie=>[cookie(-name=>"companionAssembly$assemblyId",-value=>$companionAssemblyId),cookie(-name=>"pixelUnit",-value=>$pixelUnit),cookie(-name=>"tickLength",-value=>$tickLength)]);
+	print header(-cookie=>[cookie(-name=>"companionAssembly$assemblyId",-value=>$companionAssemblyId),cookie(-name=>"pixelUnit",-value=>$pixelUnit),cookie(-name=>"tickLength",-value=>$tickLength),cookie(-name=>"alignmentLength",-value=>$alignmentLength)]);
 	print $html;
 }
 else

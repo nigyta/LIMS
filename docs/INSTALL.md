@@ -1,18 +1,18 @@
 # [Pangu LIMS Docs](README.md)
 ## Installation Instruction
 
-1) Download GPM source files and unzip the file on your own local system.
+1) Download LIMS source files and unzip the file on your own local system.
 
 2) Make a new directory under both /var/www/cgi-bin/ directory and /var/www/html/ directory. For example, the new directory named "lims". The commands are:
 ```
 $ mkdir /var/www/cgi-bin/lims
 $ mkdir /var/www/html/lims
 ```
-3) Copy all the files and directories in the "cgi-bin" directory (GPM source directory, e.g. ~/LIMS-master/cgi-bin/) to the /var/www/cgi-bin/lims directory:
+3) Copy all the files and directories in the "cgi-bin" directory (e.g. ~/LIMS-master/cgi-bin/) to the /var/www/cgi-bin/lims directory:
 ```
 $ cp -r ~/LIMS-master/cgi-bin/* /var/www/cgi-bin/lims/
 ```
-4) Copy all the files and directories in the "htdocs" directory (GPM source directory, e.g. ~/LIMS-master/htdocs/) to /var/www/html/lims directory:
+4) Copy all the files and directories in the "htdocs" directory (e.g. ~/LIMS-master/htdocs/) to /var/www/html/lims directory:
 ```
 $ cp -r ~/LIMS-master/htdocs/* /var/www/html/lims/
 ```
@@ -48,20 +48,20 @@ The source of these modules are:
 ```
 $ ln -s /usr/biosoft/blast+/
 ```
-10) Make a new database named "gpm" for GPM by mysql. The command are:
+10) Make a new MySQL database named "lims" for LIMS. The command are:
 ```
 $ mysql -u root -p
 Enter password: ********
-mysql> CREATE DATABASE IF NOT EXISTS gmp;
-mysql> use gmp;
+mysql> CREATE DATABASE IF NOT EXISTS lims;
+mysql> use lims;
 mysql> source /LIMS-master/sql/lims.sql
 ```
 11) Open the "main.conf" file in /var/www/cgi-bin/lims/ directory and complete the information as follow:
 
 ```
-USERNAME = root
-PASSWORD = YOUR PASSWORD OF THE ROOT
-DATABASE = gpm (YOUR DATABASE-NAME YOU CREATED ON STEP 10)
+USERNAME = root #Your username for accessing MySQL
+PASSWORD = xxxxxx #Your password for accessing MySQL
+DATABASE = lims #(The DATABASE-NAME YOU CREATED ON STEP 10)
 DBHOST = localhost
 HOSTURL = http://YOUR-HOSTURL
 CGIBINDIR = /var/www/cgi-bin/lims
@@ -71,15 +71,15 @@ HTDOCS =  /lims
 DATADIR = /var/www/html/lims/data
 TMPDIR = /var/www/html/lims/data/tmp
 TMPURL = /lims/data/tmp
-JOBDIR = /var/www/html/lims/data/jobs
-VECTOR = /var/www/html/lims/data/pAGIBAC1_HindIII.txt
-VECTORLENGTH = 7522
-POLISHED = /var/www/html/lims/data/polished
-POLISHEDURL = /lims/data/polished
+JOBDIR = /var/www/html/lims/data/jobs #optional --leave this blank if you don't know what this is
+VECTOR = /var/www/html/lims/data/pAGIBAC1_HindIII.txt #optional --leave this blank if you don't know what this is
+VECTORLENGTH = 7522 #optional --leave this blank if you don't know what this is
+POLISHED = /var/www/html/lims/data/polished #optional --leave this blank if you don't know what this is
+POLISHEDURL = /lims/data/polished #optional --leave this blank if you don't know what this is
 ```
 Make sure that you enter the correct path of your files and don't forget to bring the directory name you created on step 2. In this text we add "lims" into the path.
 
-12) To optimize GPM, change some settings in the /etc/my.cnf file as below:
+12) To optimize LIMS, change some settings in the /etc/my.cnf file as below:
 ```
 #set max_allowed_packet to 512M for loading long sequences, like maize genome
 #The maximum size of one packet or any generated/intermediate string

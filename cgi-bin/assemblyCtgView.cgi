@@ -50,6 +50,14 @@ for (sort {$a <=>$b} keys %tickLengthOptions)
 {
 	$tickLengthList .= ($_ eq $tickLength) ? "<option value='$_' selected>$tickLengthOptions{$_}</option>":"<option value='$_'>$tickLengthOptions{$_}</option>";
 }
+my $cookieAlignmentLength = cookie("alignmentLength") || '1000';
+my $alignmentLength = param ('alignmentLength') || $cookieAlignmentLength;
+my %alignmentLengthOptions = ( 1000=>'1kb', 10000=>'10kb', 100000=>'100kb');
+my $alignmentLengthList;
+for (sort {$a <=>$b} keys %alignmentLengthOptions)
+{
+	$alignmentLengthList .= ($_ eq $alignmentLength) ? "<option value='$_' selected>$alignmentLengthOptions{$_}</option>":"<option value='$_'>$alignmentLengthOptions{$_}</option>";
+}
 my $maxCol = 0;
 my $gapLength = 100;
 if ($assemblyCtgId)
@@ -446,7 +454,7 @@ if ($assemblyCtgId)
 			
 			while (my @alignments = $alignments->fetchrow_array())
 			{
-				next if ($alignments[5] < $pixelUnit); #skip if alignment shorter than pixelUnit
+				next if ($alignments[5] < $alignmentLength); #skip if alignment shorter than alignmentLength
 				my $preXOne = 0;
 				my $preXTwo = 0;
 				if($assemblySeqOrient->{$preSeq} eq "+")
@@ -633,6 +641,7 @@ if ($assemblyCtgId)
 	<div style='float: right; margin-right: .3em; white-space: nowrap;'>
 		<label for='pixelUnit'><b>Pixel Unit</b></label><select class='ui-widget-content ui-corner-all' name='pixelUnit' id='pixelUnit' onchange='closeViewer();openViewer(\"assemblyCtgView.cgi?assemblyCtgId=$assemblyCtg[0]&pixelUnit=\"+this.value);'>$pixelUnitList</select>
 		<label for='tickLength'><b>Tick Length</b></label><select class='ui-widget-content ui-corner-all' name='tickLength' id='tickLength' onchange='closeViewer();openViewer(\"assemblyCtgView.cgi?assemblyCtgId=$assemblyCtg[0]&tickLength=\"+this.value);'>$tickLengthList</select>
+		<label for='alignmentLength'><b>Alignment Length</b></label><select class='ui-widget-content ui-corner-all' name='alignmentLength' id='alignmentLength' onchange='closeViewer();openViewer(\"assemblyCtgView.cgi?assemblyCtgId=$assemblyCtg[0]&alignmentLength=\"+this.value);'>$alignmentLengthList</select>
 		<a onclick='openDialog(\"comment.cgi?itemId=$assemblyCtgId\");'><span style='left: 0px;top: 0px;display:inline-block;' class='ui-icon ui-icon-comment'></span>Comments</a>
 	</div>
 	<br><br>
@@ -652,7 +661,7 @@ if ($assemblyCtgId)
 	$html =~ s/\$scrollLeft/$scrollLeft/g;
 	$html =~ s/\$\$/$$/g;
 
-	print header(-cookie=>[cookie(-name=>'assemblyCtg',-value=>$assemblyCtgId),cookie(-name=>"pixelUnit",-value=>$pixelUnit),cookie(-name=>"tickLength",-value=>$tickLength)]);
+	print header(-cookie=>[cookie(-name=>'assemblyCtg',-value=>$assemblyCtgId),cookie(-name=>"pixelUnit",-value=>$pixelUnit),cookie(-name=>"tickLength",-value=>$tickLength),cookie(-name=>"alignmentLength",-value=>$alignmentLength)]);
 	print $html;
 }
 else
