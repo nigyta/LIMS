@@ -54,13 +54,13 @@ $ mysql -u root -p
 Enter password: ********
 mysql> CREATE DATABASE IF NOT EXISTS lims;
 mysql> use lims;
-mysql> source /LIMS-master/sql/lims.sql
+mysql> source ~/LIMS-master/sql/lims.sql
 ```
 11) Open the "main.conf" file in /var/www/cgi-bin/lims/ directory and complete the information as follow:
 
 ```
 USERNAME = root #Your username for accessing MySQL
-PASSWORD = xxxxxx #Your password for accessing MySQL
+PASSWORD = ******** #Your password for accessing MySQL
 DATABASE = lims #(The DATABASE-NAME YOU CREATED ON STEP 10)
 DBHOST = localhost
 HOSTURL = http://YOUR-HOSTURL
