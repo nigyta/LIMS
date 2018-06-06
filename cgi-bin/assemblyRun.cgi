@@ -674,139 +674,6 @@ END
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		}
 
-		if($refGenomeId)
-		{
-			my $updateAssemblyGenomeId=$dbh->do("UPDATE matrix SET y = $refGenomeId WHERE id = $assemblyId");
-			my $sequenceInRefGenome;
-			my $getGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
-			$getGenomeSequence->execute($refGenomeId);
-			while(my @getGenomeSequence = $getGenomeSequence->fetchrow_array())
-			{
-				$sequenceInRefGenome->{$getGenomeSequence[0]} = $getGenomeSequence[6];
-			}
-			
-			my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
-			#assign ctg to genome chr
-			my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ?");
-			$assemblyAllCtgList->execute($assemblyId);
-			while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
-			{
-				my $chrNumber;
-				my $chrPosition;
-				my $ctgAllSeqLength = 0;
-				for (split ",", $assemblyAllCtgList[8])
-				{
-					next unless ($_);
-					/^-/ and next;
-					$_ =~ s/[^a-zA-Z0-9]//g;
-					my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
-					$getAlignment->execute($sequenceIdOfAssemblySeq->{$_});
-					while (my @getAlignment = $getAlignment->fetchrow_array())
-					{
-						next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
-						next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} >= $alignmentBlockPercent);
-						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
-						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
-						my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength : $getAlignment[11] - $sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} + $getAlignment[9] - $ctgAllSeqLength;
-						if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
-						{
-							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
-						}
-						else
-						{
-							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
-						}
-					}
-					my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-					$assemblySeq->execute($_);
-					my @assemblySeq = $assemblySeq->fetchrow_array();
-					my ($assemblySeqStart,$assemblySeqEnd) = split ",",$assemblySeq[8];
-					$ctgAllSeqLength += $assemblySeqEnd - $assemblySeqStart + 1;
-				}
-				my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
-				my $assignedChr = ($assemblyAllCtgList[4]) ? $assemblyAllCtgList[4] : (@assignedChr) ? shift @assignedChr : 0;
-				my $assignedPosition = 0;
-					
-				if($assignedChr)
-				{
-					my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
-					sort {$a <=> $b} @assignedPositionCandidates;
-					my $estimatedMedian = int ($#assignedPositionCandidates/2);
-					$assignedPosition = $assignedPositionCandidates[$estimatedMedian];
-				}
-				if($assignChr && $assemblyAllCtgList[4] == 0) #assign chrNumber for unplaced contigs
-				{
-					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
-				}
-				if ($reposition && $assemblyAllCtgList[4]) #relocate position
-				{
-					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
-				}
-			}
-			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
-
-			if($orientContigs)
-			{
-				my $updateAssemblyToOrientingContigs=$dbh->do("UPDATE matrix SET barcode = '-8' WHERE id = $assemblyId");
-				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
-				$assemblyAllCtgList->execute($assemblyId);
-				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
-				{
-					my $toBeFlipped = 0;
-					for (split ",", $assemblyAllCtgList[8])
-					{
-						next unless ($_);
-						/^-/ and next;
-						$_ =~ s/[^a-zA-Z0-9]//g;						
-						my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-						$assemblySeq->execute($_);
-						my @assemblySeq = $assemblySeq->fetchrow_array();
-						my $alignmentToGenome = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ?");
-						$alignmentToGenome->execute($assemblySeq[5]);
-						while (my @alignmentToGenome = $alignmentToGenome->fetchrow_array())
-						{
-							next unless (exists $sequenceInRefGenome->{$alignmentToGenome[3]});
-							if($assemblySeq[7] > 0)
-							{
-								if ($alignmentToGenome[10] > $alignmentToGenome[11])
-								{
-									$toBeFlipped += $alignmentToGenome[5];
-								}
-								else
-								{
-									$toBeFlipped -= $alignmentToGenome[5];
-								}
-							}
-							else
-							{
-								if ($alignmentToGenome[10] < $alignmentToGenome[11])
-								{
-									$toBeFlipped += $alignmentToGenome[5];
-								}
-								else
-								{
-									$toBeFlipped -= $alignmentToGenome[5];
-								}
-							}
-						}
-					}
-					if ($toBeFlipped > 0)
-					{
-						$assemblyAllCtgList[8] = join ",", (reverse split ",", $assemblyAllCtgList[8]);
-						foreach (split ",", $assemblyAllCtgList[8])
-						{
-							next unless ($_);
-							$_ =~ s/[^a-zA-Z0-9]//g;
-							my $updateAssemblySeq=$dbh->do("UPDATE matrix SET barcode = barcode * (-1) WHERE id = $_");
-						}
-						my $updateAssemblyCtg=$dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
-						$updateAssemblyCtg->execute($assemblyAllCtgList[8],$assemblyAllCtgList[0]);
-					}
-				}
-				my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
- 	 		}
-		}
-
 		# end-to-end merge
 		if($endToEnd)
 		{
@@ -1587,121 +1454,352 @@ END
 			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		}
 
-		my $updateAssemblyToEstimatingLength=$dbh->do("UPDATE matrix SET barcode = '-11' WHERE id = $assemblyId");
-		my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,barcode");
-		$assemblyAllCtgList->execute($assemblyId);
-		my $totalCtgNumber = $assemblyAllCtgList->rows;
-		my $assignedChrOrder = 1;
-		while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
+		if($refGenomeId)
 		{
-			my $assemblyCtgLength = 0;
-			my $assemblySeqList = '';
-
-			my @assemblySeqListAll;
-			my $firstAssemblySeq = "";
-			my $lastAssemblySeq = "";
-			
-			foreach (split ",", $assemblyAllCtgList[8])
+			my $updateAssemblyGenomeId=$dbh->do("UPDATE matrix SET y = $refGenomeId WHERE id = $assemblyId");
+			my $sequenceInRefGenome;
+			my $getGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
+			$getGenomeSequence->execute($refGenomeId);
+			while(my @getGenomeSequence = $getGenomeSequence->fetchrow_array())
 			{
-				next unless ($_);
-				$assemblySeqList .= ($assemblySeqList ne '') ? ",$_": $_;
-				/^-/ and next;
-				$_ =~ s/[^a-zA-Z0-9]//g;
-				push @assemblySeqListAll, $_;
-				$firstAssemblySeq = $_ unless ($firstAssemblySeq);
-				$lastAssemblySeq = $_;
+				$sequenceInRefGenome->{$getGenomeSequence[0]} = $getGenomeSequence[6];
 			}
-
-			my $lastComponentType = '';
-			for (@assemblySeqListAll)
+			
+			my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
+			#assign ctg to genome chr
+			my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ?");
+			$assemblyAllCtgList->execute($assemblyId);
+			while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
 			{
-				my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-				$assemblySeq->execute($_);
-				my @assemblySeq = $assemblySeq->fetchrow_array();
-				my $assemblySeqStart;
-				my $assemblySeqEnd;
-				if($assemblySeq[8])
+				my $assemblyCtgLength = 0;
+				my $assemblySeqList = '';
+				my $chrNumber;
+				my $chrPosition;
+
+				my @assemblySeqListAll;
+				my $firstAssemblySeq = "";
+				my $lastAssemblySeq = "";
+			
+				foreach (split ",", $assemblyAllCtgList[8])
 				{
-					($assemblySeqStart,$assemblySeqEnd) = split ",",$assemblySeq[8];
+					next unless ($_);
+					$assemblySeqList .= ($assemblySeqList ne '') ? ",$_": $_;
+					/^-/ and next;
+					$_ =~ s/[^a-zA-Z0-9]//g;
+					push @assemblySeqListAll, $_;
+					$firstAssemblySeq = $_ unless ($firstAssemblySeq);
+					$lastAssemblySeq = $_;
 				}
-				else
+				my $lastComponentType = '';
+				for (@assemblySeqListAll)
 				{
-					$assemblySeqStart = 1;
-					$assemblySeqEnd = $assemblySeq[6];
-					my $updateAssemblySeq=$dbh->do("UPDATE matrix SET note = '$assemblySeqStart,$assemblySeqEnd' WHERE id = $assemblySeq[0]");
-				}
-				my $filterLength = 0;
-				my $sequence = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
-				$sequence->execute($assemblySeq[5]);
-				my @sequence =  $sequence->fetchrow_array();
-				my $sequenceDetails = decode_json $sequence[8];
-				$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
-				if ($sequenceDetails->{'filter'}) 
-				{
-					foreach (split ",", $sequenceDetails->{'filter'} )
+					my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
+					$getAlignment->execute($sequenceIdOfAssemblySeq->{$_});
+					while (my @getAlignment = $getAlignment->fetchrow_array())
 					{
-						my ($filterStart,$filterEnd) = split "-", $_;
-						next if ($assemblySeqStart > $filterEnd);
-						next if ($assemblySeqEnd < $filterStart);
-						if ($assemblySeqStart >= $filterStart && $assemblySeqEnd <= $filterEnd)
+						next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
+						next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} >= $alignmentBlockPercent);
+						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
+						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
+						my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $assemblyCtgLength : $getAlignment[11] - $sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} + $getAlignment[9] - $assemblyCtgLength;
+						if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
 						{
-							$filterLength += $assemblySeqEnd - $assemblySeqStart + 1;
-						}
-						elsif ($assemblySeqStart >= $filterStart && $assemblySeqStart <= $filterEnd)
-						{
-							$filterLength += $filterEnd - $assemblySeqStart + 1;
-						}
-						elsif ($assemblySeqEnd >= $filterStart && $assemblySeqEnd <= $filterEnd)
-						{
-							$filterLength += $assemblySeqEnd - $filterStart + 1;
+							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
 						}
 						else
 						{
-							$filterLength += $filterEnd - $filterStart + 1;
+							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
+						}
+					}
+					my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$assemblySeq->execute($_);
+					my @assemblySeq = $assemblySeq->fetchrow_array();
+					my $assemblySeqStart;
+					my $assemblySeqEnd;
+					if($assemblySeq[8])
+					{
+						($assemblySeqStart,$assemblySeqEnd) = split ",",$assemblySeq[8];
+					}
+					else
+					{
+						$assemblySeqStart = 1;
+						$assemblySeqEnd = $assemblySeq[6];
+						my $updateAssemblySeq=$dbh->do("UPDATE matrix SET note = '$assemblySeqStart,$assemblySeqEnd' WHERE id = $assemblySeq[0]");
+					}
+					my $filterLength = 0;
+					my $sequence = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$sequence->execute($assemblySeq[5]);
+					my @sequence =  $sequence->fetchrow_array();
+					my $sequenceDetails = decode_json $sequence[8];
+					$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
+					if ($sequenceDetails->{'filter'}) 
+					{
+						foreach (split ",", $sequenceDetails->{'filter'} )
+						{
+							my ($filterStart,$filterEnd) = split "-", $_;
+							next if ($assemblySeqStart > $filterEnd);
+							next if ($assemblySeqEnd < $filterStart);
+							if ($assemblySeqStart >= $filterStart && $assemblySeqEnd <= $filterEnd)
+							{
+								$filterLength += $assemblySeqEnd - $assemblySeqStart + 1;
+							}
+							elsif ($assemblySeqStart >= $filterStart && $assemblySeqStart <= $filterEnd)
+							{
+								$filterLength += $filterEnd - $assemblySeqStart + 1;
+							}
+							elsif ($assemblySeqEnd >= $filterStart && $assemblySeqEnd <= $filterEnd)
+							{
+								$filterLength += $assemblySeqEnd - $filterStart + 1;
+							}
+							else
+							{
+								$filterLength += $filterEnd - $filterStart + 1;
+							}
+						}
+					}
+					#add non-end gaps to assemblyCtg length
+					if($_ ne $firstAssemblySeq && $lastComponentType ne 'U')
+					{
+						if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+						{
+							$assemblyCtgLength += $gapLength;
+							$lastComponentType = 'U';
+						}
+					}
+					$assemblyCtgLength += $assemblySeqEnd - $assemblySeqStart + 1 - $filterLength;
+					$lastComponentType = 'D';
+					if($_ ne $lastAssemblySeq && $lastComponentType ne 'U')
+					{
+						if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+						{
+							$assemblyCtgLength += $gapLength;				
+							$lastComponentType = 'U';
 						}
 					}
 				}
-				#add non-end gaps to assemblyCtg length
-				if($_ ne $firstAssemblySeq && $lastComponentType ne 'U')
+				my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
+				my $assignedChr = ($assemblyAllCtgList[4]) ? $assemblyAllCtgList[4] : (@assignedChr) ? shift @assignedChr : 0;
+				my $assignedPosition = 0;
+					
+				if($assignedChr)
 				{
-					if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+					my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
+					sort {$a <=> $b} @assignedPositionCandidates;
+					my $estimatedMedian = int ($#assignedPositionCandidates/2);
+					$assignedPosition = $assignedPositionCandidates[$estimatedMedian];
+				}
+				if($assignChr && $assemblyAllCtgList[4] == 0) #assign chrNumber for unplaced contigs
+				{
+					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
+				}
+				if ($reposition && $assemblyAllCtgList[4]) #relocate position
+				{
+					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
+				}
+				my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET barcode = $assemblyCtgLength, note = '$assemblySeqList' WHERE id = $assemblyAllCtgList[0]");
+			}
+			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
+
+			if($orientContigs)
+			{
+				my $updateAssemblyToOrientingContigs=$dbh->do("UPDATE matrix SET barcode = '-8' WHERE id = $assemblyId");
+				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z");
+				$assemblyAllCtgList->execute($assemblyId);
+				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
+				{
+					my $toBeFlipped = 0;
+					for (split ",", $assemblyAllCtgList[8])
 					{
-						$assemblyCtgLength += $gapLength;
-						$lastComponentType = 'U';
+						next unless ($_);
+						/^-/ and next;
+						$_ =~ s/[^a-zA-Z0-9]//g;						
+						my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+						$assemblySeq->execute($_);
+						my @assemblySeq = $assemblySeq->fetchrow_array();
+						my $alignmentToGenome = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ?");
+						$alignmentToGenome->execute($assemblySeq[5]);
+						while (my @alignmentToGenome = $alignmentToGenome->fetchrow_array())
+						{
+							next unless (exists $sequenceInRefGenome->{$alignmentToGenome[3]});
+							if($assemblySeq[7] > 0)
+							{
+								if ($alignmentToGenome[10] > $alignmentToGenome[11])
+								{
+									$toBeFlipped += $alignmentToGenome[5];
+								}
+								else
+								{
+									$toBeFlipped -= $alignmentToGenome[5];
+								}
+							}
+							else
+							{
+								if ($alignmentToGenome[10] < $alignmentToGenome[11])
+								{
+									$toBeFlipped += $alignmentToGenome[5];
+								}
+								else
+								{
+									$toBeFlipped -= $alignmentToGenome[5];
+								}
+							}
+						}
+					}
+					if ($toBeFlipped > 0)
+					{
+						$assemblyAllCtgList[8] = join ",", (reverse split ",", $assemblyAllCtgList[8]);
+						foreach (split ",", $assemblyAllCtgList[8])
+						{
+							next unless ($_);
+							$_ =~ s/[^a-zA-Z0-9]//g;
+							my $updateAssemblySeq=$dbh->do("UPDATE matrix SET barcode = barcode * (-1) WHERE id = $_");
+						}
+						my $updateAssemblyCtg=$dbh->prepare("UPDATE matrix SET note = ? WHERE id = ?");
+						$updateAssemblyCtg->execute($assemblyAllCtgList[8],$assemblyAllCtgList[0]);
 					}
 				}
- 			  	$assemblyCtgLength += $assemblySeqEnd - $assemblySeqStart + 1 - $filterLength;
-				$lastComponentType = 'D';
-				if($_ ne $lastAssemblySeq && $lastComponentType ne 'U')
+				my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
+ 	 		}
+
+			my $updateAssemblyToEstimatingLength=$dbh->do("UPDATE matrix SET barcode = '-11' WHERE id = $assemblyId");
+			if($renumber)
+			{
+				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,barcode");
+				$assemblyAllCtgList->execute($assemblyId);
+				my $totalCtgNumber = $assemblyAllCtgList->rows;
+				my $assignedChrOrder = 1;
+				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
 				{
-					if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+					if($assemblyAllCtgList[4] > 0)
 					{
-						$assemblyCtgLength += $gapLength;				
-						$lastComponentType = 'U';
+						my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET name = $assignedChrOrder, y = $assignedChrOrder WHERE id = $assemblyAllCtgList[0]");
+						$assignedChrOrder++;
+					}
+					else
+					{
+						my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET name = $totalCtgNumber, y = $totalCtgNumber WHERE id = $assemblyAllCtgList[0]");
+						$totalCtgNumber--;
 					}
 				}
 			}
-
-			if($renumber)
+		}
+		else
+		{
+			my $updateAssemblyToEstimatingLength=$dbh->do("UPDATE matrix SET barcode = '-11' WHERE id = $assemblyId");
+			my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ? ORDER BY x,z,barcode");
+			$assemblyAllCtgList->execute($assemblyId);
+			my $totalCtgNumber = $assemblyAllCtgList->rows;
+			my $assignedChrOrder = 1;
+			while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
 			{
-				if($assemblyAllCtgList[4] > 0)
+				my $assemblyCtgLength = 0;
+				my $assemblySeqList = '';
+
+				my @assemblySeqListAll;
+				my $firstAssemblySeq = "";
+				my $lastAssemblySeq = "";
+			
+				foreach (split ",", $assemblyAllCtgList[8])
 				{
-					my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET name = $assignedChrOrder, y = $assignedChrOrder, barcode = $assemblyCtgLength, note = '$assemblySeqList' WHERE id = $assemblyAllCtgList[0]");
-					$assignedChrOrder++;
+					next unless ($_);
+					$assemblySeqList .= ($assemblySeqList ne '') ? ",$_": $_;
+					/^-/ and next;
+					$_ =~ s/[^a-zA-Z0-9]//g;
+					push @assemblySeqListAll, $_;
+					$firstAssemblySeq = $_ unless ($firstAssemblySeq);
+					$lastAssemblySeq = $_;
+				}
+
+				my $lastComponentType = '';
+				for (@assemblySeqListAll)
+				{
+					my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$assemblySeq->execute($_);
+					my @assemblySeq = $assemblySeq->fetchrow_array();
+					my $assemblySeqStart;
+					my $assemblySeqEnd;
+					if($assemblySeq[8])
+					{
+						($assemblySeqStart,$assemblySeqEnd) = split ",",$assemblySeq[8];
+					}
+					else
+					{
+						$assemblySeqStart = 1;
+						$assemblySeqEnd = $assemblySeq[6];
+						my $updateAssemblySeq=$dbh->do("UPDATE matrix SET note = '$assemblySeqStart,$assemblySeqEnd' WHERE id = $assemblySeq[0]");
+					}
+					my $filterLength = 0;
+					my $sequence = $dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$sequence->execute($assemblySeq[5]);
+					my @sequence =  $sequence->fetchrow_array();
+					my $sequenceDetails = decode_json $sequence[8];
+					$sequenceDetails->{'filter'} = '' unless (exists $sequenceDetails->{'filter'});
+					if ($sequenceDetails->{'filter'}) 
+					{
+						foreach (split ",", $sequenceDetails->{'filter'} )
+						{
+							my ($filterStart,$filterEnd) = split "-", $_;
+							next if ($assemblySeqStart > $filterEnd);
+							next if ($assemblySeqEnd < $filterStart);
+							if ($assemblySeqStart >= $filterStart && $assemblySeqEnd <= $filterEnd)
+							{
+								$filterLength += $assemblySeqEnd - $assemblySeqStart + 1;
+							}
+							elsif ($assemblySeqStart >= $filterStart && $assemblySeqStart <= $filterEnd)
+							{
+								$filterLength += $filterEnd - $assemblySeqStart + 1;
+							}
+							elsif ($assemblySeqEnd >= $filterStart && $assemblySeqEnd <= $filterEnd)
+							{
+								$filterLength += $assemblySeqEnd - $filterStart + 1;
+							}
+							else
+							{
+								$filterLength += $filterEnd - $filterStart + 1;
+							}
+						}
+					}
+					#add non-end gaps to assemblyCtg length
+					if($_ ne $firstAssemblySeq && $lastComponentType ne 'U')
+					{
+						if ($assemblySeq[4] eq 1 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 4 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+						{
+							$assemblyCtgLength += $gapLength;
+							$lastComponentType = 'U';
+						}
+					}
+					$assemblyCtgLength += $assemblySeqEnd - $assemblySeqStart + 1 - $filterLength;
+					$lastComponentType = 'D';
+					if($_ ne $lastAssemblySeq && $lastComponentType ne 'U')
+					{
+						if ($assemblySeq[4] eq 2 || $assemblySeq[4] eq 3 || $assemblySeq[4] eq 5 || $assemblySeq[4] eq 6 || $assemblySeq[4] eq 7 || $assemblySeq[4] eq 8) # add 5' 100 Ns
+						{
+							$assemblyCtgLength += $gapLength;				
+							$lastComponentType = 'U';
+						}
+					}
+				}
+
+				if($renumber)
+				{
+					if($assemblyAllCtgList[4] > 0)
+					{
+						my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET name = $assignedChrOrder, y = $assignedChrOrder, barcode = $assemblyCtgLength, note = '$assemblySeqList' WHERE id = $assemblyAllCtgList[0]");
+						$assignedChrOrder++;
+					}
+					else
+					{
+						my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET name = $totalCtgNumber, y = $totalCtgNumber, barcode = $assemblyCtgLength, note = '$assemblySeqList' WHERE id = $assemblyAllCtgList[0]");
+						$totalCtgNumber--;
+					}
 				}
 				else
 				{
-					my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET name = $totalCtgNumber, y = $totalCtgNumber, barcode = $assemblyCtgLength, note = '$assemblySeqList' WHERE id = $assemblyAllCtgList[0]");
-					$totalCtgNumber--;
+					my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET y = $assignedChrOrder, barcode = $assemblyCtgLength, note = '$assemblySeqList' WHERE id = $assemblyAllCtgList[0]");
+					$assignedChrOrder++;
 				}
 			}
-			else
-			{
-				my $updateAssemblyCtgLength=$dbh->do("UPDATE matrix SET y = $assignedChrOrder, barcode = $assemblyCtgLength, note = '$assemblySeqList' WHERE id = $assemblyAllCtgList[0]");
-				$assignedChrOrder++;
-			}
 		}
-
 		my $assemblyDetails = decode_json $assembly[8];
 		$assemblyDetails->{'log'} = '' if (!exists $assemblyDetails->{'log'});
 		$assemblyDetails->{'log'} .= "\n" if ($assemblyDetails->{'log'});
