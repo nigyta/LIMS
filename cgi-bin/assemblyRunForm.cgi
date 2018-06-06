@@ -16,6 +16,7 @@ exit if (!$userId);
 my $commoncfg = readConfig("main.conf");
 my $dbh=DBI->connect("DBI:mysql:$commoncfg->{DATABASE}:$commoncfg->{DBHOST}",$commoncfg->{USERNAME},$commoncfg->{PASSWORD});
 my $userConfig = new userConfig;
+my $SEQTOGNMMINOVERLAP = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP");
 my $ENDTOENDMINOVERLAP = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"ENDTOENDMINOVERLAP");
 my $ENDTOENDIDENTITY = $userConfig->getFieldValueWithUserIdAndFieldName($userId,"ENDTOENDIDENTITY");
 
@@ -116,6 +117,7 @@ $html =~ s/\$assemblyId/$assemblyId/g;
 $html =~ s/\$assemblyName/$assembly[2]/g;
 $html =~ s/\$fpcOrAgpId/$fpcOrAgpId/g;
 $html =~ s/\$refGenomeId/$refGenomeId/g;
+$html =~ s/\$SEQTOGNMMINOVERLAP/$SEQTOGNMMINOVERLAP/g;
 $html =~ s/\$ENDTOENDMINOVERLAP/$ENDTOENDMINOVERLAP/g;
 $html =~ s/\$ENDTOENDIDENTITY/$ENDTOENDIDENTITY/g;
 
@@ -132,8 +134,8 @@ __DATA__
 			<input type="radio" id="newAssemblyReplaceRadio1" name="replace" value="0" checked="checked"><label for="newAssemblyReplaceRadio1">No</label>
 		</div>
 	</td></tr>
-	<tr><td style='text-align:left'><label for="newAssemblySeqMinLength"><b>AssemblySeq Minimum Length (bp)</b></label></td>
-		<td><input name="assemblySeqMinLength" id="newAssemblySeqMinLength" size="4" type="text" maxlength="6" VALUE="0" /></td>
+	<tr><td style='text-align:left'><label for="newAssemblySeqMinLength"><b>AssemblySeq Minimum Length</b></label></td>
+		<td><input name="assemblySeqMinLength" id="newAssemblySeqMinLength" size="4" type="text" maxlength="6" VALUE="0" />(bp)</td>
 	</tr>
 	</table>
 	<table>
@@ -144,8 +146,10 @@ __DATA__
 	<table>
 	<tr><td style='text-align:right'><label for="newAssemblyGenome"><b>Reference Genome</b></label></td>
 	<td><select class='ui-widget-content ui-corner-all' name="refGenomeId" id="newAssemblyGenome">$refGenomeId</select><br>
-			<input type="checkbox" id="newAssemblyAssignChrCheckbox" name="assignChr" value="1" checked="checked"><label for="newAssemblyAssignChrCheckbox">Assign chromosome number for Chr0 contigs</label><br>
-			<input type="checkbox" id="newAssemblyOrientContigsCheckbox" name="orientContigs" value="1" checked="checked"><label for="newAssemblyOrientContigsCheckbox">Orient contigs based-on reference genome</label>
+			<label for="newAssemblyAlignmentBlockSize">Alignment Block Size</label> <input name="alignmentBlockSize" id="newAssemblyAlignmentBlockSize" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" />(bp)<br>
+			<label for="newAssemblyAlignmentBlockPercent">Alignment Percent</label> <input name="alignmentBlockPercent" id="newAssemblyAlignmentBlockPercent" size="2" type="text" maxlength="3" VALUE="25" />(%)<br>
+			<input type="checkbox" id="newAssemblyAssignChrCheckbox" name="assignChr" value="1" checked="checked"> <label for="newAssemblyAssignChrCheckbox">Assign chromosome number for unplaced contigs</label><br>
+			<input type="checkbox" id="newAssemblyOrientContigsCheckbox" name="orientContigs" value="1" checked="checked"> <label for="newAssemblyOrientContigsCheckbox">Orient contigs based-on reference genome</label>
 	</td>
 	</tr>
 	</table>
@@ -157,9 +161,9 @@ __DATA__
 			<input type="radio" id="newAssemblyEndToEndRadio1" name="endToEnd" value="0" checked="checked"><label for="newAssemblyEndToEndRadio1">No</label>
 		</div>
 	</td>
-	<td style='text-align:right'><label for="newAssemblyEndToEndMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapEndToEnd" id="newAssemblyEndToEndMinOverlap" size="4" type="text" maxlength="6" VALUE="$ENDTOENDMINOVERLAP" /></td>
+	<td style='text-align:right'><label for="newAssemblyEndToEndMinOverlap"><b>Minimum Overlap</b></label></td><td><input name="minOverlapEndToEnd" id="newAssemblyEndToEndMinOverlap" size="4" type="text" maxlength="6" VALUE="$ENDTOENDMINOVERLAP" />(bp)</td>
 	</tr>
-	<tr><td style='text-align:right'><label for="newAssemblyEndToEndIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityEndToEnd" id="newAssemblyEndToEndIdentity" size="4" type="text" maxlength="4" VALUE="$ENDTOENDIDENTITY" /></td></tr>
+	<tr><td style='text-align:right'><label for="newAssemblyEndToEndIdentity"><b>Minimum Identity</b></label></td><td><input name="identityEndToEnd" id="newAssemblyEndToEndIdentity" size="4" type="text" maxlength="4" VALUE="$ENDTOENDIDENTITY" />(%)</td></tr>
 	</table>
 	<hr>
 	<table>
@@ -216,6 +220,8 @@ $( "#newAssemblySeqMinLength" ).spinner({
 		}
 	}
 });
+$( "#newAssemblyAlignmentBlockSize" ).spinner({ min: 0, max: 30000, step: 1000});
+$( "#newAssemblyAlignmentBlockPercent" ).spinner({ min: 10, max: 100, step: 5});
 $( "#newAssemblyEndToEnd" ).buttonset();
 $( "#newAssemblyEndToEndMinOverlap" ).spinner({
 	min: 500,

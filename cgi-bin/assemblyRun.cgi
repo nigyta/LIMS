@@ -41,6 +41,8 @@ my $replace = param ('replace') || '0';
 my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
 my $refGenomeId = param ('refGenomeId') || '0';
 my $assignChr = param ('assignChr') || '0';
+my $alignmentBlockSize = param ('alignmentBlockSize') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP"); #1 kb
+my $alignmentBlockPercent = param ('alignmentBlockPercent') || '25'; #25%
 my $orientContigs = param ('orientContigs') || '0';
 my $assemblySeqMinLength = param ('assemblySeqMinLength') || '0';
 my $endToEnd = param ('endToEnd') || '0';
@@ -720,9 +722,10 @@ END
 						while (my @getAlignment = $getAlignment->fetchrow_array())
 						{
 							next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
+							next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$assemblySequenceLength->{$assemblySequenceId->{$_}} >= $alignmentBlockPercent);
 							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
 							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
-							my $estimatedPosition = $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength;
+							my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength : $getAlignment[11] - $assemblySequenceLength->{$assemblySequenceId->{$_}} + $getAlignment[9] - $ctgAllSeqLength;
 							if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
 							{
 								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
@@ -732,7 +735,7 @@ END
 								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
 							}
 						}
-						$ctgAllSeqLength += $assemblySequenceLength->{$_};
+						$ctgAllSeqLength += $assemblySequenceLength->{$assemblySequenceId->{$_}};
 					}
 					my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
 					my $assignedChr = (@assignedChr) ? shift @assignedChr : 0;

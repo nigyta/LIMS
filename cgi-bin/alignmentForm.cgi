@@ -147,8 +147,8 @@ __DATA__
 		<input type="checkbox" id="newAlignmentSpeedyMode" name="speedyMode" value="1" checked="checked"><label for="newAlignmentSpeedyMode" title="This will skip 'Check End Match'">Speedy Mode</label><br>
 		<input type="checkbox" id="newAlignmentCheckGood" name="checkGood" value="1"><label for="newAlignmentCheckGood">Check End Match for SeqToSeq</label><br>
 		<input type="checkbox" id="newMarkRepeatRegionCheckbox" name="markRepeatRegion" value="1" checked="checked"><label for="newMarkRepeatRegionCheckbox">Mark Repeat Region</label></td></tr>
-	<tr><td></td><td style='text-align:right'><label for="newAlignmentMinOverlap"><b>Minimum Overlap</b></label><br>(length in bp)</td><td><input name="minOverlapAlignment" id="newAlignmentMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" /></td></tr>
-	<tr><td></td><td style='text-align:right'><label for="newAlignmentIdentity"><b>Minimum Identity</b></label><br>(%)</td><td><input name="identityAlignment" id="newAlignmentIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOGNMIDENTITY" /></td></tr>
+	<tr><td></td><td style='text-align:right'><label for="newAlignmentMinOverlap"><b>Minimum Overlap</b></label></td><td><input name="minOverlapAlignment" id="newAlignmentMinOverlap" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" />(bp)</td></tr>
+	<tr><td></td><td style='text-align:right'><label for="newAlignmentIdentity"><b>Minimum Identity</b></label></td><td><input name="identityAlignment" id="newAlignmentIdentity" size="4" type="text" maxlength="4" VALUE="$SEQTOGNMIDENTITY" />(%)</td></tr>
 	<tr><td></td><td style='text-align:left' colspan='2'><input type="checkbox" id="newEmailNotificationCheckbox" name="emailNotification" value="1" checked="checked"><label for="newEmailNotificationCheckbox">Email a notification after alignment is done.</label></td></tr>
 	</table>
 </form>
