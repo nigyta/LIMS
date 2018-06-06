@@ -112,9 +112,9 @@ END
 		my @target = $target->fetchrow_array();
 
 		my $inAssemblySequenceId;
-		my $assemblySequenceLength;
-		my $assemblySequenceName;
-		my $assemblySequenceId;
+		my $sequenceLength;
+		my $sequenceName;
+		my $sequenceIdOfAssemblySeq;
 		my $updateAssemblyToRunning=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 		if($replace) #delete existing information
 		{
@@ -140,12 +140,12 @@ END
 					$getSequences->execute($assemblySeqMinLength,$getClones[1]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
-						$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
-						$assemblySequenceName->{$getSequences[0]} = $getSequences[2];
+						$sequenceLength->{$getSequences[0]} = $getSequences[5];
+						$sequenceName->{$getSequences[0]} = $getSequences[2];
 						my $insertAssemblySeq=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblySeq', ?, ?, 0, ?, ?, 1, ?, ?, NOW())");
 						$insertAssemblySeq->execute($getSequences[2],$assemblyId,$getSequences[0],$getSequences[5],"1,$getSequences[5]",$userName);
 						my $assemblySeqId = $dbh->{mysql_insertid};
-						$assemblySequenceId->{$assemblySeqId} = $getSequences[0];
+						$sequenceIdOfAssemblySeq->{$assemblySeqId} = $getSequences[0];
 						if (@assemblySeqList)
 						{
 							push @assemblySeqList,"-($assemblySeqId)";
@@ -167,12 +167,12 @@ END
 				$getSequences->execute($assemblySeqMinLength,$assembly[4]);
 				while(my @getSequences = $getSequences->fetchrow_array())
 				{
-					$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
-					$assemblySequenceName->{$getSequences[0]} = $getSequences[2];
+					$sequenceLength->{$getSequences[0]} = $getSequences[5];
+					$sequenceName->{$getSequences[0]} = $getSequences[2];
 					my $insertAssemblySeq=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblySeq', ?, ?, 0, ?, ?, 1, ?, ?, NOW())");
 					$insertAssemblySeq->execute($getSequences[2],$assemblyId,$getSequences[0],$getSequences[5],"1,$getSequences[5]",$userName);
 					my $assemblySeqId = $dbh->{mysql_insertid};
-					$assemblySequenceId->{$assemblySeqId} = $getSequences[0];
+					$sequenceIdOfAssemblySeq->{$assemblySeqId} = $getSequences[0];
 					$assemblyCtgNumber++;
 					my $insertAssemblyCtg=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblyCtg', ?, ?, 0, 0, 0, 0, ?, ?, NOW())");
 					$insertAssemblyCtg->execute($assemblyCtgNumber,$assemblyId,"($assemblySeqId)",$userName);
@@ -191,9 +191,9 @@ END
 				my $assemblyCtgOfSeq = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND MATCH (note) AGAINST (?)");
 				$assemblyCtgOfSeq->execute($assemblySeqs[0]);
 				my @assemblyCtgOfSeq = $assemblyCtgOfSeq->fetchrow_array();
-				$assemblySequenceLength->{$assemblySeqs[5]} = $assemblySeqs[6];
-				$assemblySequenceName->{$assemblySeqs[5]} = $assemblySeqs[2];
-				$assemblySequenceId->{$assemblySeqs[0]} = $assemblySeqs[5];
+				$sequenceLength->{$assemblySeqs[5]} = $assemblySeqs[6];
+				$sequenceName->{$assemblySeqs[5]} = $assemblySeqs[2];
+				$sequenceIdOfAssemblySeq->{$assemblySeqs[0]} = $assemblySeqs[5];
 				$cloneInAssemblyCtg->{$assemblySeqs[2]} = $assemblyCtgOfSeq[0];
 				$assemblyCtgNumber = $assemblyCtgOfSeq[2] if($assemblyCtgOfSeq[2] > $assemblyCtgNumber);
 			}
@@ -207,13 +207,13 @@ END
 					$getSequences->execute($assemblySeqMinLength,$getClones[1]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
-						next if (exists $assemblySequenceLength->{$getSequences[0]}); #skip if seq has been assembled
-						$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
-						$assemblySequenceName->{$getSequences[0]} = $getSequences[2];
+						next if (exists $sequenceLength->{$getSequences[0]}); #skip if seq has been assembled
+						$sequenceLength->{$getSequences[0]} = $getSequences[5];
+						$sequenceName->{$getSequences[0]} = $getSequences[2];
 						my $insertAssemblySeq=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblySeq', ?, ?, 0, ?, ?, 1, ?, ?, NOW())");
 						$insertAssemblySeq->execute($getSequences[2],$assemblyId,$getSequences[0],$getSequences[5],"1,$getSequences[5]",$userName);
 						my $assemblySeqId = $dbh->{mysql_insertid};
-						$assemblySequenceId->{$assemblySeqId} = $getSequences[0];
+						$sequenceIdOfAssemblySeq->{$assemblySeqId} = $getSequences[0];
 						if(exists $cloneInAssemblyCtg->{$getSequences[2]})
 						{
 							my $assemblyCtg=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
@@ -257,14 +257,14 @@ END
 				$getSequences->execute($assemblySeqMinLength,$assembly[4]);
 				while(my @getSequences = $getSequences->fetchrow_array())
 				{
-					next if (exists $assemblySequenceLength->{$getSequences[0]}); #skip if seq has been assembled
+					next if (exists $sequenceLength->{$getSequences[0]}); #skip if seq has been assembled
 					$assemblyCtgNumber++;
-					$assemblySequenceLength->{$getSequences[0]} = $getSequences[5];
-					$assemblySequenceName->{$getSequences[0]} = $getSequences[2];
+					$sequenceLength->{$getSequences[0]} = $getSequences[5];
+					$sequenceName->{$getSequences[0]} = $getSequences[2];
 					my $insertAssemblySeq=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblySeq', ?, ?, 0, ?, ?, 1, ?, ?, NOW())");
 					$insertAssemblySeq->execute($getSequences[2],$assemblyId,$getSequences[0],$getSequences[5],"1,$getSequences[5]",$userName);
 					my $assemblySeqId = $dbh->{mysql_insertid};
-					$assemblySequenceId->{$assemblySeqId} = $getSequences[0];
+					$sequenceIdOfAssemblySeq->{$assemblySeqId} = $getSequences[0];
 					my $insertAssemblyCtg=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblyCtg', ?, ?, 0, 0, 0, 0, ?, ?, NOW())");
 					$insertAssemblyCtg->execute($assemblyCtgNumber,$assemblyId,"($assemblySeqId)",$userName);
 				}
@@ -501,17 +501,17 @@ END
 						my $startFound = 0;
 						my $endFound = 0;
 						my $coveredLength = 0;
-						if($assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i-1]}} <= $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i]}})
+						if($sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]}} <= $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i]}})
 						{
 							my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? ORDER BY id");
-							$getAlignment->execute($assemblySequenceId->{$seqInCtg[$i-1]},$assemblySequenceId->{$seqInCtg[$i]});
+							$getAlignment->execute($sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]},$sequenceIdOfAssemblySeq->{$seqInCtg[$i]});
 							while (my @getAlignment = $getAlignment->fetchrow_array())
 							{
 								$startFound = 1 if ($getAlignment[8] == 1);
-								$endFound = 1 if ($getAlignment[9] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i-1]}});
+								$endFound = 1 if ($getAlignment[9] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]}});
 								$coveredLength += $getAlignment[9] - $getAlignment[8] + 1;
 							}
-							if ($startFound > 0 && $endFound > 0 && $coveredLength / $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i-1]}} >= 0.99)
+							if ($startFound > 0 && $endFound > 0 && $coveredLength / $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]}} >= 0.99)
 							{
 								$assemblyMultiCtgList[8] =~ s/\($seqInCtg[$i-1]\)/-($seqInCtg[$i-1])/g;
 								my $updateAssemblyCtgNote=$dbh->do("UPDATE matrix SET note = '$assemblyMultiCtgList[8]' WHERE id = $assemblyMultiCtgList[0]");
@@ -522,14 +522,14 @@ END
 						else
 						{
 							my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? ORDER BY id");
-							$getAlignment->execute($assemblySequenceId->{$seqInCtg[$i]},$assemblySequenceId->{$seqInCtg[$i-1]});
+							$getAlignment->execute($sequenceIdOfAssemblySeq->{$seqInCtg[$i]},$sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]});
 							while (my @getAlignment = $getAlignment->fetchrow_array())
 							{
 								$startFound = 1 if ($getAlignment[8] == 1);
-								$endFound = 1 if ($getAlignment[9] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i]}});
+								$endFound = 1 if ($getAlignment[9] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i]}});
 								$coveredLength += $getAlignment[9] - $getAlignment[8] + 1;
 							}
-							if ($startFound > 0 && $endFound > 0 && $coveredLength / $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i]}} >= 0.99)
+							if ($startFound > 0 && $endFound > 0 && $coveredLength / $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i]}} >= 0.99)
 							{
 								$assemblyMultiCtgList[8] =~ s/\($seqInCtg[$i]\)/-($seqInCtg[$i])/g;
 								my $updateAssemblyCtgNote=$dbh->do("UPDATE matrix SET note = '$assemblyMultiCtgList[8]' WHERE id = $assemblyMultiCtgList[0]");
@@ -556,7 +556,7 @@ END
 					for (my $i = 1; $i < $totalSeqInCtg - 1; $i++)
 					{
 						my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? ORDER BY id");
-						$getAlignment->execute($assemblySequenceId->{$seqInCtg[$i-1]},$assemblySequenceId->{$seqInCtg[$i+1]});
+						$getAlignment->execute($sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]},$sequenceIdOfAssemblySeq->{$seqInCtg[$i+1]});
 						if ($getAlignment->rows > 0)
 						{
 							my $goodEndFound = 0;
@@ -564,11 +564,11 @@ END
 							{
 								if($getAlignment[10] < $getAlignment[11])
 								{
-									$goodEndFound = 1 if ($getAlignment[8] == 1 || $getAlignment[9] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i-1]}} || $getAlignment[10] == 1 || $getAlignment[11] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i+1]}});
+									$goodEndFound = 1 if ($getAlignment[8] == 1 || $getAlignment[9] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]}} || $getAlignment[10] == 1 || $getAlignment[11] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i+1]}});
 								}
 								else
 								{
-									$goodEndFound = 1 if ($getAlignment[8] == 1 || $getAlignment[9] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i-1]}} || $getAlignment[10] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i+1]}} || $getAlignment[11] == 1);
+									$goodEndFound = 1 if ($getAlignment[8] == 1 || $getAlignment[9] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]}} || $getAlignment[10] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i+1]}} || $getAlignment[11] == 1);
 								}
 							}
 							if($goodEndFound)
@@ -577,23 +577,23 @@ END
 								my $endFound = 0;
 								my $coveredLength = 0;
 								my $getAlignmentPre = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? ORDER BY id");
-								$getAlignmentPre->execute($assemblySequenceId->{$seqInCtg[$i]},$assemblySequenceId->{$seqInCtg[$i-1]});
+								$getAlignmentPre->execute($sequenceIdOfAssemblySeq->{$seqInCtg[$i]},$sequenceIdOfAssemblySeq->{$seqInCtg[$i-1]});
 								while (my @getAlignmentPre = $getAlignmentPre->fetchrow_array())
 								{
 									$startFound = 1 if ($getAlignmentPre[8] == 1);
-									$endFound = 1 if ($getAlignmentPre[9] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i]}});
+									$endFound = 1 if ($getAlignmentPre[9] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i]}});
 									$coveredLength += $getAlignmentPre[9] - $getAlignmentPre[8] + 1;
 								}
 								my $getAlignmentNext = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? ORDER BY id");
-								$getAlignmentNext->execute($assemblySequenceId->{$seqInCtg[$i]},$assemblySequenceId->{$seqInCtg[$i+1]});
+								$getAlignmentNext->execute($sequenceIdOfAssemblySeq->{$seqInCtg[$i]},$sequenceIdOfAssemblySeq->{$seqInCtg[$i+1]});
 								while (my @getAlignmentNext = $getAlignmentNext->fetchrow_array())
 								{
 									$startFound = 1 if ($getAlignmentNext[8] == 1);
-									$endFound = 1 if ($getAlignmentNext[9] == $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i]}});
+									$endFound = 1 if ($getAlignmentNext[9] == $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i]}});
 									$coveredLength += $getAlignmentNext[9] - $getAlignmentNext[8] + 1;
 								}
 
-								if ($startFound > 0 && $endFound > 0 && $coveredLength / $assemblySequenceLength->{$assemblySequenceId->{$seqInCtg[$i]}} > 1)
+								if ($startFound > 0 && $endFound > 0 && $coveredLength / $sequenceLength->{$sequenceIdOfAssemblySeq->{$seqInCtg[$i]}} > 1)
 								{
 									$assemblyMultiCtgList[8] =~ s/\($seqInCtg[$i]\)/-($seqInCtg[$i])/g;
 									my $updateAssemblyCtgNote=$dbh->do("UPDATE matrix SET note = '$assemblyMultiCtgList[8]' WHERE id = $assemblyMultiCtgList[0]");
@@ -677,30 +677,13 @@ END
 		if($refGenomeId)
 		{
 			my $updateAssemblyGenomeId=$dbh->do("UPDATE matrix SET y = $refGenomeId WHERE id = $assemblyId");
-
-			my $hasAlignmentSequenceId;
 			my $sequenceInRefGenome;
-			open (GENOME,">$commoncfg->{TMPDIR}/$refGenomeId.$$.genome") or die "can't open file: $commoncfg->{TMPDIR}/$refGenomeId.$$.genome";
-			my $getGenome = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
-			$getGenome->execute($refGenomeId);
-			while(my @getGenome = $getGenome->fetchrow_array())
+			my $getGenomeSequence = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
+			$getGenomeSequence->execute($refGenomeId);
+			while(my @getGenomeSequence = $getGenomeSequence->fetchrow_array())
 			{
-				$sequenceInRefGenome->{$getGenome[0]} = $getGenome[6];
-				my $sequenceDetails = decode_json $getGenome[8];
-				$sequenceDetails->{'id'} = '' unless (exists $sequenceDetails->{'id'});
-				$sequenceDetails->{'description'} = '' unless (exists $sequenceDetails->{'description'});
-				$sequenceDetails->{'sequence'} = '' unless (exists $sequenceDetails->{'sequence'});
-				$sequenceDetails->{'sequence'} =~ tr/a-zA-Z/N/c; #replace nonword characters.;
-				$sequenceDetails->{'gapList'} = '' unless (exists $sequenceDetails->{'gapList'});
-				print GENOME ">$getGenome[0]\n$sequenceDetails->{'sequence'}\n";
-				my $alignmentChecker = $dbh->prepare("SELECT query FROM alignment WHERE subject = ? GROUP BY query");
-				$alignmentChecker->execute($getGenome[0]);
-				while(my @alignmentChecker = $alignmentChecker->fetchrow_array())
-				{
-					$hasAlignmentSequenceId->{$alignmentChecker[0]} = 1;
-				}
+				$sequenceInRefGenome->{$getGenomeSequence[0]} = $getGenomeSequence[6];
 			}
-			close(GENOME);
 			
 			my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
 			#assign ctg to genome chr
@@ -717,14 +700,14 @@ END
 					/^-/ and next;
 					$_ =~ s/[^a-zA-Z0-9]//g;
 					my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
-					$getAlignment->execute($assemblySequenceId->{$_});
+					$getAlignment->execute($sequenceIdOfAssemblySeq->{$_});
 					while (my @getAlignment = $getAlignment->fetchrow_array())
 					{
 						next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
-						next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$assemblySequenceLength->{$assemblySequenceId->{$_}} >= $alignmentBlockPercent);
+						next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} >= $alignmentBlockPercent);
 						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
 						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
-						my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength : $getAlignment[11] - $assemblySequenceLength->{$assemblySequenceId->{$_}} + $getAlignment[9] - $ctgAllSeqLength;
+						my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength : $getAlignment[11] - $sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} + $getAlignment[9] - $ctgAllSeqLength;
 						if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
 						{
 							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
@@ -734,7 +717,11 @@ END
 							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
 						}
 					}
-					$ctgAllSeqLength += $assemblySequenceLength->{$assemblySequenceId->{$_}};
+					my $assemblySeq=$dbh->prepare("SELECT * FROM matrix WHERE id = ?");
+					$assemblySeq->execute($_);
+					my @assemblySeq = $assemblySeq->fetchrow_array();
+					my ($assemblySeqStart,$assemblySeqEnd) = split ",",$assemblySeq[8];
+					$ctgAllSeqLength += $assemblySeqEnd - $assemblySeqStart + 1;
 				}
 				my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
 				my $assignedChr = ($assemblyAllCtgList[4]) ? $assemblyAllCtgList[4] : (@assignedChr) ? shift @assignedChr : 0;
@@ -1694,6 +1681,7 @@ END
 					}
 				}
 			}
+
 			if($renumber)
 			{
 				if($assemblyAllCtgList[4] > 0)
