@@ -41,6 +41,7 @@ my $replace = param ('replace') || '0';
 my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
 my $refGenomeId = param ('refGenomeId') || '0';
 my $assignChr = param ('assignChr') || '0';
+my $reposition = param ('reposition') || '0';
 my $alignmentBlockSize = param ('alignmentBlockSize') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP"); #1 kb
 my $alignmentBlockPercent = param ('alignmentBlockPercent') || '25'; #25%
 my $orientContigs = param ('orientContigs') || '0';
@@ -701,57 +702,61 @@ END
 			}
 			close(GENOME);
 			
-			if($assignChr)
+			my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
+			#assign ctg to genome chr
+			my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = ?");
+			$assemblyAllCtgList->execute($assemblyId);
+			while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
 			{
-				my $updateAssemblyToAssignChr=$dbh->do("UPDATE matrix SET barcode = '-5' WHERE id = $assemblyId");
-				#assign ctg to genome chr
-				my $assemblyAllCtgList=$dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND x = 0 AND o = ?");
-				$assemblyAllCtgList->execute($assemblyId);
-				while (my @assemblyAllCtgList = $assemblyAllCtgList->fetchrow_array())
+				my $chrNumber;
+				my $chrPosition;
+				my $ctgAllSeqLength = 0;
+				for (split ",", $assemblyAllCtgList[8])
 				{
-					my $chrNumber;
-					my $chrPosition;
-					my $ctgAllSeqLength = 0;
-					for (split ",", $assemblyAllCtgList[8])
+					next unless ($_);
+					/^-/ and next;
+					$_ =~ s/[^a-zA-Z0-9]//g;
+					my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
+					$getAlignment->execute($assemblySequenceId->{$_});
+					while (my @getAlignment = $getAlignment->fetchrow_array())
 					{
-						next unless ($_);
-						/^-/ and next;
-						$_ =~ s/[^a-zA-Z0-9]//g;
-						my $getAlignment = $dbh->prepare("SELECT * FROM alignment WHERE hidden = 0 AND query = ? ORDER BY alignment.id");
-						$getAlignment->execute($assemblySequenceId->{$_});
-						while (my @getAlignment = $getAlignment->fetchrow_array())
+						next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
+						next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$assemblySequenceLength->{$assemblySequenceId->{$_}} >= $alignmentBlockPercent);
+						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
+						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
+						my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength : $getAlignment[11] - $assemblySequenceLength->{$assemblySequenceId->{$_}} + $getAlignment[9] - $ctgAllSeqLength;
+						if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
 						{
-							next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
-							next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$assemblySequenceLength->{$assemblySequenceId->{$_}} >= $alignmentBlockPercent);
-							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
-							$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
-							my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $ctgAllSeqLength : $getAlignment[11] - $assemblySequenceLength->{$assemblySequenceId->{$_}} + $getAlignment[9] - $ctgAllSeqLength;
-							if(exists $chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}})
-							{
-								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
-							}
-							else
-							{
-								$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
-							}
+							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} .= ",$estimatedPosition";
 						}
-						$ctgAllSeqLength += $assemblySequenceLength->{$assemblySequenceId->{$_}};
+						else
+						{
+							$chrPosition->{$sequenceInRefGenome->{$getAlignment[3]}} = $estimatedPosition;
+						}
 					}
-					my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
-					my $assignedChr = (@assignedChr) ? shift @assignedChr : 0;
-					my $assignedPosition = 0;
+					$ctgAllSeqLength += $assemblySequenceLength->{$assemblySequenceId->{$_}};
+				}
+				my @assignedChr = sort {$chrNumber->{$b} <=> $chrNumber->{$a}} keys %$chrNumber;
+				my $assignedChr = ($assemblyAllCtgList[4]) ? $assemblyAllCtgList[4] : (@assignedChr) ? shift @assignedChr : 0;
+				my $assignedPosition = 0;
 					
-					if($assignedChr)
-					{
-						my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
-						sort {$a <=> $b} @assignedPositionCandidates;
-						my $estimatedMedian = int ($#assignedPositionCandidates/2);
-						$assignedPosition = $assignedPositionCandidates[$estimatedMedian];
-					}
+				if($assignedChr)
+				{
+					my @assignedPositionCandidates = split ",",$chrPosition->{$assignedChr};
+					sort {$a <=> $b} @assignedPositionCandidates;
+					my $estimatedMedian = int ($#assignedPositionCandidates/2);
+					$assignedPosition = $assignedPositionCandidates[$estimatedMedian];
+				}
+				if($assignChr && $assemblyAllCtgList[4] == 0) #assign chrNumber for unplaced contigs
+				{
 					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
 				}
-				my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
+				if ($reposition && $assemblyAllCtgList[4]) #relocate position
+				{
+					my $updateAssemblyCtg=$dbh->do("UPDATE matrix SET x = $assignedChr, z = $assignedPosition WHERE id = $assemblyAllCtgList[0]");
+				}
 			}
+			my $updateAssemblyToRunningStatus=$dbh->do("UPDATE matrix SET barcode = '-1' WHERE id = $assemblyId");
 
 			if($orientContigs)
 			{

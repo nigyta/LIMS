@@ -149,6 +149,7 @@ __DATA__
 			<label for="newAssemblyAlignmentBlockSize">Alignment Block Size</label> <input name="alignmentBlockSize" id="newAssemblyAlignmentBlockSize" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" />(bp)<br>
 			<label for="newAssemblyAlignmentBlockPercent">Alignment Percent</label> <input name="alignmentBlockPercent" id="newAssemblyAlignmentBlockPercent" size="2" type="text" maxlength="3" VALUE="25" />(%)<br>
 			<input type="checkbox" id="newAssemblyAssignChrCheckbox" name="assignChr" value="1" checked="checked"> <label for="newAssemblyAssignChrCheckbox">Assign chromosome number for unplaced contigs</label><br>
+			<input type="checkbox" id="newAssemblyRepositionCheckbox" name="reposition" value="1"> <label for="newAssemblyRepositionCheckbox">Re-estimate position for anchored contigs</label><br>
 			<input type="checkbox" id="newAssemblyOrientContigsCheckbox" name="orientContigs" value="1" checked="checked"> <label for="newAssemblyOrientContigsCheckbox">Orient contigs based-on reference genome</label>
 	</td>
 	</tr>
