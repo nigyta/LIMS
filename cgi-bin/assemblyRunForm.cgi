@@ -147,7 +147,7 @@ __DATA__
 	<tr><td style='text-align:right'><label for="newAssemblyGenome"><b>Reference Genome</b></label></td>
 	<td><select class='ui-widget-content ui-corner-all' name="refGenomeId" id="newAssemblyGenome">$refGenomeId</select><br>
 			<label for="newAssemblyAlignmentBlockSize">Alignment Block Size</label> <input name="alignmentBlockSize" id="newAssemblyAlignmentBlockSize" size="4" type="text" maxlength="6" VALUE="$SEQTOGNMMINOVERLAP" />(bp)<br>
-			<label for="newAssemblyAlignmentBlockPercent">Alignment Coverage Percent</label> <input name="alignmentBlockPercent" id="newAssemblyAlignmentBlockPercent" size="2" type="text" maxlength="3" VALUE="25" />(%)<br>
+			<label for="newAssemblyAlignmentCoverage">Alignment Coverage Percent</label> <input name="alignmentCoverage" id="newAssemblyAlignmentCoverage" size="2" type="text" maxlength="3" VALUE="25" />(%)<br>
 			<input type="checkbox" id="newAssemblyAssignChrCheckbox" name="assignChr" value="1" checked="checked"> <label for="newAssemblyAssignChrCheckbox">Assign chromosome number for unplaced contigs</label><br>
 			<input type="checkbox" id="newAssemblyRepositionCheckbox" name="reposition" value="1"> <label for="newAssemblyRepositionCheckbox">Re-estimate position for anchored contigs</label><br>
 			<input type="checkbox" id="newAssemblyOrientContigsCheckbox" name="orientContigs" value="1" checked="checked"> <label for="newAssemblyOrientContigsCheckbox">Orient contigs based-on reference genome</label>
@@ -222,7 +222,7 @@ $( "#newAssemblySeqMinLength" ).spinner({
 	}
 });
 $( "#newAssemblyAlignmentBlockSize" ).spinner({ min: 0, max: 30000, step: 1000});
-$( "#newAssemblyAlignmentBlockPercent" ).spinner({ min: 10, max: 100, step: 5});
+$( "#newAssemblyAlignmentCoverage" ).spinner({ min: 10, max: 100, step: 5});
 $( "#newAssemblyEndToEnd" ).buttonset();
 $( "#newAssemblyEndToEndMinOverlap" ).spinner({
 	min: 500,

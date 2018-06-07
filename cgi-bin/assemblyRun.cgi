@@ -43,7 +43,7 @@ my $refGenomeId = param ('refGenomeId') || '0';
 my $assignChr = param ('assignChr') || '0';
 my $reposition = param ('reposition') || '0';
 my $alignmentBlockSize = param ('alignmentBlockSize') || $userConfig->getFieldValueWithUserIdAndFieldName($userId,"SEQTOGNMMINOVERLAP"); #1 kb
-my $alignmentBlockPercent = param ('alignmentBlockPercent') || '25'; #25%
+my $alignmentCoverage = param ('alignmentCoverage') || '25'; #25%
 my $orientContigs = param ('orientContigs') || '0';
 my $assemblySeqMinLength = param ('assemblySeqMinLength') || '0';
 my $endToEnd = param ('endToEnd') || '0';
@@ -1498,7 +1498,7 @@ END
 					while (my @getAlignment = $getAlignment->fetchrow_array())
 					{
 						next unless (exists $sequenceInRefGenome->{$getAlignment[3]}); #check if subject is in refGenome
-						next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} >= $alignmentBlockPercent);
+						next unless ($getAlignment[5] >= $alignmentBlockSize || $getAlignment[5]*100/$sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} >= $alignmentCoverage);
 						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} = 0 unless (exists $chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}});
 						$chrNumber->{$sequenceInRefGenome->{$getAlignment[3]}} += $getAlignment[5];
 						my $estimatedPosition = ($getAlignment[10] < $getAlignment[11]) ? $getAlignment[10] - $getAlignment[8] - $assemblyCtgLength : $getAlignment[11] - $sequenceLength->{$sequenceIdOfAssemblySeq->{$_}} + $getAlignment[9] - $assemblyCtgLength;
@@ -1807,7 +1807,7 @@ END
 		$assemblyDetails->{'log'} .= "==== ". localtime() . " ====\n"
 			."New Assembly: $replace;\n"
 			."Physical Reference: $fpcOrAgpId;\n"
-			."Reference Genome: $refGenomeId; Assign Chr: $assignChr; Orient Contigs: $orientContigs;\n"
+			."Reference Genome: $refGenomeId; alignmentBlockSize $alignmentBlockSize; alignmentCoverage $alignmentCoverage; Assign Chr: $assignChr; Orient Contigs: $orientContigs;\n"
 			."End-to-End: $endToEnd, Identity:$identityEndToEnd, Overlap:$minOverlapEndToEnd;\n"
 			."Filter Redundancy: Seq - $redundancyFilterSeq ($redundancySeq Hidden), Overlap - $redundancyFilterOverlap;\n"
 			."Auto-Orient Seqs: $orientSeqs;\n"
