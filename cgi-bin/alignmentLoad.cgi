@@ -68,7 +68,7 @@ END
 		if($queryGenome[1] eq 'library')
 		{
 			my $getClones = $dbh->prepare("SELECT * FROM clones WHERE sequenced > 0 AND libraryId = ?");
-			$getClones->execute($assembly[4]);
+			$getClones->execute($queryGenomeId);
 			while(my @getClones = $getClones->fetchrow_array())
 			{
 				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ?");
@@ -82,7 +82,7 @@ END
 		if($queryGenome[1] eq 'genome')
 		{
 			my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
-			$getSequences->execute($assembly[4]);
+			$getSequences->execute($queryGenomeId);
 			while(my @getSequences = $getSequences->fetchrow_array())
 			{
 				$queryId->{$getSequences[2]} = $getSequences[0];
@@ -102,7 +102,7 @@ END
 			if($subjectGenome[1] eq 'library')
 			{
 				my $getClones = $dbh->prepare("SELECT * FROM clones WHERE sequenced > 0 AND libraryId = ?");
-				$getClones->execute($assembly[4]);
+				$getClones->execute($subjectGenomeId);
 				while(my @getClones = $getClones->fetchrow_array())
 				{
 					my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o < 50 AND name LIKE ?");
@@ -116,7 +116,7 @@ END
 			if($subjectGenome[1] eq 'genome')
 			{
 				my $getSequences = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'sequence' AND o = 99 AND x = ?");
-				$getSequences->execute($assembly[4]);
+				$getSequences->execute($subjectGenomeId);
 				while(my @getSequences = $getSequences->fetchrow_array())
 				{
 					$subjectId->{$getSequences[2]} = $getSequences[0];
@@ -133,8 +133,36 @@ END
 			{
 				$hit[0] = $queryId->{$hit[0]};
 				$hit[1] = $subjectId->{$hit[1]};
-				my $insertAlignment=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-				$insertAlignment->execute(@hit);
+				my $insertAlignmentA=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+				$insertAlignmentA->execute(@hit);
+
+				#switch query and subject
+				if($hit[8] < $hit[9])
+				{
+					my $exchange = $hit[8];
+					$hit[8] = $hit[6];
+					$hit[6] = $exchange;
+					$exchange = $hit[9];
+					$hit[9] = $hit[7];
+					$hit[7] = $exchange;
+					$exchange = $hit[1];
+					$hit[1] = $hit[0];
+					$hit[0] = $exchange;
+				}
+				else
+				{
+					my $exchange = $hit[8];
+					$hit[8] = $hit[7];
+					$hit[7] = $exchange;
+					$exchange = $hit[9];
+					$hit[9] = $hit[6];
+					$hit[6] = $exchange;
+					$exchange = $hit[1];
+					$hit[1] = $hit[0];
+					$hit[0] = $exchange;
+				}
+				my $insertAlignmentB=$dbh->prepare("INSERT INTO alignment VALUES ('', '$alignEngine', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+				$insertAlignmentB->execute(@hit);
 			}
 			else
 			{
@@ -143,7 +171,6 @@ END
 		}
 		close(ALN);
 		unlink ($alignmentInfile);
-		my $updateAssemblyToWork=$dbh->do("UPDATE matrix SET barcode = '1' WHERE id = $assemblyId");
 	}
 	else{
 		die "couldn't fork: $!\n";
