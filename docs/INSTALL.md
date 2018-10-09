@@ -28,7 +28,7 @@ $ mv /var/www/html/lims/index.html.tmpl /var/www/html/lims/index.html
 ```
 $ mv /var/www/cgi-bin/lims/main.conf.tmpl /var/www/cgi-bin/lims/main.conf
 ```
-8) Install the following perl modules for GPM: 
+8) Install the following perl modules for GPM as needed: 
 ```
 $ cpan SVG
 $ cpan CGI
