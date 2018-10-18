@@ -91,7 +91,7 @@ __DATA__
 	<tr><td style='text-align:right'><label for="editAssemblyCtgNumber"><b>Contig</b></label></td>
 		<td colspan='2'><select class='ui-widget-content ui-corner-all' name="assemblyCtgNumber" id="editAssemblyCtgNumber"><option value='$assemblyCtg' selected>Ctg$assemblyCtg</option><optgroup label='Rename this contig as'>$assemblyNameCtg</optgroup></select></td>
 	</tr>
-	<tr><td style='text-align:right'><label for="editAssemblyChr"><b>Chromosome</b></label></td>
+	<tr><td style='text-align:right'><label for="editAssemblyChr"><b>Chromosome</b></label><br><sup class='ui-state-disabled'>98 for Chloroplast</sup><br><sup class='ui-state-disabled'>99 for Mitochondrion</sup><br><sup class='ui-state-disabled'>100 for Contamination</sup></td>
 		<td><input class='ui-widget-content ui-corner-all' name="assemblyChr" id="editAssemblyChr" size="4" type="text" maxlength="3" value="$assemblyChr" /></td>
 		<td class='ui-state-highlight ui-corner-all' rowspan='2'>
 		<input type='checkbox' id='appendCtg$$' name='appendCtg' value='1'><label for="appendCtg$$"><b>Append <input class='ui-widget-content ui-corner-all' name="appendCtgNumber" id="editAssemblyAppendCtgNumber" size="5" type="text" maxlength="10"> to Ctg$assemblyCtg</b></label><br>
