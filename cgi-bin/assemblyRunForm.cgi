@@ -134,6 +134,13 @@ __DATA__
 			<input type="radio" id="newAssemblyReplaceRadio1" name="replace" value="0" checked="checked"><label for="newAssemblyReplaceRadio1">No</label>
 		</div>
 	</td></tr>
+	<tr><td style='text-align:left'><label for="newAssemblyWithAllSequences"><b>With All Sequences available?</b></label></td>
+		<td>
+		<div id="newAssemblyWithAllSequences">
+			<input type="radio" id="newAssemblyWithAllSequencesRadio2" name="withAllSequences" value="1" checked="checked"><label for="newAssemblyWithAllSequencesRadio2">Yes</label>
+			<input type="radio" id="newAssemblyWithAllSequencesRadio1" name="withAllSequences" value="0"><label for="newAssemblyWithAllSequencesRadio1">No</label>
+		</div>
+	</td></tr>
 	<tr><td style='text-align:left'><label for="newAssemblySeqMinLength"><b>AssemblySeq Minimum Length</b></label></td>
 		<td><input name="assemblySeqMinLength" id="newAssemblySeqMinLength" size="4" type="text" maxlength="6" VALUE="0" />(bp)</td>
 	</tr>
@@ -205,6 +212,7 @@ __DATA__
 $('#dialog').dialog("option", "title", "Run Assembly ($assemblyName)");
 $( "#dialog" ).dialog( "option", "buttons", [{ text: "Run Assembly", click: function() { submitForm('newAssembly'); } }, { text: "Cancel", click: function() {closeDialog(); } } ] );
 $( "#newAssemblyReplace" ).buttonset();
+$( "#newAssemblyWithAllSequences" ).buttonset();
 $( "#newAssemblySeqMinLength" ).spinner({
 	min: 0,
 	max: 10000,

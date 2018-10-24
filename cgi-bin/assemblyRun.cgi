@@ -38,6 +38,7 @@ my $numThreads = 16;
 
 my $assemblyId = param ('assemblyId') || '';
 my $replace = param ('replace') || '0';
+my $withAllSequences = param ('withAllSequences') || '0';
 my $fpcOrAgpId = param ('fpcOrAgpId') || '0';
 my $refGenomeId = param ('refGenomeId') || '0';
 my $assignChr = param ('assignChr') || '0';
@@ -207,7 +208,7 @@ END
 					$getSequences->execute($assemblySeqMinLength,$getClones[1]);
 					while(my @getSequences = $getSequences->fetchrow_array())
 					{
-						next if (exists $sequenceLength->{$getSequences[0]}); #skip if seq has been assembled
+						next if (exists $sequenceLength->{$getSequences[0]} || $withAllSequences < 1); #skip if seq has been assembled or not needed.
 						$sequenceLength->{$getSequences[0]} = $getSequences[5];
 						$sequenceName->{$getSequences[0]} = $getSequences[2];
 						my $insertAssemblySeq=$dbh->prepare("INSERT INTO matrix VALUES ('', 'assemblySeq', ?, ?, 0, ?, ?, 1, ?, ?, NOW())");
@@ -257,7 +258,7 @@ END
 				$getSequences->execute($assemblySeqMinLength,$assembly[4]);
 				while(my @getSequences = $getSequences->fetchrow_array())
 				{
-					next if (exists $sequenceLength->{$getSequences[0]}); #skip if seq has been assembled
+					next if (exists $sequenceLength->{$getSequences[0]} || $withAllSequences < 1); #skip if seq has been assembled or not needed.
 					$assemblyCtgNumber++;
 					$sequenceLength->{$getSequences[0]} = $getSequences[5];
 					$sequenceName->{$getSequences[0]} = $getSequences[2];

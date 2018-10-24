@@ -267,9 +267,24 @@ END
 			}
 			elsif($item[1] eq 'assembly')
 			{
-				if ($option eq 'chrZeroOnly')
+				if ($option eq 'unplaced')
 				{
 					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $itemId AND x = 0");
+					$assemblyCtg->execute();
+					while (my @assemblyCtg=$assemblyCtg->fetchrow_array())
+					{
+						foreach (split ",", $assemblyCtg[8])
+						{
+							$_ =~ s/[^a-zA-Z0-9]//g;
+							my $deleteAssemblySeq=$dbh->do("DELETE FROM matrix WHERE id = $_");
+						}
+						my $deleteAssemblyCtg=$dbh->do("DELETE FROM matrix WHERE id = $assemblyCtg[0]");
+						my $deleteComment=$dbh->do("DELETE FROM matrix WHERE container LIKE 'comment' AND o = $assemblyCtg[0]");
+					}
+				}
+				elsif ($option eq 'contamination')
+				{
+					my $assemblyCtg = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'assemblyCtg' AND o = $itemId AND x = 100");
 					$assemblyCtg->execute();
 					while (my @assemblyCtg=$assemblyCtg->fetchrow_array())
 					{
