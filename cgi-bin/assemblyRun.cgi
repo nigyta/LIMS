@@ -1807,6 +1807,7 @@ END
 		#add log info
 		$assemblyDetails->{'log'} .= "==== ". localtime() . " ====\n"
 			."New Assembly: $replace;\n"
+			."With All Sequences: $withAllSequences;\n"
 			."Physical Reference: $fpcOrAgpId;\n"
 			."Reference Genome: $refGenomeId; alignmentBlockSize $alignmentBlockSize; alignmentCoverage $alignmentCoverage; Assign Chr: $assignChr; Orient Contigs: $orientContigs;\n"
 			."End-to-End: $endToEnd, Identity:$identityEndToEnd, Overlap:$minOverlapEndToEnd;\n"

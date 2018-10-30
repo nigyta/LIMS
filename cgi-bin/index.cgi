@@ -184,7 +184,7 @@ __DATA__
 <body id="top">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr>
-		<td width="15%"><a href="$commoncfg->{HTDOCS}"><img src="$commoncfg->{HTDOCS}/images/logo.png"/></a></td>
+		<td width="15%"><a href="$commoncfg->{HTDOCS}"><img src="pangulogo.cgi"/></a></td>
 		<td style="vertical-align: bottom;align:left;"><div id="slogan" style="float:right;padding: .7em;"><i>$slogan</i></div><h2>$siteName</h2></td>
 		<td width="200" style="vertical-align: top;align:left;" class="header">
 		<div id="login" class="ui-widget-content ui-corner-all" style="padding: .5em .5em; margin-top: .1em; margin-bottom: .1em;">
