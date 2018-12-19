@@ -378,6 +378,7 @@ if ($assemblyId && $chr)
 			my @hiddenSeqPosition;
 			my $companionAssemblySeqCol;
 			my $seqCount = 0;
+			my $alignmentCount = 0;
 			for my $currentSeq (@companionAssemblySeq)
 			{
 				my $sequenceDetails = decode_json $companionAssemblySequenceData->{$currentSeq};
@@ -592,6 +593,7 @@ if ($assemblyId && $chr)
 				while (my @alignments = $alignments->fetchrow_array())
 				{
 						next if ($alignments[5] < $alignmentLength); #skip if alignment shorter than alignmentLength
+						$alignmentCount++;
 						my $seqXOne = 0;
 						my $seqXTwo = 0;
 						if($companionAssemblySeqOrient->{$currentSeq} eq "+")
@@ -616,7 +618,7 @@ if ($assemblyId && $chr)
 						);
 						$companionAssemblyChrSeqAlignment->polygon(
 							%$points,
-							id=>'companionAln'.$alignments[0],
+							id=>'companionAln'.$alignmentCount.$alignments[0],
 							onclick => "closeDialog();openDialog('alignmentView.cgi?alignmentId=$alignments[0]')",
 							class=>'hasmenuForAlignment',
 							style=>{ stroke => 'red',
@@ -790,6 +792,8 @@ if ($assemblyId && $chr)
 		my @hiddenSeqPosition;
 		my $assemblySeqCol;
 		my $seqCount = 0;
+		my $alignmentCount = 0;
+
 		for my $currentSeq (@assemblySeq)
 		{
 			my $sequenceDetails = decode_json $assemblySequenceData->{$currentSeq};
@@ -997,12 +1001,13 @@ if ($assemblyId && $chr)
 				'align-url' => "alignmentCheckForm.cgi?assemblyId=$assemblyId&seqOne=$assemblySequenceId->{$currentSeq}",
 				'view-url' => "seqView.cgi?seqId=$assemblySequenceId->{$currentSeq}"
 			)->cdata($seqLabel) if ($assemblySeqLength->{$currentSeq} / $pixelUnit > $seqLabelLength * $textFontWidth);
-
+			
 			my $alignments = $dbh->prepare("SELECT * FROM alignment WHERE query = ? AND subject = ? AND hidden < 1");
 			$alignments->execute($assemblySequenceId->{$currentSeq},$refGenomeSequence[0]);
 			while (my @alignments = $alignments->fetchrow_array())
 			{
 					next if ($alignments[5] < $alignmentLength); #skip if alignment shorter than alignmentLength
+					$alignmentCount++;
 					my $seqXOne = 0;
 					my $seqXTwo = 0;
 					if($assemblySeqOrient->{$currentSeq} eq "+")
@@ -1027,7 +1032,7 @@ if ($assemblyId && $chr)
 					);
 					$assemblyChrSeqAlignment->polygon(
 						%$points,
-						id=>'aln'.$alignments[0],
+						id=>'aln'.$alignmentCount.$alignments[0],
 						onclick => "closeDialog();openDialog('alignmentView.cgi?alignmentId=$alignments[0]')",
 						class=>'hasmenuForAlignment',
 						style=>{ stroke => 'red',
