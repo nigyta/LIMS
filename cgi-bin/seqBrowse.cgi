@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI qw(:standard);
-use CGI::Carp qw ( fatalsToBrowser ); 
-use JSON::XS; #JSON::XS is recommended to be installed for handling JSON string of big size 
+use CGI::Carp qw ( fatalsToBrowser );
+use JSON::XS; #JSON::XS is recommended to be installed for handling JSON string of big size
 use DBI;
 use SVG;
 use lib "lib/";
@@ -192,7 +192,7 @@ if ($seqId)
 		$fpcContig->{$besSequence[2]} = "None" unless (exists $fpcContig->{$besSequence[2]});
 		$fpcCloneLeftEnd->{$besSequence[2]} = -1 unless (exists $fpcCloneLeftEnd->{$besSequence[2]});
 		$fpcCloneRightEnd->{$besSequence[2]} = -1 unless (exists $fpcCloneRightEnd->{$besSequence[2]});
-		
+
 		my $getFpcClone = $dbh->prepare("SELECT * FROM matrix WHERE container LIKE 'fpcClone' AND name LIKE ?");
 		$getFpcClone->execute($besSequence[2]);
 		while (my @getFpcClone = $getFpcClone->fetchrow_array())
@@ -284,7 +284,7 @@ if ($seqId)
 		my $besDistanceText =  commify($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone});
 		my $lable = ($fpcCloneRightEnd->{$currentClone} eq '-1') ?  $currentClone." (~$besDistanceText bp)" : $currentClone." (~$besDistanceText bp) FPC: $fpcContig->{$currentClone}($fpcCloneLeftEnd->{$currentClone}-$fpcCloneRightEnd->{$currentClone})";
 		my $lableLength = length $lable;
-		
+
     	my $textX = $margin + $barHeight + $besLeftPosition->{$currentClone} / $pixelUnit;
     	my $textY = $barY + $barHeight * (1.3 * ($goodCol + 2 ) + 2) - 2;
     	my $textEnd = $besLeftPosition->{$currentClone}  + $lableLength * $textFontWidth * $pixelUnit;
@@ -303,7 +303,7 @@ if ($seqId)
     }
 
 	my $nonFpcCloneNumber = $colCount;
-	my $nonFpcCloneToBeFlippedNumber = $toBeFlipped; 
+	my $nonFpcCloneToBeFlippedNumber = $toBeFlipped;
 
 	my $colNumber = 0;
     for(@colPostion)
@@ -368,7 +368,7 @@ if ($seqId)
 		my $besDistanceText =  commify($besRightPosition->{$currentClone} - $besLeftPosition->{$currentClone});
 		my $lable = ($fpcCloneRightEnd->{$currentClone} eq '0') ?  $currentClone." (~$besDistanceText bp)" : $currentClone." (~$besDistanceText bp) FPC: $fpcContig->{$currentClone}($fpcCloneLeftEnd->{$currentClone}-$fpcCloneRightEnd->{$currentClone})";
 		my $lableLength = length $lable;
-		
+
     	my $textX = $margin + $barHeight + $besLeftPosition->{$currentClone} / $pixelUnit;
     	my $textY = $barY + $barHeight * (1.3 * ($goodCol + 2 ) + 2) - 2;
     	my $textEnd = $besLeftPosition->{$currentClone}  + $lableLength * $textFontWidth * $pixelUnit;
@@ -422,7 +422,7 @@ if ($seqId)
 		if($subtotal > $totalLength/2 && $n50Length == 0)
 		{
 			$n50Length = $_;
-		}		
+		}
 	}
 
 	for (my $rulerNumber = 0;$rulerNumber <= $refSequence[5];$rulerNumber += $unitLength)
@@ -454,7 +454,7 @@ if ($seqId)
 			y1    => ($rulerNumber % (5*$unitLength) == 0) ? $rulerY - 5 : $rulerY - 3,
 			x2    => $margin + $rulerNumber / $pixelUnit,
 			y2    => $rulerY
-			
+
 		);
 		if($rulerNumber % (5*$unitLength) == 0)
 		{
@@ -505,7 +505,6 @@ else
 	print header(-type=>'text/html',-status=>'402 Invalid operation');
 	exit;
 }
-
 
 __DATA__
 
