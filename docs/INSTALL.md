@@ -35,6 +35,7 @@ $ cpan CGI
 $ cpan URI-Escape-XS
 $ cpan Math::Trig
 $ cpan JSON
+$ cpan JSON::XS
 ```
 The source of these modules are:
 
@@ -43,6 +44,7 @@ The source of these modules are:
 - URI-Escape-XS http://search.cpan.org/dist/URI-Escape-XS/
 - Math::Trig http://search.cpan.org/~zefram/Math-Complex-1.59/lib/Math/Trig.pm
 - JSON http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
+- JSON::XS https://metacpan.org/pod/JSON::XS
 
 9) Download the blast+(ftp://ftp.ncbi.nih.gov/blast/) then install it in /usr/biosoft/ directory and create symbol link in the /var/www/cgi-bin/lims/ document by using the command: 
 ```
