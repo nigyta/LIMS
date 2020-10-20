@@ -1,0 +1,52 @@
+version: '3.7'
+services:
+    db:
+        image: mysql:5.6
+        ports:
+            # localの13306をコンテナの3306にマッピング
+            # localから接続する場合　mysql -u root -p -h 127.0.0.1 -P 13306 marpolbase2
+            - "13306:3306"
+        volumes:
+            # DB初期化用のSQLをいれておく（ファイル名は 1_hoge.sql. 2_hoge.sql ...)
+            - ./sql/lims.sql:/docker-entrypoint-initdb.d/1_lims.sql
+            - ./docker_resources/my.cnf:/etc/mysql/conf.d/my.cnf
+            # DB永続化用ディレクトリ
+            # - ../marpolbase_data/mysql_data:/var/lib/mysql
+            # - ../marpolbase_data/db_resources:/db_resources
+
+        environment:
+            # 下記はDB初期化時に設定されると思われる
+            # あとから変更する場合は、../marpolbase_data/mysql_data の中を空にしてコンテナを再生成する必要あり
+            MYSQL_DATABASE: lims
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_USER: lims
+            MYSQL_PASSWORD: lims
+            # TZ: Asia/Tokyo
+        restart: unless-stopped
+
+    app:
+        build: .
+        image: lims
+        # command: tail -f /dev/null
+        volumes:
+            - .:/code
+            - ./cgi-bin/*:/var/www/cgi-bin/lims/cgi-bin/*
+            - ./docker_resources/main.conf.docker.tmpl:/var/www/cgi-bin/lims/main.conf 
+            - ./htdocs/css:/var/www/html/lims/css
+            - ./htdocs/images:/var/www/html/lims/images
+            - ./htdocs/js:/var/www/html/lims/js
+            - ./htdocs/data/pAGIBAC1_HindIII.txt:/var/www/html/lims/data/pAGIBAC1_HindIII.txt
+            - ./htdocs/index.html.tmpl:/var/www/html/lims/index.html
+
+            # ダウンロード用データ、gmap DBの置き場所
+            # - ../marpolbase_data/db_resources:/db_resources
+            # casfinder data
+            #  - ../marpolbase_data/casfinder/:/casfinder
+        ports:
+            - 8080:80
+        privileged: true
+        depends_on:
+            - db
+        # environment:
+        #    - TZ=Asia/Tokyo            
+        restart: unless-stopped
