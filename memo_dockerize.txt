@@ -1,0 +1,72 @@
+change sql filename
+    sql/lims.sql ---> sql/1_lims.sql
+    (for mysql entry point)
+
+
+
+---
+
+curl -LO ftp://ftp.tu-chemnitz.de//.SAN0/pub/linux/dag/redhat/el6/en/x86_64/dag/RPMS/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+rpm -Uvh rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm 
+yum install -y wget less
+yum install -y gcc.x86_64
+yum install -y perl-core 
+yum install -y perl-URI-Escape-XS
+yum install -y perl-JSON-XS
+yum install -y perl-XML-LibXML.x86_64
+yum install -y perl-DBD-MySQL.x86_64
+yum install -y perl-App-cpanminus
+yum install -7 perl-GD
+yum install -y gd-devel.x86_64
+
+
+# yum install -y mysql-community-client.x86_64
+
+rpm -Uvh http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+yum -y install mysql-community-client
+
+curl -LO https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.10.1+-x64-linux.tar.gz
+tar xvfz ncbi-blast-2.10.1+-x64-linux.tar.gz
+mkdir -p /var/www/cgi-bin/lims/blast+/bin/
+cp ncbi-blast-2.10.1+/bin/* /var/www/cgi-bin/lims/blast+/bin/
+rm -rf ncbi-blast-2.10.1+ ncbi-blast-2.10.1+-x64-linux.tar.gz
+
+
+cpanm SVG
+cpanm CGI
+cpanm URI::Escape::XS
+cpanm Math::Trig
+cpanm JSON
+cpanm JSON::XS
+cpanm GD
+cpanm GD::Text::Wrap
+cpanm Bio::Seq
+
+
+SRC=.
+WWWROOT=/var/www/
+
+mkdir -p /var/www/cgi-bin/lims
+mkdir -p /var/www/html/lims
+
+cp -r ./cgi-bin/* /var/www/cgi-bin/lims/
+
+cp -r ./htdocs/* /var/www/html/lims/
+
+chmod 775 ${WWWROOT}/cgi-bin/lims/*
+
+# mv ${WWWROOT}/html/lims/index.html.tmpl ${WWWROOT}/html/lims/index.html
+
+# mv ${WWWROOT}/cgi-bin/lims/main.conf.tmpl ${WWWROOT}/cgi-bin/lims/main.conf
+
+cp index.docker.html /var/www/html/lims/index.html
+cp main.conf.docker.tmpl /var/www/cgi-bin/lims/main.conf 
+
+
+---
+メール
+yum install postfix
+service postfix start
+
+権限
+chmod -R 777  /var/www/html/lims/data/
