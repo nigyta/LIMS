@@ -467,7 +467,7 @@ END
 					exit;
 				}
 
-				my $genomeForAsbProject = $dbh->prepare("SELECT * FROM link WHERE child = $itemId AND type LIKE 'asbProject");
+				my $genomeForAsbProject = $dbh->prepare("SELECT * FROM link WHERE child = $itemId AND type LIKE 'asbProject'");
 				$genomeForAsbProject->execute();
 				if($genomeForAsbProject->rows > 0)
 				{
